@@ -5,9 +5,13 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import org.apache.commons.io.FileUtils;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.transport.CredentialsProvider;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
-import java.util.logging.Level;
+import java.io.File;
+import java.util.Iterator;
 import java.util.logging.Logger;
 
 public class Cli {
@@ -19,8 +23,13 @@ public class Cli {
 
         this.args = args;
 
-        options.addOption("r", false, "release version");
-        options.addOption("n", false, "next snapshot version");
+        options.addOption("repo", true, "repo url");
+        options.addOption("localDirectory", true, "local source repository directory");
+        options.addOption("name", true, "github username");
+        options.addOption("password", true, "github password");
+        options.addOption("c", true, "current snapshot version");
+        options.addOption("r", true, "release version");
+        options.addOption("n", true, "next snapshot version");
         options.addOption("h", false, "help");
 
     }
@@ -31,19 +40,74 @@ public class Cli {
         CommandLine cmd = null;
         try {
             cmd = parser.parse(options, args);
+            String repo="";
+            String localDirectory="";
+            String currentVersion="";
+            String releaseVersion="";
+            String nextVersion="";
+            String name="";
+            String password="";
 
-            if (cmd.hasOption("h"))
-                help();
 
+            if (cmd.hasOption("h")) {
+                HelpFormatter f = new HelpFormatter();
+                f.printHelp("OptionsTip", options);
+            }
+
+            if (cmd.hasOption("name")) {
+                name=cmd.getOptionValue("name");
+            }
+            if (cmd.hasOption("password")) {
+                password=cmd.getOptionValue("password");
+            }
+            if (cmd.hasOption("repo")) {
+                repo=cmd.getOptionValue("repo");
+                System.out.println("repo url:"+cmd.getOptionValue("repo"));
+            }
+            if (cmd.hasOption("localDirectory")) {
+                localDirectory=cmd.getOptionValue("localDirectory");
+                System.out.println("repo url:"+cmd.getOptionValue("localDirectory"));
+            }
+
+            if (cmd.hasOption("c")) {
+                currentVersion=cmd.getOptionValue("c");
+                System.out.println("releasing to the version:"+cmd.getOptionValue("c"));
+            }
             if (cmd.hasOption("r")) {
-                System.out.println(cmd.getOptionValue("r"));
-            }
-            if (cmd.hasOption("n")) {
-                System.out.println(cmd.getOptionValue("n"));
+                releaseVersion=cmd.getOptionValue("r");
+                System.out.println("releasing to the version:"+cmd.getOptionValue("r"));
             }
 
-        } catch (ParseException e) {
-            log.log(Level.SEVERE, "Failed to parse comand line properties", e);
+            if (cmd.hasOption("n")) {
+                nextVersion=cmd.getOptionValue("n");
+                System.out.println("updating to the next version:"+cmd.getOptionValue("n"));
+            }
+
+            FileUtils.deleteDirectory(new File(localDirectory));
+
+            CredentialsProvider cp = new UsernamePasswordCredentialsProvider(name, password);
+            Git.cloneRepository()
+                    .setURI(repo)
+                    .setDirectory(new File(localDirectory))
+                    .setCredentialsProvider(cp)
+                    .call();
+
+            Iterator it = FileUtils.iterateFiles(new File(localDirectory), null, false);
+            while(it.hasNext()){
+                File f = (File)it.next();
+                String content = FileUtils.readFileToString(f);
+                FileUtils.writeStringToFile(f, content.replaceAll(currentVersion, releaseVersion));
+            }
+
+            Git git = Git.open(new File(localDirectory));
+
+            git.add().addFilepattern(".").call();
+            git.commit().setCommitter("justrelease","info@justrelease.com").setMessage(releaseVersion).call();
+            git.push().setCredentialsProvider(cp).call();
+
+
+        } catch (Exception e) {
+            System.out.println(e);
             help();
         }
     }
