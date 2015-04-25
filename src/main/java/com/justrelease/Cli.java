@@ -65,7 +65,7 @@ public class Cli {
             }
             if (cmd.hasOption("localDirectory")) {
                 localDirectory=cmd.getOptionValue("localDirectory");
-                System.out.println("repo url:"+cmd.getOptionValue("localDirectory"));
+                System.out.println("local directory:"+cmd.getOptionValue("localDirectory"));
             }
             DefaultVersionInfo versionInfo = null;
 
