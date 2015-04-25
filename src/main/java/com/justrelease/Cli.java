@@ -113,6 +113,7 @@ public class Cli {
             }
             git.commit().setCommitter("justrelease","info@justrelease.com").setMessage(nextVersion).call();
             git.push().setCredentialsProvider(cp).call();
+            git.push().setPushTags().setCredentialsProvider(cp).call();
 
 
         } catch (Exception e) {
