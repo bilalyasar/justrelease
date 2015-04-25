@@ -32,6 +32,7 @@ public class Cli {
         options.addOption("password", true, "github password");
         options.addOption("c", true, "current snapshot version");
         options.addOption("h", false, "help");
+        options.addOption("dryRun",false,"release without push");
 
     }
 
@@ -112,8 +113,11 @@ public class Cli {
                 FileUtils.writeStringToFile(f, content.replaceAll(releaseVersion, nextVersion));
             }
             git.commit().setCommitter("justrelease","info@justrelease.com").setMessage(nextVersion).call();
-            git.push().setCredentialsProvider(cp).call();
-            git.push().setPushTags().setCredentialsProvider(cp).call();
+
+            if(!cmd.hasOption("dryRun")) {
+                git.push().setCredentialsProvider(cp).call();
+                git.push().setPushTags().setCredentialsProvider(cp).call();
+            }
 
 
         } catch (Exception e) {
