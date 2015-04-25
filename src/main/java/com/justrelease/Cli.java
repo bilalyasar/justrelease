@@ -5,9 +5,15 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.shared.release.versions.DefaultVersionInfo;
 import org.apache.maven.shared.release.versions.VersionParseException;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.transport.CredentialsProvider;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
+import java.io.File;
+import java.util.Iterator;
 import java.util.logging.Logger;
 
 public class Cli {
@@ -76,27 +82,28 @@ public class Cli {
                 System.out.println("updating to the next version:"+nextVersion);
 
 
-//            FileUtils.deleteDirectory(new File(localDirectory));
-//
-//            CredentialsProvider cp = new UsernamePasswordCredentialsProvider(name, password);
-//            Git.cloneRepository()
-//                    .setURI(repo)
-//                    .setDirectory(new File(localDirectory))
-//                    .setCredentialsProvider(cp)
-//                    .call();
-//
-//            Iterator it = FileUtils.iterateFiles(new File(localDirectory), null, false);
-//            while(it.hasNext()){
-//                File f = (File)it.next();
-//                String content = FileUtils.readFileToString(f);
-//                FileUtils.writeStringToFile(f, content.replaceAll(currentVersion, releaseVersion));
-//            }
-//
-//            Git git = Git.open(new File(localDirectory));
-//
-//            git.add().addFilepattern(".").call();
-//            git.commit().setCommitter("justrelease","info@justrelease.com").setMessage(releaseVersion).call();
-//            git.push().setCredentialsProvider(cp).call();
+            FileUtils.deleteDirectory(new File(localDirectory));
+
+            CredentialsProvider cp =
+                    new UsernamePasswordCredentialsProvider(name, password);
+            Git.cloneRepository()
+                    .setURI(repo)
+                    .setDirectory(new File(localDirectory))
+                    .setCredentialsProvider(cp)
+                    .call();
+
+            Iterator it = FileUtils.iterateFiles(new File(localDirectory), null, false);
+            while(it.hasNext()){
+                File f = (File)it.next();
+                String content = FileUtils.readFileToString(f);
+                FileUtils.writeStringToFile(f, content.replaceAll(currentVersion, releaseVersion));
+            }
+
+            Git git = Git.open(new File(localDirectory));
+
+            git.add().addFilepattern(".").call();
+            git.commit().setCommitter("justrelease","info@justrelease.com").setMessage(releaseVersion).call();
+            git.push().setCredentialsProvider(cp).call();
 
 
         } catch (Exception e) {
