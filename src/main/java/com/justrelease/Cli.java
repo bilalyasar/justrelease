@@ -105,7 +105,6 @@ public class Cli {
             git.add().addFilepattern(".").call();
             git.commit().setCommitter("justrelease", "info@justrelease.com").setMessage(releaseVersion).call();
             git.tag().setName("v"+releaseVersion).call();
-            git.checkout().setName("master").call();
             it = FileUtils.iterateFiles(new File(localDirectory), null, false);
 
             while(it.hasNext()){
@@ -113,8 +112,9 @@ public class Cli {
                 String content = FileUtils.readFileToString(f);
                 FileUtils.writeStringToFile(f, content.replaceAll(releaseVersion, nextVersion));
             }
-            git.commit().setCommitter("justrelease","info@justrelease.com").setMessage(nextVersion).call();
 
+            git.commit().setCommitter("justrelease","info@justrelease.com").setMessage(nextVersion).call();
+            
             if(!cmd.hasOption("dryRun")) {
                 git.push().setCredentialsProvider(cp).call();
                 git.push().setPushTags().setCredentialsProvider(cp).call();
