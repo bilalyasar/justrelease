@@ -102,7 +102,16 @@ public class Cli {
             Git git = Git.open(new File(localDirectory));
 
             git.add().addFilepattern(".").call();
-            git.commit().setCommitter("justrelease","info@justrelease.com").setMessage(releaseVersion).call();
+            git.commit().setCommitter("justrelease", "info@justrelease.com").setMessage(releaseVersion).call();
+            git.tag().setName(releaseVersion).call(); 
+            it = FileUtils.iterateFiles(new File(localDirectory), null, false);
+
+            while(it.hasNext()){
+                File f = (File)it.next();
+                String content = FileUtils.readFileToString(f);
+                FileUtils.writeStringToFile(f, content.replaceAll(releaseVersion, nextVersion));
+            }
+            git.commit().setCommitter("justrelease","info@justrelease.com").setMessage(nextVersion).call();
             git.push().setCredentialsProvider(cp).call();
 
 
