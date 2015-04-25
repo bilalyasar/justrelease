@@ -104,7 +104,7 @@ public class Cli {
 
             git.add().addFilepattern(".").call();
             git.commit().setCommitter("justrelease", "info@justrelease.com").setMessage(releaseVersion).call();
-            git.tag().setName(releaseVersion).call();
+            git.tag().setName("v"+releaseVersion).call();
             git.checkout().setName("master").call();
             it = FileUtils.iterateFiles(new File(localDirectory), null, false);
 
