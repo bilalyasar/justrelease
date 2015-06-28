@@ -26,7 +26,7 @@ public class Cli {
     private static final Logger log = Logger.getLogger(Cli.class.getName());
     private String[] args = null;
     private Options options = new Options();
-
+    private CommandLine cmd;
     public Cli(String[] args) throws VersionParseException {
 
 
@@ -44,12 +44,11 @@ public class Cli {
 
     public void parse() {
         CommandLineParser parser = new BasicParser();
-
-        CommandLine cmd;
+        
         try {
             cmd = parser.parse(options, args);
             String repo = "";
-            String localDirectory = "";
+            String localDirectory = "release";
             String currentVersion = "";
             String name = "";
             String password = "";
@@ -67,13 +66,13 @@ public class Cli {
                 password = cmd.getOptionValue("password");
             }
             if (cmd.hasOption("repo")) {
-                repo = cmd.getOptionValue("repo");
-                System.out.println("repo url:" + cmd.getOptionValue("repo"));
+                repo = createGithubUrl(cmd.getOptionValue("repo"));
+                System.out.println("repo url:" + repo);
             }
             if (cmd.hasOption("localDirectory")) {
                 localDirectory = cmd.getOptionValue("localDirectory");
-                System.out.println("local directory:" + cmd.getOptionValue("localDirectory"));
             }
+            System.out.println("local directory:" + localDirectory);
             DefaultVersionInfo versionInfo = null;
 
 
@@ -133,6 +132,12 @@ public class Cli {
             System.out.println(e);
             help();
         }
+    }
+
+    private String createGithubUrl(String repo) {
+        if(cmd.hasOption("username") && cmd.hasOption("password"))
+            return String.format("https://github.com/%s.git",repo);
+        return String.format("git@github.com:%s.git",repo);
     }
 
     private void help() {
