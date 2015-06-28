@@ -1,5 +1,6 @@
 package com.justrelease;
 
+import com.jcraft.jsch.Session;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -7,7 +8,14 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.transport.CredentialsProvider;
+import org.eclipse.jgit.transport.JschConfigSessionFactory;
+import org.eclipse.jgit.transport.OpenSshConfig;
+import org.eclipse.jgit.transport.SshSessionFactory;
+import org.eclipse.jgit.transport.SshTransport;
+import org.eclipse.jgit.transport.Transport;
+import org.eclipse.jgit.transport.TransportHttp;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import java.io.File;
@@ -30,7 +38,7 @@ public class Cli {
         options.addOption("password", true, "github password");
         options.addOption("c", true, "current snapshot version");
         options.addOption("h", false, "help");
-        options.addOption("dryRun",false,"release without push");
+        options.addOption("dryRun", false, "release without push");
 
     }
 
@@ -40,11 +48,11 @@ public class Cli {
         CommandLine cmd;
         try {
             cmd = parser.parse(options, args);
-            String repo="";
-            String localDirectory="";
-            String currentVersion="";
-            String name="";
-            String password="";
+            String repo = "";
+            String localDirectory = "";
+            String currentVersion = "";
+            String name = "";
+            String password = "";
 
 
             if (cmd.hasOption("h")) {
@@ -53,32 +61,32 @@ public class Cli {
             }
 
             if (cmd.hasOption("name")) {
-                name=cmd.getOptionValue("name");
+                name = cmd.getOptionValue("name");
             }
             if (cmd.hasOption("password")) {
-                password=cmd.getOptionValue("password");
+                password = cmd.getOptionValue("password");
             }
             if (cmd.hasOption("repo")) {
-                repo=cmd.getOptionValue("repo");
-                System.out.println("repo url:"+cmd.getOptionValue("repo"));
+                repo = cmd.getOptionValue("repo");
+                System.out.println("repo url:" + cmd.getOptionValue("repo"));
             }
             if (cmd.hasOption("localDirectory")) {
-                localDirectory=cmd.getOptionValue("localDirectory");
-                System.out.println("local directory:"+cmd.getOptionValue("localDirectory"));
+                localDirectory = cmd.getOptionValue("localDirectory");
+                System.out.println("local directory:" + cmd.getOptionValue("localDirectory"));
             }
             DefaultVersionInfo versionInfo = null;
 
 
             if (cmd.hasOption("c")) {
-                currentVersion=cmd.getOptionValue("c");
+                currentVersion = cmd.getOptionValue("c");
                 versionInfo = new DefaultVersionInfo(currentVersion);
-                System.out.println("current version:"+versionInfo);
+                System.out.println("current version:" + versionInfo);
             }
-                String releaseVersion=versionInfo.getReleaseVersionString();
-                System.out.println("releasing to the version:"+releaseVersion);
+            String releaseVersion = versionInfo.getReleaseVersionString();
+            System.out.println("releasing to the version:" + releaseVersion);
 
-                String nextVersion=versionInfo.getNextVersion().getSnapshotVersionString();
-                System.out.println("updating to the next version:"+nextVersion);
+            String nextVersion = versionInfo.getNextVersion().getSnapshotVersionString();
+            System.out.println("updating to the next version:" + nextVersion);
 
 
             FileUtils.deleteDirectory(new File(localDirectory));
@@ -88,12 +96,13 @@ public class Cli {
             Git.cloneRepository()
                     .setURI(repo)
                     .setDirectory(new File(localDirectory))
+                    .setTransportConfigCallback(getTransportConfigCallback())
                     .setCredentialsProvider(cp)
                     .call();
 
             Iterator it = FileUtils.iterateFiles(new File(localDirectory), null, false);
-            while(it.hasNext()){
-                File f = (File)it.next();
+            while (it.hasNext()) {
+                File f = (File) it.next();
                 String content = FileUtils.readFileToString(f);
                 FileUtils.writeStringToFile(f, content.replaceAll(currentVersion, releaseVersion));
             }
@@ -105,18 +114,18 @@ public class Cli {
             git.tag().setName("v" + releaseVersion).call();
             it = FileUtils.iterateFiles(new File(localDirectory), null, false);
 
-            while(it.hasNext()){
-                File f = (File)it.next();
+            while (it.hasNext()) {
+                File f = (File) it.next();
                 String content = FileUtils.readFileToString(f);
                 FileUtils.writeStringToFile(f, content.replaceAll(releaseVersion, nextVersion));
             }
 
             git.add().addFilepattern(".").call();
-            git.commit().setCommitter("justrelease","info@justrelease.com").setMessage(nextVersion).call();
+            git.commit().setCommitter("justrelease", "info@justrelease.com").setMessage(nextVersion).call();
 
-            if(!cmd.hasOption("dryRun")) {
-                git.push().setCredentialsProvider(cp).call();
-                git.push().setPushTags().setCredentialsProvider(cp).call();
+            if (!cmd.hasOption("dryRun")) {
+                git.push().setTransportConfigCallback(getTransportConfigCallback()).setCredentialsProvider(cp).call();
+                git.push().setTransportConfigCallback(getTransportConfigCallback()).setPushTags().setCredentialsProvider(cp).call();
             }
 
 
@@ -132,5 +141,21 @@ public class Cli {
 
         formater.printHelp("JustRelease", options);
         System.exit(0);
+    }
+
+    private TransportConfigCallback getTransportConfigCallback() {
+        final SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
+            @Override
+            protected void configure(OpenSshConfig.Host host, Session session) {
+            }
+        };
+        return new TransportConfigCallback() {
+            @Override
+            public void configure(Transport transport) {
+                if (transport instanceof TransportHttp) return;
+                SshTransport sshTransport = (SshTransport) transport;
+                sshTransport.setSshSessionFactory(sshSessionFactory);
+            }
+        };
     }
 }
