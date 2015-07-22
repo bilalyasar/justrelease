@@ -6,7 +6,7 @@
 
     <groupId>com.justrelease</groupId>
     <artifactId>justrelease</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.3</version>
 
     <build>
         <plugins>
