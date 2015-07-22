@@ -6,7 +6,7 @@
 
     <groupId>com.justrelease</groupId>
     <artifactId>justrelease</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3-SNAPSHOT</version>
 
     <build>
         <plugins>
@@ -81,7 +81,7 @@
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
-            <version>3.4.1.201406201815-r</version>
+            <version>3.4.1.201.0.3-SNAPSHOT01815-r</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
