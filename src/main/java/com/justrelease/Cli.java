@@ -7,6 +7,8 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.transport.CredentialsProvider;
@@ -19,6 +21,7 @@ import org.eclipse.jgit.transport.TransportHttp;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
@@ -27,6 +30,7 @@ public class Cli {
     private String[] args = null;
     private Options options = new Options();
     private CommandLine cmd;
+
     public Cli(String[] args) throws VersionParseException {
 
 
@@ -42,9 +46,9 @@ public class Cli {
 
     }
 
-    public void parse() {
+    public void parse() throws Exception {
         CommandLineParser parser = new BasicParser();
-        
+
         try {
             cmd = parser.parse(options, args);
             String repo = "";
@@ -76,18 +80,6 @@ public class Cli {
             DefaultVersionInfo versionInfo = null;
 
 
-            if (cmd.hasOption("c")) {
-                currentVersion = cmd.getOptionValue("c");
-                versionInfo = new DefaultVersionInfo(currentVersion);
-                System.out.println("current version:" + versionInfo);
-            }
-            String releaseVersion = versionInfo.getReleaseVersionString();
-            System.out.println("releasing to the version:" + releaseVersion);
-
-            String nextVersion = versionInfo.getNextVersion().getSnapshotVersionString();
-            System.out.println("updating to the next version:" + nextVersion);
-
-
             FileUtils.deleteDirectory(new File(localDirectory));
 
             CredentialsProvider cp =
@@ -99,6 +91,23 @@ public class Cli {
                     .setCredentialsProvider(cp)
                     .call();
 
+            if (cmd.hasOption("c")) {
+                currentVersion = cmd.getOptionValue("c");
+            } else {
+                MavenXpp3Reader reader = new MavenXpp3Reader();
+                Model result = reader.read(new FileInputStream(localDirectory + "/pom.xml"));
+                currentVersion = result.getVersion();
+            }
+            
+            
+            versionInfo = new DefaultVersionInfo(currentVersion);
+            System.out.println("current version:" + versionInfo);
+            String releaseVersion = versionInfo.getReleaseVersionString();
+            System.out.println("releasing to the version:" + releaseVersion);
+
+            String nextVersion = versionInfo.getNextVersion().getSnapshotVersionString();
+            System.out.println("updating to the next version:" + nextVersion);
+            
             Iterator it = FileUtils.iterateFiles(new File(localDirectory), null, false);
             while (it.hasNext()) {
                 File f = (File) it.next();
@@ -135,9 +144,9 @@ public class Cli {
     }
 
     private String createGithubUrl(String repo) {
-        if(cmd.hasOption("username") && cmd.hasOption("password"))
-            return String.format("https://github.com/%s.git",repo);
-        return String.format("git@github.com:%s.git",repo);
+        if (cmd.hasOption("username") && cmd.hasOption("password"))
+            return String.format("https://github.com/%s.git", repo);
+        return String.format("git@github.com:%s.git", repo);
     }
 
     private void help() {
