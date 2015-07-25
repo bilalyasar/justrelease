@@ -16,13 +16,16 @@ public class MavenProject extends AbstractProjectInfo implements ProjectInfo {
     }
 
     public String getVersion() {
+        if(!currentVersion.equals("")) return currentVersion;
         MavenXpp3Reader reader = new MavenXpp3Reader();
         Model result = null;
         try {
-            result = reader.read(new FileInputStream(localDirectory + "/pom.xml"));
+            String workingDir = System.getProperty("user.dir");
+            result = reader.read(new FileInputStream(workingDir + "/" + localDirectory + "/pom.xml"));
         } catch (Exception e) {
             e.printStackTrace();
         }
+        currentVersion = result.getVersion();
         return result.getVersion();
     }
 }

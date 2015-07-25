@@ -40,11 +40,8 @@ public abstract class AbstractProjectInfo {
 
         if (cmd.hasOption("c")) {
             currentVersion = cmd.getOptionValue("c");
-        } else {
-            currentVersion = getVersion();
         }
         // options end, now we have necessary infos
-
     }
 
     protected abstract String getVersion();

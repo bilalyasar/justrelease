@@ -64,8 +64,8 @@ public class Cli {
             } else projectInfo = new GruntProject(cmd);
 
             projectInfo.setup();
-            findVersions();
             cloneRepo();
+            findVersions();
             replaceReleaseVersion();
             commitAndTagVersion();
             replaceNextVersion();
