@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<justrelease xmlns="http://www.justrelease.com/schema/config">
+    <main-repo>justrelease/justrelease</main-repo>
+    <project-type>maven</project-type>
+</justrelease>

@@ -1,5 +1,6 @@
 package com.justrelease.project.type;
 
+import com.justrelease.config.ReleaseConfig;
 import org.apache.commons.cli.CommandLine;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -11,21 +12,28 @@ import java.io.FileInputStream;
  */
 public class MavenProject extends AbstractProjectInfo implements ProjectInfo {
 
-    public MavenProject(CommandLine cmd) {
+    public MavenProject(CommandLine cmd, ReleaseConfig releaseConfig) {
+        this.releaseConfig = releaseConfig;
         this.cmd = cmd;
     }
 
-    public String getVersion() {
-        if(!currentVersion.equals("")) return currentVersion;
+    public String getCurrentVersion() {
+        if (!releaseConfig.getCurrentVersion().equals("")) return releaseConfig.getCurrentVersion();
         MavenXpp3Reader reader = new MavenXpp3Reader();
         Model result = null;
         try {
             String workingDir = System.getProperty("user.dir");
-            result = reader.read(new FileInputStream(workingDir + "/" + localDirectory + "/pom.xml"));
+            result = reader.read(new FileInputStream(workingDir + "/" + releaseConfig.getLocalDirectory() + "/pom.xml"));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        currentVersion = result.getVersion();
+        releaseConfig.setCurrentVersion(result.getVersion());
         return result.getVersion();
+    }
+
+    public void createArtifacts() {
+        String workingDir = System.getProperty("user.dir");
+        String[] cmd = {"/bin/sh", "-c", "cd " + workingDir + "/" + releaseConfig.getLocalDirectory() + "; mvn clean install -DskipTests"};
+        runCommand(cmd);
     }
 }

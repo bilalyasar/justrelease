@@ -1,5 +1,7 @@
 package com.justrelease;
 
+import com.justrelease.config.ConfigParser;
+import com.justrelease.config.ReleaseConfig;
 import com.justrelease.project.type.GruntProject;
 import com.justrelease.project.type.MavenProject;
 import com.justrelease.project.type.ProjectInfo;
@@ -30,8 +32,7 @@ public class Cli {
     DefaultVersionInfo versionInfo = null;
     CredentialsProvider cp;
     String projectType = "maven";
-    String releaseVersion, nextVersion;
-
+    ReleaseConfig releaseConfig = new ReleaseConfig();
 
     public Cli(String[] args) throws VersionParseException {
 
@@ -55,18 +56,14 @@ public class Cli {
             if (cmd.hasOption("h")) {
                 printHelp();
             }
-            if (cmd.hasOption("type")) {
-                projectType = cmd.getOptionValue("type");
-            }
-
-            if (projectType.equals("maven")) {
-                projectInfo = new MavenProject(cmd);
-            } else projectInfo = new GruntProject(cmd);
-
+            ConfigParser configParser = new ConfigParser();
+            configParser.parse(releaseConfig);
+            projectInfo = createProjectInfo();
             projectInfo.setup();
             cloneRepo();
             findVersions();
             replaceReleaseVersion();
+            projectInfo.createArtifacts();
             commitAndTagVersion();
             replaceNextVersion();
             commitNextVersion();
@@ -77,10 +74,21 @@ public class Cli {
         }
     }
 
+    private ProjectInfo createProjectInfo() {
+        if (cmd.hasOption("type")) {
+            projectType = cmd.getOptionValue("type");
+        } else projectType = releaseConfig.getProjectType();
+
+        if (projectType.equals("maven")) {
+            return new MavenProject(cmd, releaseConfig);
+        }
+        return new GruntProject(cmd, releaseConfig);
+    }
+
     private void commitNextVersion() throws IOException, GitAPIException {
-        Git git = Git.open(new File(projectInfo.getLocalDirectory()));
+        Git git = Git.open(new File(releaseConfig.getLocalDirectory()));
         git.add().addFilepattern(".").call();
-        git.commit().setCommitter("justrelease", "info@justrelease.com").setMessage(nextVersion).call();
+        git.commit().setCommitter("justrelease", "info@justrelease.com").setMessage(releaseConfig.getNextVersion()).call();
 
         if (!cmd.hasOption("dryRun")) {
             git.push().setTransportConfigCallback(getTransportConfigCallback()).setCredentialsProvider(cp).call();
@@ -90,37 +98,37 @@ public class Cli {
     }
 
     private void replaceNextVersion() throws IOException {
-        Iterator it = FileUtils.iterateFiles(new File(projectInfo.getLocalDirectory()), null, false);
+        Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory()), null, false);
 
         while (it.hasNext()) {
             File f = (File) it.next();
             String content = FileUtils.readFileToString(f);
-            FileUtils.writeStringToFile(f, content.replaceAll(releaseVersion, nextVersion));
+            FileUtils.writeStringToFile(f, content.replaceAll(releaseConfig.getReleaseVersion(), releaseConfig.getNextVersion()));
         }
     }
 
     private void commitAndTagVersion() throws IOException, GitAPIException {
-        Git git = Git.open(new File(projectInfo.getLocalDirectory()));
+        Git git = Git.open(new File(releaseConfig.getLocalDirectory()));
         git.add().addFilepattern(".").call();
-        git.commit().setCommitter("justrelease", "info@justrelease.com").setMessage(releaseVersion).call();
-        git.tag().setName("v" + releaseVersion).call();
+        git.commit().setCommitter("justrelease", "info@justrelease.com").setMessage(releaseConfig.getReleaseVersion()).call();
+        git.tag().setName("v" + releaseConfig.getReleaseVersion()).call();
     }
 
     private void replaceReleaseVersion() throws IOException {
-        Iterator it = FileUtils.iterateFiles(new File(projectInfo.getLocalDirectory()), null, false);
+        Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory()), null, false);
         while (it.hasNext()) {
             File f = (File) it.next();
             String content = FileUtils.readFileToString(f);
-            FileUtils.writeStringToFile(f, content.replaceAll(projectInfo.getCurrentVersion(), releaseVersion));
+            FileUtils.writeStringToFile(f, content.replaceAll(projectInfo.getCurrentVersion(), releaseConfig.getReleaseVersion()));
         }
     }
 
     private void cloneRepo() throws IOException, GitAPIException {
-        FileUtils.deleteDirectory(new File(projectInfo.getLocalDirectory()));
-        cp = new UsernamePasswordCredentialsProvider(projectInfo.getName(), projectInfo.getPassword());
+        FileUtils.deleteDirectory(new File(releaseConfig.getLocalDirectory()));
+        cp = new UsernamePasswordCredentialsProvider(releaseConfig.getGithubName(), releaseConfig.getGithubPassword());
         Git.cloneRepository()
-                .setURI(projectInfo.getRepoUrl())
-                .setDirectory(new File(projectInfo.getLocalDirectory()))
+                .setURI(releaseConfig.getMainRepo())
+                .setDirectory(new File(releaseConfig.getLocalDirectory()))
                 .setTransportConfigCallback(getTransportConfigCallback())
                 .setCredentialsProvider(cp)
                 .call();
@@ -133,14 +141,18 @@ public class Cli {
     }
 
     private void findVersions() throws VersionParseException {
-        versionInfo = new DefaultVersionInfo(projectInfo.getVersion());
+        versionInfo = new DefaultVersionInfo(projectInfo.getCurrentVersion());
         System.out.println("current version:" + versionInfo);
 
-        releaseVersion = versionInfo.getReleaseVersionString();
-        System.out.println("releasing to the version:" + releaseVersion);
+        if (releaseConfig.getReleaseVersion().equals("")) {
+            releaseConfig.setReleaseVersion(versionInfo.getReleaseVersionString());
+        }
+        System.out.println("releasing to the version:" + releaseConfig.getReleaseVersion());
 
-        nextVersion = versionInfo.getNextVersion().getSnapshotVersionString();
-        System.out.println("updating to the next version:" + nextVersion);
+        if (releaseConfig.getNextVersion().equals("")) {
+            releaseConfig.setNextVersion(versionInfo.getNextVersion().getSnapshotVersionString());
+        }
+        System.out.println("updating to the next version:" + releaseConfig.getNextVersion());
 
     }
 

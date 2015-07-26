@@ -1,6 +1,7 @@
 package com.justrelease.project.type;
 
 import com.jcraft.jsch.Session;
+import com.justrelease.config.ReleaseConfig;
 import org.apache.commons.cli.CommandLine;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.transport.JschConfigSessionFactory;
@@ -10,44 +11,44 @@ import org.eclipse.jgit.transport.SshTransport;
 import org.eclipse.jgit.transport.Transport;
 import org.eclipse.jgit.transport.TransportHttp;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
 /**
  * Created by bilal on 25/07/15.
  */
 public abstract class AbstractProjectInfo {
-    String repo = "";
-    String localDirectory = "release";
-    public String currentVersion = "";
-    String name = "";
-    String password = "";
+    ReleaseConfig releaseConfig;
+
     public CommandLine cmd;
 
 
     public void setup() throws Exception {
         if (cmd.hasOption("name")) {
-            name = cmd.getOptionValue("name");
+            releaseConfig.setGithubName(cmd.getOptionValue("name"));
         }
         if (cmd.hasOption("password")) {
-            password = cmd.getOptionValue("password");
+            releaseConfig.setGithubPassword(cmd.getOptionValue("password"));
         }
         if (cmd.hasOption("repo")) {
-            repo = createGithubUrl(cmd.getOptionValue("repo"));
-            System.out.println("repo url:" + repo);
+            releaseConfig.setMainRepo(cmd.getOptionValue("repo"));
         }
+        releaseConfig.setMainRepo(createGithubUrl(releaseConfig.getMainRepo()));
+        System.out.println("repo url:" + releaseConfig.getMainRepo());
         if (cmd.hasOption("localDirectory")) {
-            localDirectory = cmd.getOptionValue("localDirectory");
+            releaseConfig.setLocalDirectory(cmd.getOptionValue("localDirectory"));
         }
-        System.out.println("local directory:" + localDirectory);
+        System.out.println("local directory:" + releaseConfig.getLocalDirectory());
 
         if (cmd.hasOption("c")) {
-            currentVersion = cmd.getOptionValue("c");
+            releaseConfig.setCurrentVersion(cmd.getOptionValue("c"));
+            ;
         }
         // options end, now we have necessary infos
     }
 
-    protected abstract String getVersion();
-
     private String createGithubUrl(String repo) {
-        if (cmd.hasOption("username") && cmd.hasOption("password"))
+        if (!releaseConfig.getGithubName().equals("") && !releaseConfig.getGithubPassword().equals(""))
             return String.format("https://github.com/%s.git", repo);
         return String.format("git@github.com:%s.git", repo);
     }
@@ -68,23 +69,18 @@ public abstract class AbstractProjectInfo {
         };
     }
 
-    public String getLocalDirectory() {
-        return localDirectory;
-    }
-
-    public String getCurrentVersion() {
-        return currentVersion;
-    }
-
-    public String getRepoUrl() {
-        return repo;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getPassword() {
-        return password;
+    public void runCommand(String[] cmd) {
+        try {
+            Process p = Runtime.getRuntime().exec(cmd);
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(p.getInputStream()));
+            String line;
+            while ((line = in.readLine()) != null) {
+                System.out.println(line);
+            }
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

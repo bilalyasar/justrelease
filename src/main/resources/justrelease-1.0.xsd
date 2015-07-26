@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://www.justrelease.com/schema/config"
+           targetNamespace="http://www.justrelease.com/schema/config"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+
+    <xs:element name="justrelease" >
+        <xs:complexType>
+            <xs:choice maxOccurs="unbounded">
+                <xs:element name="main-repo" type="xs:string"/>
+                <xs:element name="dependency-repo" type="xs:string"/>
+                <xs:element name="project-type" type="project-type" default="maven"/>
+                <xs:element name="current-version" type="xs:string"/>
+                <xs:element name="release-version" type="xs:string"/>
+                <xs:element name="next-version" type="xs:string"/>
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:simpleType name="project-type">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="maven" />
+            <xs:enumeration value="grunt" />
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>

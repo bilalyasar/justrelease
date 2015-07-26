@@ -5,18 +5,10 @@ package com.justrelease.project.type;
  */
 public interface ProjectInfo {
 
-    String getVersion();
+    String getCurrentVersion();
 
     void setup() throws Exception;
-    
-    String getLocalDirectory();
-    
-    String getCurrentVersion();
-    
-    String getRepoUrl();
 
-    String getName();
-    
-    String getPassword();
+    void createArtifacts();
 
 }
