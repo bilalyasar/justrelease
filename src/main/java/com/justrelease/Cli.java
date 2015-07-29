@@ -31,6 +31,7 @@ public class Cli {
     private ProjectInfo projectInfo;
     DefaultVersionInfo versionInfo = null;
     CredentialsProvider cp;
+    String configLocation = "justrelease.xml";
     String projectType = "maven";
     ReleaseConfig releaseConfig = new ReleaseConfig();
 
@@ -45,6 +46,7 @@ public class Cli {
         options.addOption("h", false, "help");
         options.addOption("dryRun", false, "release without push");
         options.addOption("type", true, "project type info");
+        options.addOption("config", true, "release config file location");
     }
 
     public void parse() throws Exception {
@@ -56,7 +58,10 @@ public class Cli {
             if (cmd.hasOption("h")) {
                 printHelp();
             }
-            ConfigParser configParser = new ConfigParser();
+            if(cmd.hasOption("config")){
+                configLocation = cmd.getOptionValue("config");
+            }
+            ConfigParser configParser = new ConfigParser(configLocation);
             configParser.parse(releaseConfig);
             projectInfo = createProjectInfo();
             projectInfo.setup();

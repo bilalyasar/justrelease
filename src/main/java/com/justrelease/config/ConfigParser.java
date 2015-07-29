@@ -26,10 +26,15 @@ import static com.justrelease.config.XmlElements.RELEASEVERSION;
  */
 public class ConfigParser {
     ReleaseConfig releaseConfig;
+    String configLocation;
     InputStream in;
 
+    public ConfigParser(String configLocation) {
+        this.configLocation = configLocation;
+    }
+
     void loadFromWorkingDirectory() {
-        File file = new File("justrelease.xml");
+        File file = new File(configLocation);
         if (!file.exists()) {
             return;
         }
