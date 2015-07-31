@@ -1,6 +1,7 @@
 package com.justrelease;
 
 import com.justrelease.config.ConfigParser;
+import com.justrelease.config.GithubRepo;
 import com.justrelease.config.ReleaseConfig;
 import com.justrelease.project.type.GruntProject;
 import com.justrelease.project.type.MavenProject;
@@ -58,7 +59,7 @@ public class Cli {
             if (cmd.hasOption("h")) {
                 printHelp();
             }
-            if(cmd.hasOption("config")){
+            if (cmd.hasOption("config")) {
                 configLocation = cmd.getOptionValue("config");
             }
             ConfigParser configParser = new ConfigParser(configLocation);
@@ -66,6 +67,7 @@ public class Cli {
             projectInfo = createProjectInfo();
             projectInfo.setup();
             cloneRepo();
+            cloneDependencyRepos();
             findVersions();
             replaceReleaseVersion();
             projectInfo.createArtifacts();
@@ -76,6 +78,19 @@ public class Cli {
         } catch (Exception e) {
             System.out.println(e);
             help();
+        }
+    }
+
+    private void cloneDependencyRepos() throws GitAPIException {
+        if (releaseConfig.getDependencyRepos().size() == 0) return;
+        for (GithubRepo repo : releaseConfig.getDependencyRepos()) {
+            cp = new UsernamePasswordCredentialsProvider(releaseConfig.getGithubName(), releaseConfig.getGithubPassword());
+            Git.cloneRepository()
+                    .setURI(repo.getRepoUrl())
+                    .setDirectory(new File(releaseConfig.getLocalDirectory() + "/" + repo.getDirectory()))
+                    .setTransportConfigCallback(getTransportConfigCallback())
+                    .setCredentialsProvider(cp)
+                    .call();
         }
     }
 
@@ -132,8 +147,8 @@ public class Cli {
         FileUtils.deleteDirectory(new File(releaseConfig.getLocalDirectory()));
         cp = new UsernamePasswordCredentialsProvider(releaseConfig.getGithubName(), releaseConfig.getGithubPassword());
         Git.cloneRepository()
-                .setURI(releaseConfig.getMainRepo())
-                .setDirectory(new File(releaseConfig.getLocalDirectory()))
+                .setURI(releaseConfig.getMainRepo().getRepoUrl())
+                .setDirectory(new File(releaseConfig.getLocalDirectory() + File.separator + releaseConfig.getMainRepo().getDirectory()))
                 .setTransportConfigCallback(getTransportConfigCallback())
                 .setCredentialsProvider(cp)
                 .call();

@@ -1,6 +1,7 @@
 package com.justrelease.project.type;
 
 import com.jcraft.jsch.Session;
+import com.justrelease.config.GithubRepo;
 import com.justrelease.config.ReleaseConfig;
 import org.apache.commons.cli.CommandLine;
 import org.eclipse.jgit.api.TransportConfigCallback;
@@ -33,8 +34,13 @@ public abstract class AbstractProjectInfo {
         if (cmd.hasOption("repo")) {
             releaseConfig.setMainRepo(cmd.getOptionValue("repo"));
         }
-        releaseConfig.setMainRepo(createGithubUrl(releaseConfig.getMainRepo()));
-        System.out.println("repo url:" + releaseConfig.getMainRepo());
+        releaseConfig.getMainRepo().setRepoUrl(createGithubUrl(releaseConfig.getMainRepo().getRepoName()));
+        for (GithubRepo githubRepo : releaseConfig.getDependencyRepos()) {
+            githubRepo.setRepoUrl(createGithubUrl(githubRepo.getRepoName()));
+        }
+
+
+        System.out.println("repo url:" + releaseConfig.getMainRepo().getRepoUrl());
         if (cmd.hasOption("localDirectory")) {
             releaseConfig.setLocalDirectory(cmd.getOptionValue("localDirectory"));
         }

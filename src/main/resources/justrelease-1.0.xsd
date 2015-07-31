@@ -5,11 +5,21 @@
            elementFormDefault="qualified"
            attributeFormDefault="unqualified">
 
-    <xs:element name="justrelease" >
+    <xs:element name="justrelease">
         <xs:complexType>
             <xs:choice maxOccurs="unbounded">
-                <xs:element name="main-repo" type="xs:string"/>
-                <xs:element name="dependency-repo" type="xs:string"/>
+                <xs:element name="main-repo" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:attribute name="repo-name" use="required"/>
+                        <xs:attribute name="branch" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="dependency-repo">
+                    <xs:complexType>
+                        <xs:attribute name="repo-name" use="required"/>
+                        <xs:attribute name="branch" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
                 <xs:element name="project-type" type="project-type" default="maven"/>
                 <xs:element name="current-version" type="xs:string"/>
                 <xs:element name="release-version" type="xs:string"/>
@@ -20,8 +30,8 @@
 
     <xs:simpleType name="project-type">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="maven" />
-            <xs:enumeration value="grunt" />
+            <xs:enumeration value="maven"/>
+            <xs:enumeration value="grunt"/>
         </xs:restriction>
     </xs:simpleType>
 

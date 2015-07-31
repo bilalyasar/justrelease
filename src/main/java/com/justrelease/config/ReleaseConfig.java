@@ -7,14 +7,14 @@ import java.util.ArrayList;
  */
 public class ReleaseConfig {
     String localDirectory = "release";
-    String mainRepo = "justrelease/justrelease";
+    GithubRepo mainRepo = new GithubRepo("justrelease/justrelease");
     String githubName = "";
     String githubPassword = "";
-    ArrayList<String> dependencyRepos = new ArrayList<String>();
+    ArrayList<GithubRepo> dependencyRepos = new ArrayList<GithubRepo>();
     String projectType = "maven";
     String currentVersion = "";
     String releaseVersion = "";
-    String nextVersion= "";
+    String nextVersion = "";
 
     public String getLocalDirectory() {
         return localDirectory;
@@ -39,7 +39,7 @@ public class ReleaseConfig {
     public void setGithubPassword(String githubPassword) {
         this.githubPassword = githubPassword;
     }
-    
+
 
     public String getReleaseVersion() {
         return releaseVersion;
@@ -49,19 +49,19 @@ public class ReleaseConfig {
         this.releaseVersion = releaseVersion;
     }
 
-    public String getMainRepo() {
+    public GithubRepo getMainRepo() {
         return mainRepo;
     }
 
     public void setMainRepo(String mainRepo) {
-        this.mainRepo = mainRepo;
+        this.mainRepo.setRepoName(mainRepo);
     }
 
-    public ArrayList<String> getDependencyRepos() {
+    public ArrayList<GithubRepo> getDependencyRepos() {
         return dependencyRepos;
     }
 
-    public void setDependencyRepos(ArrayList<String> dependencyRepos) {
+    public void setDependencyRepos(ArrayList<GithubRepo> dependencyRepos) {
         this.dependencyRepos = dependencyRepos;
     }
 

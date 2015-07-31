@@ -5,6 +5,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 
+import java.io.File;
 import java.io.FileInputStream;
 
 /**
@@ -23,7 +24,13 @@ public class MavenProject extends AbstractProjectInfo implements ProjectInfo {
         Model result = null;
         try {
             String workingDir = System.getProperty("user.dir");
-            result = reader.read(new FileInputStream(workingDir + "/" + releaseConfig.getLocalDirectory() + "/pom.xml"));
+            result = reader.read(new FileInputStream(workingDir +
+                    File.separator +
+                    releaseConfig.getLocalDirectory() +
+                    File.separator +
+                    releaseConfig.getMainRepo().getDirectory() +
+                    File.separator +
+                    "pom.xml"));
         } catch (Exception e) {
             e.printStackTrace();
         }

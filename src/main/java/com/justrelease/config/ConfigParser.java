@@ -91,14 +91,19 @@ public class ConfigParser {
     }
 
     private void handleDependencyRepo(Node node) {
-        ArrayList list = releaseConfig.getDependencyRepos();
-        list.add(cleanNodeName(getTextContent(node).trim()));
+        ArrayList<GithubRepo> list = releaseConfig.getDependencyRepos();
+        String dependencyRepo = getAttribute(node, "repo-name");
+        GithubRepo githubRepo = new GithubRepo(dependencyRepo);
+        githubRepo.setDirectory(cleanNodeName(dependencyRepo.split("/")[1]));
+        list.add(githubRepo);
         releaseConfig.setDependencyRepos(list);
 
     }
 
     private void handleMainRepo(Node node) {
-        releaseConfig.setMainRepo(cleanNodeName(getTextContent(node).trim()));
+        String mainRepo = getAttribute(node,"repo-name");
+        releaseConfig.setMainRepo(mainRepo);
+        releaseConfig.getMainRepo().setDirectory(mainRepo.split("/")[1]);
     }
 
 
@@ -173,5 +178,12 @@ public class ConfigParser {
             return text != null ? text.trim() : "";
         }
         return "";
+    }
+    protected String getAttribute(org.w3c.dom.Node node, String attName) {
+        final Node attNode = node.getAttributes().getNamedItem(attName);
+        if (attNode == null) {
+            return null;
+        }
+        return getTextContent(attNode);
     }
 }
