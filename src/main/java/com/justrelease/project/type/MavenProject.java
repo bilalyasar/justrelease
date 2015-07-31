@@ -40,7 +40,9 @@ public class MavenProject extends AbstractProjectInfo implements ProjectInfo {
 
     public void createArtifacts() {
         String workingDir = System.getProperty("user.dir");
-        String[] cmd = {"/bin/sh", "-c", "cd " + workingDir + "/" + releaseConfig.getLocalDirectory() + "; mvn clean install -DskipTests"};
+        String[] cmd = {"/bin/sh", "-c", "cd " + workingDir + "/" + releaseConfig.getLocalDirectory() +
+                File.separator +
+                releaseConfig.getMainRepo().getDirectory() +"; mvn clean install -DskipTests"};
         runCommand(cmd);
     }
 }

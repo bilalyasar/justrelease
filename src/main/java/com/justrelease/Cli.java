@@ -106,7 +106,7 @@ public class Cli {
     }
 
     private void commitNextVersion() throws IOException, GitAPIException {
-        Git git = Git.open(new File(releaseConfig.getLocalDirectory()));
+        Git git = Git.open(new File(releaseConfig.getLocalDirectory() + File.separator + releaseConfig.getMainRepo().getDirectory()));
         git.add().addFilepattern(".").call();
         git.commit().setCommitter("justrelease", "info@justrelease.com").setMessage(releaseConfig.getNextVersion()).call();
 
@@ -118,7 +118,7 @@ public class Cli {
     }
 
     private void replaceNextVersion() throws IOException {
-        Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory()), null, false);
+        Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory() + File.separator + releaseConfig.getMainRepo().getDirectory()), null, false);
 
         while (it.hasNext()) {
             File f = (File) it.next();
@@ -128,14 +128,14 @@ public class Cli {
     }
 
     private void commitAndTagVersion() throws IOException, GitAPIException {
-        Git git = Git.open(new File(releaseConfig.getLocalDirectory()));
+        Git git = Git.open(new File(releaseConfig.getLocalDirectory() + File.separator + releaseConfig.getMainRepo().getDirectory()));
         git.add().addFilepattern(".").call();
         git.commit().setCommitter("justrelease", "info@justrelease.com").setMessage(releaseConfig.getReleaseVersion()).call();
         git.tag().setName("v" + releaseConfig.getReleaseVersion()).call();
     }
 
     private void replaceReleaseVersion() throws IOException {
-        Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory()), null, false);
+        Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory() + File.separator + releaseConfig.getMainRepo().getDirectory()), null, false);
         while (it.hasNext()) {
             File f = (File) it.next();
             String content = FileUtils.readFileToString(f);
