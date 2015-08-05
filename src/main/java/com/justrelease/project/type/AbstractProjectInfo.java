@@ -48,7 +48,6 @@ public abstract class AbstractProjectInfo {
 
         if (cmd.hasOption("c")) {
             releaseConfig.setCurrentVersion(cmd.getOptionValue("c"));
-            ;
         }
         // options end, now we have necessary infos
     }

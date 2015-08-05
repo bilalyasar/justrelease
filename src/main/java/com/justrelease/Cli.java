@@ -90,6 +90,7 @@ public class Cli {
                     .setDirectory(new File(releaseConfig.getLocalDirectory() + "/" + repo.getDirectory()))
                     .setTransportConfigCallback(getTransportConfigCallback())
                     .setCredentialsProvider(cp)
+                    .setBranch(repo.getBranch())
                     .call();
         }
     }
@@ -151,6 +152,7 @@ public class Cli {
                 .setDirectory(new File(releaseConfig.getLocalDirectory() + File.separator + releaseConfig.getMainRepo().getDirectory()))
                 .setTransportConfigCallback(getTransportConfigCallback())
                 .setCredentialsProvider(cp)
+                .setBranch(releaseConfig.getMainRepo().getBranch())
                 .call();
 
     }

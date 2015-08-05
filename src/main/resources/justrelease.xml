@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <justrelease xmlns="http://www.justrelease.com/schema/config">
-    <project-type>maven</project-type>
-    <main-repo repo-name="justrelease/justrelease"/>
-    <dependency-repo repo-name="jasonfry89/asd" />
+    <project-type>grunt</project-type>
+    <main-repo repo-name="facebook/react"/>
+    <dependency-repo repo-name="facebook/react" branch="react-gh-pages" directory="react-gh-pages" />
+    <dependency-repo repo-name="reactjs/react-bower.git" />
 </justrelease>

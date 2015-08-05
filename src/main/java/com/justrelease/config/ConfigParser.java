@@ -19,6 +19,7 @@ import static com.justrelease.config.XmlElements.CURRENTVERSION;
 import static com.justrelease.config.XmlElements.DEPENDENCYREPO;
 import static com.justrelease.config.XmlElements.MAINREPO;
 import static com.justrelease.config.XmlElements.PROJECTTYPE;
+import static com.justrelease.config.XmlElements.RELEASEDIRECTORY;
 import static com.justrelease.config.XmlElements.RELEASEVERSION;
 
 /**
@@ -71,7 +72,12 @@ public class ConfigParser {
         else if (CURRENTVERSION.isEqual(nodeName)) handleCurrentVersion(node);
         else if (RELEASEVERSION.isEqual(nodeName)) handleReleaseVersion(node);
         else if (CURRENTVERSION.isEqual(nodeName)) handleNextVersion(node);
+        else if (RELEASEDIRECTORY.isEqual(nodeName)) handleReleaseDirectory(node);
         else if (PROJECTTYPE.isEqual(nodeName)) handleProjectType(node);
+    }
+
+    private void handleReleaseDirectory(Node node) {
+        releaseConfig.setLocalDirectory(cleanNodeName(getTextContent(node).trim()));
     }
 
     private void handleProjectType(Node node) {
@@ -94,14 +100,16 @@ public class ConfigParser {
         ArrayList<GithubRepo> list = releaseConfig.getDependencyRepos();
         String dependencyRepo = getAttribute(node, "repo-name");
         GithubRepo githubRepo = new GithubRepo(dependencyRepo);
-        githubRepo.setDirectory(cleanNodeName(dependencyRepo.split("/")[1]));
+        if (getAttribute(node, "directory") == null) {
+            githubRepo.setDirectory(cleanNodeName(dependencyRepo.split("/")[1]));
+        } else githubRepo.setDirectory(cleanNodeName(getAttribute(node, "directory")));
         list.add(githubRepo);
         releaseConfig.setDependencyRepos(list);
 
     }
 
     private void handleMainRepo(Node node) {
-        String mainRepo = getAttribute(node,"repo-name");
+        String mainRepo = getAttribute(node, "repo-name");
         releaseConfig.setMainRepo(mainRepo);
         releaseConfig.getMainRepo().setDirectory(mainRepo.split("/")[1]);
     }
@@ -179,6 +187,7 @@ public class ConfigParser {
         }
         return "";
     }
+
     protected String getAttribute(org.w3c.dom.Node node, String attName) {
         final Node attNode = node.getAttributes().getNamedItem(attName);
         if (attNode == null) {

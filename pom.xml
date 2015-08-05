@@ -84,9 +84,14 @@
             <version>2.4</version>
         </dependency>
         <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
-            <version>3.4.1.201406201815-r</version>
+            <version>3.7.0.201502260915-r</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>

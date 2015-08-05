@@ -16,14 +16,16 @@
                 </xs:element>
                 <xs:element name="dependency-repo">
                     <xs:complexType>
-                        <xs:attribute name="repo-name" use="required"/>
-                        <xs:attribute name="branch" use="optional"/>
+                        <xs:attribute name="repo-name" type="xs:string" use="required"/>
+                        <xs:attribute name="branch" type="xs:string" use="optional"/>
+                        <xs:attribute name="directory" type="xs:string" use="optional"/>
                     </xs:complexType>
                 </xs:element>
                 <xs:element name="project-type" type="project-type" default="maven"/>
                 <xs:element name="current-version" type="xs:string"/>
                 <xs:element name="release-version" type="xs:string"/>
                 <xs:element name="next-version" type="xs:string"/>
+                <xs:element name="release-directory" type="xs:string"/>
             </xs:choice>
         </xs:complexType>
     </xs:element>
