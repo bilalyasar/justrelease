@@ -131,6 +131,7 @@ public class Cli {
 
         while (it.hasNext()) {
             File f = (File) it.next();
+            if (f.getName().contains(".git")) continue;
             if (f.isHidden() || f.isDirectory()) continue;
             String content = FileUtils.readFileToString(f);
             FileUtils.writeStringToFile(f, content.replaceAll(releaseConfig.getReleaseVersion(), releaseConfig.getNextVersion()));
@@ -148,6 +149,7 @@ public class Cli {
         Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory() + File.separator + releaseConfig.getMainRepo().getDirectory()), null, true);
         while (it.hasNext()) {
             File f = (File) it.next();
+            if (f.getName().contains(".git")) continue;
             if (f.isHidden() || f.isDirectory()) continue;
             String content = FileUtils.readFileToString(f);
             FileUtils.writeStringToFile(f, content.replaceAll(projectInfo.getCurrentVersion(), releaseConfig.getReleaseVersion()));
