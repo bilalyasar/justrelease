@@ -66,13 +66,21 @@ public class Cli {
             configParser.parse(releaseConfig);
             projectInfo = createProjectInfo();
             projectInfo.setup();
+            System.out.println("Cloning Main Repo:");
             cloneRepo();
+            System.out.println("Cloning Dependency Repo:");
             cloneDependencyRepos();
+            System.out.println("Find Version:");
             findVersions();
+            System.out.println("Replace Release Version:");
             replaceReleaseVersion();
+            System.out.println("Create Artifact:");
             projectInfo.createArtifacts();
+            System.out.println("Commit And Tag Version:");
             commitAndTagVersion();
+            System.out.println("Replace Next Version:");
             replaceNextVersion();
+            System.out.println("Commit Next Version:");
             commitNextVersion();
 
         } catch (Exception e) {
