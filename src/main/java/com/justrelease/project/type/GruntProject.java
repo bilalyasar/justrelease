@@ -47,6 +47,7 @@ public class GruntProject extends AbstractProjectInfo implements ProjectInfo {
     private String[] createCommand(ExecConfig execConfig) {
         String workingDir = System.getProperty("user.dir");
         GithubRepo repo = findRepo(execConfig);
+        System.out.println("cd " + workingDir + "/" + releaseConfig.getLocalDirectory() + "/" + repo.getDirectory() + "; " + execConfig.getCommand());
         String[] cmd = new String[]{"/bin/sh", "-c", "cd " + workingDir + "/" + releaseConfig.getLocalDirectory() + "/" + repo.getDirectory() + "; " + execConfig.getCommand()};
         System.out.println(cmd.toString());
         return cmd;
