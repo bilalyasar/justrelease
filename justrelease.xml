@@ -3,7 +3,7 @@
     <project-type>grunt</project-type>
     <main-repo repo-name="bilalyasar/react"/>
     <dependency-repo repo-name="bilalyasar/react" branch="react-gh-pages" directory="react-gh-pages"/>
-    <dependency-repo repo-name="bilalyasar/react-bower.git"/>
+    <dependency-repo repo-name="bilalyasar/react-bower"/>
     <build>
         <exec repo="bilalyasar/react" command="grunt build"/>
         <exec repo="bilalyasar/react" command="rm -rf node_modules"/>
