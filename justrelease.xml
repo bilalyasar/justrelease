@@ -8,6 +8,8 @@
     <dependency-repo repo-name="bilalyasar/react" branch="react-gh-pages" directory="react-gh-pages"/>
     <dependency-repo repo-name="bilalyasar/react-bower"/>
     <build>
+        <exec repo="bilalyasar/react" command="rm -rf node_modules"/>
+        <exec repo="bilalyasar/react" command="npm install"/>
         <exec repo="bilalyasar/react" command="grunt build"/>
         <exec repo="bilalyasar/react" command="rm -rf node_modules"/>
         <exec repo="bilalyasar/react" command="npm install"/>
