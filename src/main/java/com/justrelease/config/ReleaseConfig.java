@@ -1,5 +1,8 @@
 package com.justrelease.config;
 
+import com.justrelease.config.build.BuildConfig;
+import com.justrelease.config.build.ExecConfig;
+
 import java.util.ArrayList;
 
 /**
@@ -15,6 +18,7 @@ public class ReleaseConfig {
     String currentVersion = "";
     String releaseVersion = "";
     String nextVersion = "";
+    BuildConfig buildConfig = new BuildConfig();
 
     public String getLocalDirectory() {
         return localDirectory;
@@ -90,4 +94,19 @@ public class ReleaseConfig {
     }
 
 
+    public void addExecConfig(ExecConfig execConfig) {
+        buildConfig.addExecConfig(execConfig);
+    }
+
+    public BuildConfig getBuildConfig() {
+        return buildConfig;
+    }
+
+    public void setBuildConfig(BuildConfig buildConfig) {
+        this.buildConfig = buildConfig;
+    }
+
+    public void setMainRepo(GithubRepo mainRepo) {
+        this.mainRepo = mainRepo;
+    }
 }

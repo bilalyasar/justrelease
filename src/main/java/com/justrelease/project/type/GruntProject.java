@@ -1,7 +1,10 @@
 package com.justrelease.project.type;
 
 
+import com.justrelease.config.GithubRepo;
 import com.justrelease.config.ReleaseConfig;
+import com.justrelease.config.build.BuildConfig;
+import com.justrelease.config.build.ExecConfig;
 import org.apache.commons.cli.CommandLine;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -33,24 +36,27 @@ public class GruntProject extends AbstractProjectInfo implements ProjectInfo {
     }
 
     public void createArtifacts() {
+        BuildConfig buildConfig = releaseConfig.getBuildConfig();
+
+        for (ExecConfig execConfig : buildConfig.getExecConfigs()) {
+            String[] cmd = createCommand(execConfig);
+            runCommand(cmd);
+        }
+    }
+
+    private String[] createCommand(ExecConfig execConfig) {
         String workingDir = System.getProperty("user.dir");
-//        String[] cmd = {"/bin/sh", "-c", "cd " + workingDir + "/" + releaseConfig.getLocalDirectory() + "/" + releaseConfig.getMainRepo().getDirectory() + "; npm install"};
-//        runCommand(cmd);
+        GithubRepo repo = findRepo(execConfig);
+        String[] cmd = new String[]{"/bin/sh", "-c", "cd " + workingDir + "/" + releaseConfig.getLocalDirectory() + "/" + repo.getDirectory() + "; " + execConfig.getCommand()};
+        return cmd;
+    }
 
-        String[] cmd = new String[]{"/bin/sh", "-c", "cd " + workingDir + "/" + releaseConfig.getLocalDirectory() + "/" + releaseConfig.getMainRepo().getDirectory() + "; grunt build"};
-        runCommand(cmd);
-
-
-        cmd = new String[]{"/bin/sh", "-c", "cd " + workingDir + "/" + releaseConfig.getLocalDirectory() + "/" + releaseConfig.getMainRepo().getDirectory() + "; rm -rf node_modules"};
-        runCommand(cmd);
-
-        cmd = new String[]{"/bin/sh", "-c", "cd " + workingDir + "/" + releaseConfig.getLocalDirectory() + "/" + releaseConfig.getMainRepo().getDirectory() + "; npm install"};
-        runCommand(cmd);
-
-        cmd = new String[]{"/bin/sh", "-c", "cd " + workingDir + "/" + releaseConfig.getLocalDirectory() + "/" + releaseConfig.getMainRepo().getDirectory() + "; npm shrinkwrap"};
-        runCommand(cmd);
-        
-        cmd = new String[]{"/bin/sh", "-c", "cd " + workingDir + "/" + releaseConfig.getLocalDirectory() + "/" + releaseConfig.getMainRepo().getDirectory() + "; grunt release"};
-        runCommand(cmd);
+    private GithubRepo findRepo(ExecConfig execConfig) {
+        if (execConfig.getGithubRepo().equals(releaseConfig.getMainRepo().getRepoName()))
+            return releaseConfig.getMainRepo();
+        for (GithubRepo repo : releaseConfig.getDependencyRepos()) {
+            if (repo.getRepoName().equals(execConfig.getGithubRepo())) return repo;
+        }
+        return null;
     }
 }

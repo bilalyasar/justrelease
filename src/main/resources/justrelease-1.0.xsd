@@ -26,6 +26,7 @@
                 <xs:element name="release-version" type="xs:string"/>
                 <xs:element name="next-version" type="xs:string"/>
                 <xs:element name="release-directory" type="xs:string"/>
+                <xs:element name="build" type="build"/>
             </xs:choice>
         </xs:complexType>
     </xs:element>
@@ -37,4 +38,15 @@
         </xs:restriction>
     </xs:simpleType>
 
+    <xs:complexType name="build">
+        <xs:choice minOccurs="1" maxOccurs="unbounded">
+            <xs:element name="exec">
+                <xs:complexType>
+                    <xs:attribute name="repo" type="xs:string"/>
+                    <xs:attribute name="command" type="xs:string"/>
+                    <xs:attribute name="directory" use="optional" type="xs:string"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:choice>
+    </xs:complexType>
 </xs:schema>

@@ -24,6 +24,7 @@ enum XmlElements {
     RELEASEVERSION("release-version", false),
     NEXTVERSION("next-version", false),
     RELEASEDIRECTORY("release-directory", false),
+    BUILD("build", false),
     DEPENDENCYREPO("dependency-repo", true);
 
 

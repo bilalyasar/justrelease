@@ -1,5 +1,6 @@
 package com.justrelease.config;
 
+import com.justrelease.config.build.ExecConfig;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import static com.justrelease.config.XmlElements.BUILD;
 import static com.justrelease.config.XmlElements.CURRENTVERSION;
 import static com.justrelease.config.XmlElements.DEPENDENCYREPO;
 import static com.justrelease.config.XmlElements.MAINREPO;
@@ -73,7 +75,22 @@ public class ConfigParser {
         else if (RELEASEVERSION.isEqual(nodeName)) handleReleaseVersion(node);
         else if (CURRENTVERSION.isEqual(nodeName)) handleNextVersion(node);
         else if (RELEASEDIRECTORY.isEqual(nodeName)) handleReleaseDirectory(node);
+        else if (BUILD.isEqual(nodeName)) handleBuild(node);
         else if (PROJECTTYPE.isEqual(nodeName)) handleProjectType(node);
+    }
+
+    private void handleBuild(Node node) {
+        String command, repo, directory;
+        for (Node child : new IterableNodeList(node.getChildNodes())) {
+            final String nodeName = cleanNodeName(child.getNodeName());
+            if (nodeName.equals("exec")) {
+                repo = cleanNodeName(getAttribute(child, "repo"));
+                command = cleanNodeName(getAttribute(child, "command"));
+                directory = cleanNodeName(getAttribute(child, "directory"));
+                ExecConfig execConfig = new ExecConfig(directory, command, repo);
+                releaseConfig.addExecConfig(execConfig);
+            }
+        }
     }
 
     private void handleReleaseDirectory(Node node) {
