@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <justrelease xmlns="http://www.justrelease.com/schema/config">
     <project-type>grunt</project-type>
-    <main-repo repo-name="facebook/react"/>
-    <dependency-repo repo-name="facebook/react" branch="react-gh-pages" directory="react-gh-pages"/>
-    <dependency-repo repo-name="reactjs/react-bower.git"/>
+    <main-repo repo-name="bilalyasar/react"/>
+    <dependency-repo repo-name="bilalyasar/react" branch="react-gh-pages" directory="react-gh-pages"/>
+    <dependency-repo repo-name="bilalyasar/react-bower.git"/>
     <build>
-        <exec repo="facebook/react" command="grunt build"/>
-        <exec repo="facebook/react" command="rm -rf node_modules"/>
-        <exec repo="facebook/react" command="npm install"/>
-        <exec repo="facebook/react" command="npm shrinkwrap"/>
-        <exec repo="facebook/react" command="grunt release"/>
+        <exec repo="bilalyasar/react" command="grunt build"/>
+        <exec repo="bilalyasar/react" command="rm -rf node_modules"/>
+        <exec repo="bilalyasar/react" command="npm install"/>
+        <exec repo="bilalyasar/react" command="npm shrinkwrap"/>
+        <exec repo="bilalyasar/react" command="grunt release"/>
     </build>
 </justrelease>
