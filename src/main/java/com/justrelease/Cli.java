@@ -127,7 +127,7 @@ public class Cli {
     }
 
     private void replaceNextVersion() throws IOException {
-        Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory() + File.separator + releaseConfig.getMainRepo().getDirectory()), null, false);
+        Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory() + File.separator + releaseConfig.getMainRepo().getDirectory()), null, true);
 
         while (it.hasNext()) {
             File f = (File) it.next();
@@ -144,7 +144,7 @@ public class Cli {
     }
 
     private void replaceReleaseVersion() throws IOException {
-        Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory() + File.separator + releaseConfig.getMainRepo().getDirectory()), null, false);
+        Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory() + File.separator + releaseConfig.getMainRepo().getDirectory()), null, true);
         while (it.hasNext()) {
             File f = (File) it.next();
             String content = FileUtils.readFileToString(f);
