@@ -1,19 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<justrelease xmlns="http://www.justrelease.com/schema/config">
-    <project-type>grunt</project-type>
-    <current-version>0.14.0-beta3</current-version>
-    <release-version>0.14.0</release-version>
-    <next-version>0.14.0-beta4</next-version>
-    <main-repo repo-name="bilalyasar/react"/>
-    <dependency-repo repo-name="bilalyasar/react" branch="react-gh-pages" directory="react-gh-pages"/>
-    <dependency-repo repo-name="bilalyasar/react-bower"/>
-    <build>
-        <exec repo="bilalyasar/react" command="rm -rf node_modules"/>
-        <exec repo="bilalyasar/react" command="npm install"/>
-        <exec repo="bilalyasar/react" command="grunt build"/>
-        <exec repo="bilalyasar/react" command="rm -rf node_modules"/>
-        <exec repo="bilalyasar/react" command="npm install"/>
-        <exec repo="bilalyasar/react" command="npm shrinkwrap"/>
-        <exec repo="bilalyasar/react" command="grunt release"/>
-    </build>
-</justrelease>
+repositories:
+    - facebook/react#master
+    - facebook/react#gh-pages
+    - reactjs/react-bower#master
+create.artifacts:
+    - rm -rf node_modules
+    - npm install
+    - grunt build
+    - rm -rf node_modules
+    - npm install
+    - npm shrinkwrap
+    - grunt release
+publish:
+    npm:
+    github:
+    description: releasenotes.md
+    attachment: react-X.Y.Z.zip

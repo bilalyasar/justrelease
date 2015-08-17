@@ -56,6 +56,8 @@ public class ConfigParser {
     private void parseAndBuildConfig() throws Exception {
         final DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document doc;
+//        Yaml yaml = new Yaml();
+//        yaml.load(in);
         doc = builder.parse(in);
         Element root = doc.getDocumentElement();
         handleConfig(root);
