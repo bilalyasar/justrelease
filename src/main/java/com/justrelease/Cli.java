@@ -32,7 +32,7 @@ public class Cli {
     private ProjectInfo projectInfo;
     DefaultVersionInfo versionInfo = null;
     CredentialsProvider cp;
-    String configLocation = "justrelease.xml";
+    String configLocation = "justrelease.yml";
     String projectType = "maven";
     ReleaseConfig releaseConfig = new ReleaseConfig();
 

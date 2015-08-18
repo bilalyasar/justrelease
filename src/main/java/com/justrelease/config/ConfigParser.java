@@ -1,10 +1,9 @@
 package com.justrelease.config;
 
-import com.justrelease.config.build.ExecConfig;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.yaml.snakeyaml.Yaml;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -14,9 +13,9 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
-import static com.justrelease.config.XmlElements.BUILD;
 import static com.justrelease.config.XmlElements.CURRENTVERSION;
 import static com.justrelease.config.XmlElements.DEPENDENCYREPO;
 import static com.justrelease.config.XmlElements.MAINREPO;
@@ -56,17 +55,38 @@ public class ConfigParser {
     private void parseAndBuildConfig() throws Exception {
         final DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document doc;
-//        Yaml yaml = new Yaml();
-//        yaml.load(in);
-        doc = builder.parse(in);
-        Element root = doc.getDocumentElement();
-        handleConfig(root);
+        Yaml yaml = new Yaml();
+        Map map = (Map) yaml.load(in);
+//        doc = builder.parse(in);
+//        Element root = doc.getDocumentElement();
+        handleConfig(map);
     }
 
-    private void handleConfig(Element root) {
-        for (Node node : new IterableNodeList(root.getChildNodes())) {
-            final String nodeName = cleanNodeName(node.getNodeName());
-            handleXmlNode(node, nodeName);
+    private void handleConfig(Map root) {
+        handleRepositories(root);
+        handleBuild(root);
+
+    }
+
+    private void handleBuild(Map root) {
+        ArrayList<Map> artifacts = (ArrayList) root.get("create.artifacts");
+        for (Map<String, ArrayList<String>> artifact : artifacts) {
+            for (String command : artifact.values().iterator().next()) {
+                System.out.println(command);
+            }
+        }
+
+    }
+
+    private void handleRepositories(Map root) {
+        for (String repo : (ArrayList<String>) root.get("repositories")) {
+            ArrayList<GithubRepo> list = releaseConfig.getDependencyRepos();
+            String dependencyRepo = repo.split("=")[1].split("#")[0];
+            GithubRepo githubRepo = new GithubRepo(dependencyRepo);
+            githubRepo.setDirectory(cleanNodeName(repo.split("=")[1].split("#")[0].split("/")[1]));
+            githubRepo.setId(repo.split("=")[0]);
+            list.add(githubRepo);
+            releaseConfig.setDependencyRepos(list);
         }
     }
 
@@ -77,23 +97,23 @@ public class ConfigParser {
         else if (RELEASEVERSION.isEqual(nodeName)) handleReleaseVersion(node);
         else if (CURRENTVERSION.isEqual(nodeName)) handleNextVersion(node);
         else if (RELEASEDIRECTORY.isEqual(nodeName)) handleReleaseDirectory(node);
-        else if (BUILD.isEqual(nodeName)) handleBuild(node);
+//        else if (BUILD.isEqual(nodeName)) handleBuild(node);
         else if (PROJECTTYPE.isEqual(nodeName)) handleProjectType(node);
     }
 
-    private void handleBuild(Node node) {
-        String command, repo, directory;
-        for (Node child : new IterableNodeList(node.getChildNodes())) {
-            final String nodeName = cleanNodeName(child.getNodeName());
-            if (nodeName.equals("exec")) {
-                repo = cleanNodeName(getAttribute(child, "repo"));
-                command = cleanNodeName(getAttribute(child, "command"));
-                directory = cleanNodeName(getAttribute(child, "directory"));
-                ExecConfig execConfig = new ExecConfig(directory, command, repo);
-                releaseConfig.addExecConfig(execConfig);
-            }
-        }
-    }
+//    private void handleBuild(Node node) {
+//        String command, repo, directory;
+//        for (Node child : new IterableNodeList(node.getChildNodes())) {
+//            final String nodeName = cleanNodeName(child.getNodeName());
+//            if (nodeName.equals("exec")) {
+//                repo = cleanNodeName(getAttribute(child, "repo"));
+//                command = cleanNodeName(getAttribute(child, "command"));
+//                directory = cleanNodeName(getAttribute(child, "directory"));
+//                ExecConfig execConfig = new ExecConfig(directory, command, repo);
+//                releaseConfig.addExecConfig(execConfig);
+//            }
+//        }
+//    }
 
     private void handleReleaseDirectory(Node node) {
         releaseConfig.setLocalDirectory(cleanNodeName(getTextContent(node).trim()));

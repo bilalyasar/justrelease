@@ -4,11 +4,20 @@ package com.justrelease.config;
  * Created by bilal on 30/07/15.
  */
 public class GithubRepo {
+    String id;
     String repoName;
     String repoUrl;
     String branch = "master";
     String directory;
 
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getRepoUrl() {
         return repoUrl;
