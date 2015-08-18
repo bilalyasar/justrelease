@@ -1,5 +1,6 @@
 package com.justrelease.config;
 
+import com.justrelease.config.build.ExecConfig;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -69,13 +70,23 @@ public class ConfigParser {
     }
 
     private void handleBuild(Map root) {
+        String repo, directory = "";
         ArrayList<Map> artifacts = (ArrayList) root.get("create.artifacts");
         for (Map<String, ArrayList<String>> artifact : artifacts) {
             for (String command : artifact.values().iterator().next()) {
-                System.out.println(command);
+                repo = findRepoFromId(artifact.keySet().iterator().next());
+                ExecConfig execConfig = new ExecConfig(directory, command, repo);
+                releaseConfig.addExecConfig(execConfig);
             }
         }
 
+    }
+
+    private String findRepoFromId(String next) {
+        for (GithubRepo githubRepo : releaseConfig.getDependencyRepos()) {
+            if (githubRepo.getId().equals(next)) return githubRepo.getRepoName();
+        }
+        return null;
     }
 
     private void handleRepositories(Map root) {
