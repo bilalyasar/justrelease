@@ -2,6 +2,7 @@ package com.justrelease.config;
 
 import com.justrelease.config.build.BuildConfig;
 import com.justrelease.config.build.ExecConfig;
+import com.justrelease.config.build.VersionUpdateConfig;
 
 import java.util.ArrayList;
 
@@ -14,7 +15,10 @@ public class ReleaseConfig {
     String githubName = "";
     String githubPassword = "";
     ArrayList<GithubRepo> dependencyRepos = new ArrayList<GithubRepo>();
-    String projectType = "maven";
+
+
+    ArrayList<VersionUpdateConfig> versionUpdateConfigs = new ArrayList<VersionUpdateConfig>();
+    String projectType = "grunt";
     String currentVersion = "";
     String releaseVersion = "";
     String nextVersion = "";
@@ -108,5 +112,18 @@ public class ReleaseConfig {
 
     public void setMainRepo(GithubRepo mainRepo) {
         this.mainRepo = mainRepo;
+    }
+
+    public ArrayList<VersionUpdateConfig> getVersionUpdateConfigs() {
+        return versionUpdateConfigs;
+    }
+
+    public void setVersionUpdateConfigs(ArrayList<VersionUpdateConfig> versionUpdateConfigs) {
+        this.versionUpdateConfigs = versionUpdateConfigs;
+    }
+
+    public void addVersionUpdateConfig(VersionUpdateConfig versionUpdateConfig) {
+        versionUpdateConfigs.add(versionUpdateConfig);
+
     }
 }

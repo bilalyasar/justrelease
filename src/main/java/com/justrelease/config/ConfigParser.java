@@ -1,6 +1,7 @@
 package com.justrelease.config;
 
 import com.justrelease.config.build.ExecConfig;
+import com.justrelease.config.build.VersionUpdateConfig;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -66,8 +67,21 @@ public class ConfigParser {
     private void handleConfig(Map root) {
         handleRepositories(root);
         handleBuild(root);
+        handleVersionUpdate(root);
 
     }
+
+    private void handleVersionUpdate(Map root) {
+        String repo, regex;
+        ArrayList<String> versionUpdates = (ArrayList) root.get("version.update");
+        for (String versionUpdate : versionUpdates) {
+            repo = findRepoFromId(versionUpdate.split("=")[0]);
+            regex = versionUpdate.split("=")[1];
+            VersionUpdateConfig versionUpdateConfig = new VersionUpdateConfig(regex, repo);
+            releaseConfig.addVersionUpdateConfig(versionUpdateConfig);
+        }
+    }
+
 
     private void handleBuild(Map root) {
         String repo, directory = "";
@@ -94,7 +108,7 @@ public class ConfigParser {
             ArrayList<GithubRepo> list = releaseConfig.getDependencyRepos();
             String dependencyRepo = repo.split("=")[1].split("#")[0];
             GithubRepo githubRepo = new GithubRepo(dependencyRepo);
-            githubRepo.setDirectory(cleanNodeName(repo.split("=")[1].split("#")[0].split("/")[1]));
+            githubRepo.setDirectory(cleanNodeName(repo.split("=")[1].split("#")[2]));
             githubRepo.setId(repo.split("=")[0]);
             list.add(githubRepo);
             releaseConfig.setDependencyRepos(list);
@@ -219,6 +233,7 @@ public class ConfigParser {
                 }
             };
         }
+
     }
 
     public static String cleanNodeName(final String nodeName) {

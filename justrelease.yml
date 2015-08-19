@@ -1,7 +1,9 @@
 repositories:
-    - REACT=facebook/react#master
-    - REACT_DOC=facebook/react#gh-pages
-    - BOWER=reactjs/react-bower#master
+    - REACT=facebook/react#master#react
+    - REACT_DOC=facebook/react#gh-pages#react-gh-pages
+    - BOWER=reactjs/react-bower#master#react-bower
+version.update:
+    - REACT=json,js
 create.artifacts:
     - REACT:
         - rm -rf node_modules
@@ -13,6 +15,6 @@ create.artifacts:
         - grunt release
 publish:
     npm:
-    github:
+    github: REACT,REACT_DOC,BOWER
     description: releasenotes.md
     attachment: react-X.Y.Z.zip

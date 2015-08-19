@@ -3,6 +3,7 @@ package com.justrelease;
 import com.justrelease.config.ConfigParser;
 import com.justrelease.config.GithubRepo;
 import com.justrelease.config.ReleaseConfig;
+import com.justrelease.config.build.VersionUpdateConfig;
 import com.justrelease.project.type.GruntProject;
 import com.justrelease.project.type.MavenProject;
 import com.justrelease.project.type.ProjectInfo;
@@ -33,12 +34,15 @@ public class Cli {
     DefaultVersionInfo versionInfo = null;
     CredentialsProvider cp;
     String configLocation = "justrelease.yml";
-    String projectType = "maven";
+    String projectType = "grunt";
     ReleaseConfig releaseConfig = new ReleaseConfig();
 
     public Cli(String[] args) throws VersionParseException {
 
         this.args = args;
+        releaseConfig.setCurrentVersion(args[0]);
+        releaseConfig.setReleaseVersion(args[1]);
+        releaseConfig.setNextVersion(args[2]);
         options.addOption("repo", true, "repo url");
         options.addOption("localDirectory", true, "local source repository directory");
         options.addOption("name", true, "github username");
@@ -67,11 +71,11 @@ public class Cli {
             projectInfo = createProjectInfo();
             projectInfo.setup();
             System.out.println("Cloning Main Repo:");
-            cloneRepo();
+//            cloneRepo();
             System.out.println("Cloning Dependency Repo:");
-            cloneDependencyRepos();
+//            cloneDependencyRepos();
             System.out.println("Find Version:");
-            findVersions();
+//            findVersions();
             System.out.println("Replace Release Version:");
             replaceReleaseVersion();
             System.out.println("Create Artifact:");
@@ -127,14 +131,16 @@ public class Cli {
     }
 
     private void replaceNextVersion() throws IOException {
-        Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory() + File.separator + releaseConfig.getMainRepo().getDirectory()), null, true);
-
-        while (it.hasNext()) {
-            File f = (File) it.next();
-            if (f.getAbsolutePath().contains(".git")) continue;
-            if (f.isHidden() || f.isDirectory()) continue;
-            String content = FileUtils.readFileToString(f);
-            FileUtils.writeStringToFile(f, content.replaceAll(releaseConfig.getReleaseVersion(), releaseConfig.getNextVersion()));
+        for (VersionUpdateConfig versionUpdateConfig : releaseConfig.getVersionUpdateConfigs()) {
+            Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory() + File.separator + findRepo(versionUpdateConfig.getGithubRepo()).getDirectory()),
+                    versionUpdateConfig.getRegex().split(","), true);
+            while (it.hasNext()) {
+                File f = (File) it.next();
+                if (f.getAbsolutePath().contains(".git")) continue;
+                if (f.isHidden() || f.isDirectory()) continue;
+                String content = FileUtils.readFileToString(f);
+                FileUtils.writeStringToFile(f, content.replaceAll(releaseConfig.getReleaseVersion(), releaseConfig.getNextVersion()));
+            }
         }
     }
 
@@ -146,26 +152,31 @@ public class Cli {
     }
 
     private void replaceReleaseVersion() throws IOException {
-        Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory() + File.separator + releaseConfig.getMainRepo().getDirectory()), null, true);
-        while (it.hasNext()) {
-            File f = (File) it.next();
-            if (f.getAbsolutePath().contains(".git")) continue;
-            if (f.isHidden() || f.isDirectory()) continue;
-            String content = FileUtils.readFileToString(f);
-            FileUtils.writeStringToFile(f, content.replaceAll(projectInfo.getCurrentVersion(), releaseConfig.getReleaseVersion()));
+
+
+        for (VersionUpdateConfig versionUpdateConfig : releaseConfig.getVersionUpdateConfigs()) {
+            Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory() + File.separator + findRepo(versionUpdateConfig.getGithubRepo()).getDirectory()),
+                    versionUpdateConfig.getRegex().split(","), true);
+            while (it.hasNext()) {
+                File f = (File) it.next();
+                if (f.getAbsolutePath().contains(".git")) continue;
+                if (f.isHidden() || f.isDirectory()) continue;
+                String content = FileUtils.readFileToString(f);
+                FileUtils.writeStringToFile(f, content.replaceAll(projectInfo.getCurrentVersion(), releaseConfig.getReleaseVersion()));
+            }
         }
     }
 
     private void cloneRepo() throws IOException, GitAPIException {
         FileUtils.deleteDirectory(new File(releaseConfig.getLocalDirectory()));
-        cp = new UsernamePasswordCredentialsProvider(releaseConfig.getGithubName(), releaseConfig.getGithubPassword());
-        Git.cloneRepository()
-                .setURI(releaseConfig.getMainRepo().getRepoUrl())
-                .setDirectory(new File(releaseConfig.getLocalDirectory() + File.separator + releaseConfig.getMainRepo().getDirectory()))
-                .setTransportConfigCallback(getTransportConfigCallback())
-                .setCredentialsProvider(cp)
-                .setBranch(releaseConfig.getMainRepo().getBranch())
-                .call();
+//        cp = new UsernamePasswordCredentialsProvider(releaseConfig.getGithubName(), releaseConfig.getGithubPassword());
+//        Git.cloneRepository()
+//                .setURI(releaseConfig.getMainRepo().getRepoUrl())
+//                .setDirectory(new File(releaseConfig.getLocalDirectory() + File.separator + releaseConfig.getMainRepo().getDirectory()))
+//                .setTransportConfigCallback(getTransportConfigCallback())
+//                .setCredentialsProvider(cp)
+//                .setBranch(releaseConfig.getMainRepo().getBranch())
+//                .call();
 
     }
 
@@ -190,6 +201,14 @@ public class Cli {
 
     }
 
+    private GithubRepo findRepo(String repoName) {
+        if (repoName.equals(releaseConfig.getMainRepo().getRepoName()))
+            return releaseConfig.getMainRepo();
+        for (GithubRepo repo : releaseConfig.getDependencyRepos()) {
+            if (repo.getRepoName().equals(repoName)) return repo;
+        }
+        return null;
+    }
 
     private void help() {
         // This prints out some help
