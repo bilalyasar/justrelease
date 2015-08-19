@@ -119,15 +119,16 @@ public class Cli {
     }
 
     private void commitNextVersion() throws IOException, GitAPIException {
-        Git git = Git.open(new File(releaseConfig.getLocalDirectory() + File.separator + releaseConfig.getMainRepo().getDirectory()));
-        git.add().addFilepattern(".").call();
-        git.commit().setCommitter("justrelease", "info@justrelease.com").setMessage(releaseConfig.getNextVersion()).call();
+        for (String repo : releaseConfig.taggingRepos.split(",")) {
+            Git git = Git.open(new File(releaseConfig.getLocalDirectory() + File.separator + findRepo(repo).getDirectory()));
+            git.add().addFilepattern(".").call();
+            git.commit().setCommitter("justrelease", "info@justrelease.com").setMessage(releaseConfig.getNextVersion()).call();
 
-        if (!cmd.hasOption("dryRun")) {
-            git.push().setTransportConfigCallback(getTransportConfigCallback()).setCredentialsProvider(cp).call();
-            git.push().setTransportConfigCallback(getTransportConfigCallback()).setPushTags().setCredentialsProvider(cp).call();
+            if (!cmd.hasOption("dryRun")) {
+                git.push().setTransportConfigCallback(getTransportConfigCallback()).setCredentialsProvider(cp).call();
+                git.push().setTransportConfigCallback(getTransportConfigCallback()).setPushTags().setCredentialsProvider(cp).call();
+            }
         }
-
     }
 
     private void replaceNextVersion() throws IOException {
@@ -145,10 +146,12 @@ public class Cli {
     }
 
     private void commitAndTagVersion() throws IOException, GitAPIException {
-        Git git = Git.open(new File(releaseConfig.getLocalDirectory() + File.separator + releaseConfig.getMainRepo().getDirectory()));
-        git.add().addFilepattern(".").call();
-        git.commit().setCommitter("justrelease", "info@justrelease.com").setMessage(releaseConfig.getReleaseVersion()).call();
-        git.tag().setName("v" + releaseConfig.getReleaseVersion()).call();
+        for (String repo : releaseConfig.taggingRepos.split(",")) {
+            Git git = Git.open(new File(releaseConfig.getLocalDirectory() + File.separator + findRepo(repo).getDirectory()));
+            git.add().addFilepattern(".").call();
+            git.commit().setCommitter("justrelease", "info@justrelease.com").setMessage(releaseConfig.getReleaseVersion()).call();
+            git.tag().setName("v" + releaseConfig.getReleaseVersion()).call();
+        }
     }
 
     private void replaceReleaseVersion() throws IOException {

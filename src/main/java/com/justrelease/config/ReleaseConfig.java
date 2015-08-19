@@ -14,6 +14,7 @@ public class ReleaseConfig {
     GithubRepo mainRepo = new GithubRepo("justrelease/justrelease");
     String githubName = "";
     String githubPassword = "";
+    public String taggingRepos;
     ArrayList<GithubRepo> dependencyRepos = new ArrayList<GithubRepo>();
 
 

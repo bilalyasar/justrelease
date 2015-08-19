@@ -68,7 +68,12 @@ public class ConfigParser {
         handleRepositories(root);
         handleBuild(root);
         handleVersionUpdate(root);
+        handleTaggingRepos(root);
 
+    }
+
+    private void handleTaggingRepos(Map root) {
+        releaseConfig.taggingRepos = ((String) ((Map) root.get("publish")).get("github"));
     }
 
     private void handleVersionUpdate(Map root) {
