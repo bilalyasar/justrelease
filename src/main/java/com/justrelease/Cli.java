@@ -33,7 +33,7 @@ public class Cli {
     private ProjectInfo projectInfo;
     DefaultVersionInfo versionInfo = null;
     CredentialsProvider cp;
-    String configLocation = "justrelease.yml";
+    String configLocation = "https://raw.githubusercontent.com/justrelease/justrelease/master/justrelease.yml?token=AG-cc8vGG6wQgRMrIZMOj9A74iyocUx4ks5V42LGwA%3D%3D";
     String projectType = "grunt";
     ReleaseConfig releaseConfig = new ReleaseConfig();
 
@@ -153,8 +153,6 @@ public class Cli {
     }
 
     private void replaceReleaseVersion() throws IOException {
-
-
         for (VersionUpdateConfig versionUpdateConfig : releaseConfig.getVersionUpdateConfigs()) {
             Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory() + File.separator + findRepo(versionUpdateConfig.getGithubRepo()).getDirectory()),
                     versionUpdateConfig.getRegex().split(","), true);
@@ -187,19 +185,16 @@ public class Cli {
     }
 
     private void findVersions() throws VersionParseException {
-        versionInfo = new DefaultVersionInfo(projectInfo.getCurrentVersion());
-        System.out.println("current version:" + versionInfo);
-
-        if (releaseConfig.getReleaseVersion().equals("")) {
-            releaseConfig.setReleaseVersion(versionInfo.getReleaseVersionString());
-        }
+//        versionInfo = new DefaultVersionInfo(projectInfo.getCurrentVersion());
+        System.out.println("current version:" + releaseConfig.getCurrentVersion());
+//        if (releaseConfig.getReleaseVersion().equals("")) {
+//            releaseConfig.setReleaseVersion(versionInfo.getReleaseVersionString());
+//        }
         System.out.println("releasing to the version:" + releaseConfig.getReleaseVersion());
-
-        if (releaseConfig.getNextVersion().equals("")) {
-            releaseConfig.setNextVersion(versionInfo.getNextVersion().getSnapshotVersionString());
-        }
+//        if (releaseConfig.getNextVersion().equals("")) {
+//            releaseConfig.setNextVersion(versionInfo.getNextVersion().getSnapshotVersionString());
+//        }
         System.out.println("updating to the next version:" + releaseConfig.getNextVersion());
-
     }
 
     private GithubRepo findRepo(String repoName) {

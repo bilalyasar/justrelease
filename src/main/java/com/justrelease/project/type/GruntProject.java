@@ -6,10 +6,6 @@ import com.justrelease.config.ReleaseConfig;
 import com.justrelease.config.build.BuildConfig;
 import com.justrelease.config.build.ExecConfig;
 import org.apache.commons.cli.CommandLine;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-
-import java.io.FileReader;
 
 public class GruntProject extends AbstractProjectInfo implements ProjectInfo {
 
@@ -19,20 +15,8 @@ public class GruntProject extends AbstractProjectInfo implements ProjectInfo {
     }
 
     public String getCurrentVersion() {
-        if (!releaseConfig.getCurrentVersion().equals("")) return releaseConfig.getCurrentVersion();
-        String workingDir = System.getProperty("user.dir") + "/" + releaseConfig.getLocalDirectory() + "/";
-        JSONParser parser = new JSONParser();
-        Object obj = null;
-        try {
-            obj = parser.parse(new FileReader(workingDir + releaseConfig.getMainRepo().getDirectory() + "/package.json"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        return "";
 
-        JSONObject jsonObject = (JSONObject) obj;
-
-        String version = (String) jsonObject.get("version");
-        return version;
     }
 
     public void createArtifacts() {
@@ -54,8 +38,6 @@ public class GruntProject extends AbstractProjectInfo implements ProjectInfo {
     }
 
     private GithubRepo findRepo(ExecConfig execConfig) {
-        if (execConfig.getGithubRepo().equals(releaseConfig.getMainRepo().getRepoName()))
-            return releaseConfig.getMainRepo();
         for (GithubRepo repo : releaseConfig.getDependencyRepos()) {
             if (repo.getRepoName().equals(execConfig.getGithubRepo())) return repo;
         }

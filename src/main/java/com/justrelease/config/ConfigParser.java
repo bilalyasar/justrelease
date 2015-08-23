@@ -9,10 +9,9 @@ import org.yaml.snakeyaml.Yaml;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -31,14 +30,13 @@ public class ConfigParser {
     }
 
     void loadFromWorkingDirectory() {
-        File file = new File(configLocation);
-        if (!file.exists()) {
-            return;
-        }
+
         try {
-            in = new FileInputStream(file);
-        } catch (FileNotFoundException e) {
+            in = new URL(configLocation).openStream();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
     }
 
     public void parse(ReleaseConfig releaseConfig) throws Exception {
