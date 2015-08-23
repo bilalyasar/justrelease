@@ -92,7 +92,8 @@ public class Cli {
         }
     }
 
-    private void cloneDependencyRepos() throws GitAPIException {
+    private void cloneDependencyRepos() throws GitAPIException, IOException {
+        FileUtils.deleteDirectory(new File(releaseConfig.getLocalDirectory()));
         if (releaseConfig.getDependencyRepos().size() == 0) return;
         for (GithubRepo repo : releaseConfig.getDependencyRepos()) {
             cp = new UsernamePasswordCredentialsProvider(releaseConfig.getGithubName(), releaseConfig.getGithubPassword());

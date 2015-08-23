@@ -64,12 +64,14 @@ public class ConfigParser {
     }
 
     private void handleTaggingRepos(Map root) {
+        if (root.get("publish") == null) return;
         releaseConfig.taggingRepos = ((String) ((Map) root.get("publish")).get("github"));
     }
 
     private void handleVersionUpdate(Map root) {
         String repo, regex;
         ArrayList<String> versionUpdates = (ArrayList) root.get("version.update");
+        if (versionUpdates == null) return;
         for (String versionUpdate : versionUpdates) {
             repo = findRepoFromId(versionUpdate.split("=")[0]);
             regex = versionUpdate.split("=")[1];
@@ -82,6 +84,7 @@ public class ConfigParser {
     private void handleBuild(Map root) {
         String repo, directory = "";
         ArrayList<Map> artifacts = (ArrayList) root.get("create.artifacts");
+        if (artifacts == null) return;
         for (Map<String, ArrayList<String>> artifact : artifacts) {
             for (String command : artifact.values().iterator().next()) {
                 repo = findRepoFromId(artifact.keySet().iterator().next());
