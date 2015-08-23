@@ -70,12 +70,10 @@ public class Cli {
             configParser.parse(releaseConfig);
             projectInfo = createProjectInfo();
             projectInfo.setup();
-            System.out.println("Cloning Main Repo:");
-//            cloneRepo();
-            System.out.println("Cloning Dependency Repo:");
-//            cloneDependencyRepos();
+            System.out.println("Cloning Dependency Repos:");
+            cloneDependencyRepos();
             System.out.println("Find Version:");
-//            findVersions();
+            findVersions();
             System.out.println("Replace Release Version:");
             replaceReleaseVersion();
             System.out.println("Create Artifact:");
@@ -205,8 +203,6 @@ public class Cli {
     }
 
     private GithubRepo findRepo(String repoName) {
-        if (repoName.equals(releaseConfig.getMainRepo().getRepoName()))
-            return releaseConfig.getMainRepo();
         for (GithubRepo repo : releaseConfig.getDependencyRepos()) {
             if (repo.getRepoName().equals(repoName)) return repo;
         }

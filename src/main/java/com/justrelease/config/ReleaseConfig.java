@@ -11,7 +11,6 @@ import java.util.ArrayList;
  */
 public class ReleaseConfig {
     String localDirectory = "release";
-    GithubRepo mainRepo = new GithubRepo("justrelease/justrelease");
     String githubName = "";
     String githubPassword = "";
     public String taggingRepos;
@@ -58,13 +57,6 @@ public class ReleaseConfig {
         this.releaseVersion = releaseVersion;
     }
 
-    public GithubRepo getMainRepo() {
-        return mainRepo;
-    }
-
-    public void setMainRepo(String mainRepo) {
-        this.mainRepo.setRepoName(mainRepo);
-    }
 
     public ArrayList<GithubRepo> getDependencyRepos() {
         return dependencyRepos;
@@ -111,9 +103,6 @@ public class ReleaseConfig {
         this.buildConfig = buildConfig;
     }
 
-    public void setMainRepo(GithubRepo mainRepo) {
-        this.mainRepo = mainRepo;
-    }
 
     public ArrayList<VersionUpdateConfig> getVersionUpdateConfigs() {
         return versionUpdateConfigs;

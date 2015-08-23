@@ -25,22 +25,10 @@ public abstract class AbstractProjectInfo {
 
 
     public void setup() throws Exception {
-        if (cmd.hasOption("name")) {
-            releaseConfig.setGithubName(cmd.getOptionValue("name"));
-        }
-        if (cmd.hasOption("password")) {
-            releaseConfig.setGithubPassword(cmd.getOptionValue("password"));
-        }
-        if (cmd.hasOption("repo")) {
-            releaseConfig.setMainRepo(cmd.getOptionValue("repo"));
-        }
-        releaseConfig.getMainRepo().setRepoUrl(createGithubUrl(releaseConfig.getMainRepo().getRepoName()));
         for (GithubRepo githubRepo : releaseConfig.getDependencyRepos()) {
             githubRepo.setRepoUrl(createGithubUrl(githubRepo.getRepoName()));
         }
 
-
-        System.out.println("repo url:" + releaseConfig.getMainRepo().getRepoUrl());
         if (cmd.hasOption("localDirectory")) {
             releaseConfig.setLocalDirectory(cmd.getOptionValue("localDirectory"));
         }

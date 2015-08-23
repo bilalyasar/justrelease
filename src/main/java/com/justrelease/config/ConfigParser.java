@@ -18,13 +18,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import static com.justrelease.config.XmlElements.CURRENTVERSION;
-import static com.justrelease.config.XmlElements.DEPENDENCYREPO;
-import static com.justrelease.config.XmlElements.MAINREPO;
-import static com.justrelease.config.XmlElements.PROJECTTYPE;
-import static com.justrelease.config.XmlElements.RELEASEDIRECTORY;
-import static com.justrelease.config.XmlElements.RELEASEVERSION;
-
 /**
  * Created by bilal on 26/07/15.
  */
@@ -120,17 +113,6 @@ public class ConfigParser {
         }
     }
 
-    private void handleXmlNode(Node node, String nodeName) {
-        if (MAINREPO.isEqual(nodeName)) handleMainRepo(node);
-        else if (DEPENDENCYREPO.isEqual(nodeName)) handleDependencyRepo(node);
-        else if (CURRENTVERSION.isEqual(nodeName)) handleCurrentVersion(node);
-        else if (RELEASEVERSION.isEqual(nodeName)) handleReleaseVersion(node);
-        else if (CURRENTVERSION.isEqual(nodeName)) handleNextVersion(node);
-        else if (RELEASEDIRECTORY.isEqual(nodeName)) handleReleaseDirectory(node);
-//        else if (BUILD.isEqual(nodeName)) handleBuild(node);
-        else if (PROJECTTYPE.isEqual(nodeName)) handleProjectType(node);
-    }
-
 //    private void handleBuild(Node node) {
 //        String command, repo, directory;
 //        for (Node child : new IterableNodeList(node.getChildNodes())) {
@@ -176,13 +158,6 @@ public class ConfigParser {
         releaseConfig.setDependencyRepos(list);
 
     }
-
-    private void handleMainRepo(Node node) {
-        String mainRepo = getAttribute(node, "repo-name");
-        releaseConfig.setMainRepo(mainRepo);
-        releaseConfig.getMainRepo().setDirectory(mainRepo.split("/")[1]);
-    }
-
 
     public static class IterableNodeList implements Iterable<Node> {
 
