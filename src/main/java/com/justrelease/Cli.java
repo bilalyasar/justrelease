@@ -33,16 +33,17 @@ public class Cli {
     private ProjectInfo projectInfo;
     DefaultVersionInfo versionInfo = null;
     CredentialsProvider cp;
-    String configLocation = "https://raw.githubusercontent.com/justrelease/justrelease/master/justrelease.yml?token=AG-cc8vGG6wQgRMrIZMOj9A74iyocUx4ks5V42LGwA%3D%3D";
+    String configLocation = "";
     String projectType = "grunt";
     ReleaseConfig releaseConfig = new ReleaseConfig();
 
     public Cli(String[] args) throws VersionParseException {
 
         this.args = args;
-        releaseConfig.setCurrentVersion(args[0]);
-        releaseConfig.setReleaseVersion(args[1]);
-        releaseConfig.setNextVersion(args[2]);
+        configLocation = "https://raw.githubusercontent.com/" + args[0] + "/master/justrelease.yml";
+        releaseConfig.setCurrentVersion(args[1]);
+        releaseConfig.setReleaseVersion(args[2]);
+        releaseConfig.setNextVersion(args[3]);
         options.addOption("repo", true, "repo url");
         options.addOption("localDirectory", true, "local source repository directory");
         options.addOption("name", true, "github username");
