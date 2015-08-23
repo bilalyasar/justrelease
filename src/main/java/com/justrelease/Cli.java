@@ -163,7 +163,7 @@ public class Cli {
                 if (f.getAbsolutePath().contains(".git")) continue;
                 if (f.isHidden() || f.isDirectory()) continue;
                 String content = FileUtils.readFileToString(f);
-                FileUtils.writeStringToFile(f, content.replaceAll(projectInfo.getCurrentVersion(), releaseConfig.getReleaseVersion()));
+                FileUtils.writeStringToFile(f, content.replaceAll(releaseConfig.getCurrentVersion(), releaseConfig.getReleaseVersion()));
             }
         }
     }
