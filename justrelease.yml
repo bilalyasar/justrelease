@@ -1,20 +1,13 @@
 repositories:
-    - REACT=facebook/react#master#react
-    - REACT_DOC=facebook/react#gh-pages#react-gh-pages
-    - BOWER=reactjs/react-bower#master#react-bower
+    - MOONDAYS=bilalyasar/moondays#master#moondays
 version.update:
-    - REACT=json,js
+    - MOONDAYS=json,js
 create.artifacts:
-    - REACT:
-        - rm -rf node_modules
+    - MOONDAYS:
         - npm install
-        - grunt build
-        - rm -rf node_modules
-        - npm install
-        - npm shrinkwrap
-        - grunt release
+        - npm test
 publish:
-    npm:
-    github: REACT,REACT_DOC,BOWER
-    description: releasenotes.md
-    attachment: react-X.Y.Z.zip
+    - MOONDAYS:
+        - github:
+            - description=releasenotes.md
+            - attachment=lib/index.js

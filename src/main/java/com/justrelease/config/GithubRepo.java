@@ -9,6 +9,8 @@ public class GithubRepo {
     String repoUrl;
     String branch = "master";
     String directory;
+    String descriptionFileName;
+    String attachmentFile;
 
 
     public String getId() {
