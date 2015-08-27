@@ -10,6 +10,7 @@ public class GithubRepo {
     String branch = "master";
     String directory;
     String descriptionFileName;
+
     String attachmentFile;
 
 
@@ -51,6 +52,22 @@ public class GithubRepo {
 
     public void setBranch(String branch) {
         this.branch = branch;
+    }
+
+    public String getAttachmentFile() {
+        return attachmentFile;
+    }
+
+    public void setAttachmentFile(String attachmentFile) {
+        this.attachmentFile = attachmentFile;
+    }
+
+    public String getDescriptionFileName() {
+        return descriptionFileName;
+    }
+
+    public void setDescriptionFileName(String descriptionFileName) {
+        this.descriptionFileName = descriptionFileName;
     }
 
     public GithubRepo(String repoName) {

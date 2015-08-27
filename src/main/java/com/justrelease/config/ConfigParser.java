@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -54,7 +55,17 @@ public class ConfigParser {
 
     private void handleTaggingRepos(Map root) {
         if (root.get("publish") == null) return;
-        releaseConfig.taggingRepos = ((String) ((Map) root.get("publish")).get("github"));
+        ArrayList<LinkedHashMap> arrayList = ((ArrayList) root.get("publish"));
+        for (LinkedHashMap entry : arrayList) {
+            String key = (String) entry.keySet().iterator().next();
+            ArrayList<String> commands = (ArrayList) ((LinkedHashMap) ((ArrayList) entry.get(key)).get(0)).get("github");
+            for (String command : commands) {
+                if (command.startsWith("description"))
+                    findRepo(findRepoFromId(key)).setDescriptionFileName(command.split("=")[1]);
+                if (command.startsWith("attachment"))
+                    findRepo(findRepoFromId(key)).setAttachmentFile(command.split("=")[1]);
+            }
+        }
     }
 
     private void handleVersionUpdate(Map root) {
@@ -82,6 +93,13 @@ public class ConfigParser {
             }
         }
 
+    }
+
+    private GithubRepo findRepo(String repoName) {
+        for (GithubRepo repo : releaseConfig.getDependencyRepos()) {
+            if (repo.getRepoName().equals(repoName)) return repo;
+        }
+        return null;
     }
 
     private String findRepoFromId(String next) {
