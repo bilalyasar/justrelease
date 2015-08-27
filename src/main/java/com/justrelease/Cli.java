@@ -18,8 +18,11 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.logging.Logger;
@@ -42,8 +45,10 @@ public class Cli {
 
         this.args = args;
         configLocation = "https://raw.githubusercontent.com/" + args[0] + "/master/justrelease.yml";
-        releaseConfig.setCurrentVersion(args[1]);
-        if (!args[2].startsWith("-")) {
+        if (!args[1].startsWith("-")) {
+            releaseConfig.setCurrentVersion(args[1]);
+        }
+        if (args.length >= 4 && !args[2].startsWith("-")) {
             releaseConfig.setReleaseVersion(args[2]);
             releaseConfig.setNextVersion(args[3]);
         }
@@ -64,7 +69,21 @@ public class Cli {
 
         try {
             cmd = parser.parse(options, args);
+            ConfigParser configParser = new ConfigParser(configLocation);
+            configParser.parse(releaseConfig);
+            if (cmd.hasOption("h")) {
+                printHelp();
+            }
+            if (cmd.hasOption("config")) {
+                configLocation = cmd.getOptionValue("config");
+            }
+            projectInfo = createProjectInfo();
+            projectInfo.setup();
+            System.out.println("Cloning Dependency Repos:");
+            cloneDependencyRepos();
 
+            if (releaseConfig.getCurrentVersion().equals(""))
+                releaseConfig.setCurrentVersion(getCurrentVersion());
             if (cmd.hasOption("releaseType")) {
                 Version.Builder builder = new Version.Builder(releaseConfig.getCurrentVersion());
                 releaseConfig.setReleaseVersion(builder.build().getNormalVersion());
@@ -76,18 +95,8 @@ public class Cli {
                     releaseConfig.setNextVersion(builder.build().incrementPatchVersion().getNormalVersion());
                 }
             }
-            if (cmd.hasOption("h")) {
-                printHelp();
-            }
-            if (cmd.hasOption("config")) {
-                configLocation = cmd.getOptionValue("config");
-            }
-            ConfigParser configParser = new ConfigParser(configLocation);
-            configParser.parse(releaseConfig);
-            projectInfo = createProjectInfo();
-            projectInfo.setup();
-            System.out.println("Cloning Dependency Repos:");
-            cloneDependencyRepos();
+
+
             System.out.println("Find Version:");
             findVersions();
             System.out.println("Replace Release Version:");
@@ -217,5 +226,20 @@ public class Cli {
 
         formater.printHelp("JustRelease", options);
         System.exit(0);
+    }
+
+    private String getCurrentVersion() {
+        String workingDir = System.getProperty("user.dir") + "/" + releaseConfig.getLocalDirectory() + "/";
+        JSONParser parser = new JSONParser();
+        Object obj = null;
+        try {
+            obj = parser.parse(new FileReader(workingDir + findRepo(args[0]).getDirectory() + "/package.json"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        JSONObject jsonObject = (JSONObject) obj;
+
+        String version = (String) jsonObject.get("version");
+        return version;
     }
 }
