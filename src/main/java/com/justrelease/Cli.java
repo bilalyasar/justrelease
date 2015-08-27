@@ -1,5 +1,6 @@
 package com.justrelease;
 
+import com.github.zafarkhaja.semver.Version;
 import com.justrelease.config.ConfigParser;
 import com.justrelease.config.GithubRepo;
 import com.justrelease.config.ReleaseConfig;
@@ -42,8 +43,11 @@ public class Cli {
         this.args = args;
         configLocation = "https://raw.githubusercontent.com/" + args[0] + "/master/justrelease.yml";
         releaseConfig.setCurrentVersion(args[1]);
-        releaseConfig.setReleaseVersion(args[2]);
-        releaseConfig.setNextVersion(args[3]);
+        if (!args[2].startsWith("-")) {
+            releaseConfig.setReleaseVersion(args[2]);
+            releaseConfig.setNextVersion(args[3]);
+        }
+        options.addOption("releaseType", true, "release type (major | minor | patch");
         options.addOption("repo", true, "repo url");
         options.addOption("localDirectory", true, "local source repository directory");
         options.addOption("name", true, "github username");
@@ -61,6 +65,17 @@ public class Cli {
         try {
             cmd = parser.parse(options, args);
 
+            if (cmd.hasOption("releaseType")) {
+                Version.Builder builder = new Version.Builder(releaseConfig.getCurrentVersion());
+                releaseConfig.setReleaseVersion(builder.build().getNormalVersion());
+                if (cmd.getOptionValue("releaseType").equals("major")) {
+                    releaseConfig.setNextVersion(builder.build().incrementMajorVersion().getNormalVersion());
+                } else if (cmd.getOptionValue("releaseType").equals("minor")) {
+                    releaseConfig.setNextVersion(builder.build().incrementMinorVersion().getNormalVersion());
+                } else if (cmd.getOptionValue("releaseType").equals("patch")) {
+                    releaseConfig.setNextVersion(builder.build().incrementPatchVersion().getNormalVersion());
+                }
+            }
             if (cmd.hasOption("h")) {
                 printHelp();
             }
@@ -119,8 +134,9 @@ public class Cli {
     }
 
     private void commitNextVersion() throws IOException, GitAPIException {
-        for (String repo : releaseConfig.taggingRepos.split(",")) {
-            Git git = Git.open(new File(releaseConfig.getLocalDirectory() + File.separator + findRepo(repo).getDirectory()));
+        for (GithubRepo githubRepo : releaseConfig.getDependencyRepos()) {
+            if (githubRepo.getAttachmentFile() == "") continue;
+            Git git = Git.open(new File(releaseConfig.getLocalDirectory() + File.separator + githubRepo.getDirectory()));
             git.add().addFilepattern(".").call();
             git.commit().setCommitter("justrelease", "info@justrelease.com").setMessage(releaseConfig.getNextVersion()).call();
 
