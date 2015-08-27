@@ -146,12 +146,14 @@ public class Cli {
     }
 
     private void commitAndTagVersion() throws IOException, GitAPIException {
-        for (String repo : releaseConfig.taggingRepos.split(",")) {
-            Git git = Git.open(new File(releaseConfig.getLocalDirectory() + File.separator + findRepo(repo).getDirectory()));
+        for (GithubRepo githubRepo : releaseConfig.getDependencyRepos()) {
+            if (githubRepo.getAttachmentFile() == "") continue;
+            Git git = Git.open(new File(releaseConfig.getLocalDirectory() + File.separator + githubRepo.getDirectory()));
             git.add().addFilepattern(".").call();
             git.commit().setCommitter("justrelease", "info@justrelease.com").setMessage(releaseConfig.getReleaseVersion()).call();
             git.tag().setName("v" + releaseConfig.getReleaseVersion()).call();
         }
+
     }
 
     private void replaceReleaseVersion() throws IOException {
@@ -166,19 +168,6 @@ public class Cli {
                 FileUtils.writeStringToFile(f, content.replaceAll(releaseConfig.getCurrentVersion(), releaseConfig.getReleaseVersion()));
             }
         }
-    }
-
-    private void cloneRepo() throws IOException, GitAPIException {
-        FileUtils.deleteDirectory(new File(releaseConfig.getLocalDirectory()));
-//        cp = new UsernamePasswordCredentialsProvider(releaseConfig.getGithubName(), releaseConfig.getGithubPassword());
-//        Git.cloneRepository()
-//                .setURI(releaseConfig.getMainRepo().getRepoUrl())
-//                .setDirectory(new File(releaseConfig.getLocalDirectory() + File.separator + releaseConfig.getMainRepo().getDirectory()))
-//                .setTransportConfigCallback(getTransportConfigCallback())
-//                .setCredentialsProvider(cp)
-//                .setBranch(releaseConfig.getMainRepo().getBranch())
-//                .call();
-
     }
 
     private void printHelp() {
