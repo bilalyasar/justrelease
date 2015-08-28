@@ -38,7 +38,7 @@ public class Cli {
     public Cli(String[] args) throws VersionParseException {
 
         this.args = args;
-        releaseConfig.getMainRepo().setRepoName(args[0]);
+        releaseConfig.setMainRepo(new GithubRepo(args[0]));
         releaseConfig.setConfigLocation("https://raw.githubusercontent.com/" + args[0] + "/master/justrelease.yml");
 
         options.addOption("releaseType", true, "release type (major | minor | patch");
