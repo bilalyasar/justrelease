@@ -1,14 +1,16 @@
 package com.justrelease.config.build;
 
+import com.justrelease.config.GithubRepo;
+
 /**
  * Created by bilal on 14/08/15.
  */
 public class ExecConfig {
     String command;
     String directory;
-    String githubRepo;
+    GithubRepo githubRepo;
 
-    public ExecConfig(String directory, String command, String githubRepo) {
+    public ExecConfig(String directory, String command, GithubRepo githubRepo) {
         this.directory = directory;
         this.command = command;
         this.githubRepo = githubRepo;
@@ -30,11 +32,11 @@ public class ExecConfig {
         this.command = command;
     }
 
-    public String getGithubRepo() {
+    public GithubRepo getGithubRepo() {
         return githubRepo;
     }
 
-    public void setGithubRepo(String githubRepo) {
+    public void setGithubRepo(GithubRepo githubRepo) {
         this.githubRepo = githubRepo;
     }
 

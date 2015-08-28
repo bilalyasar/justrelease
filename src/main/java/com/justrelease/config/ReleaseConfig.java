@@ -11,10 +11,10 @@ import java.util.ArrayList;
  */
 public class ReleaseConfig {
     String localDirectory = "release";
+    String configLocation = "";
     String githubName = "";
     String githubPassword = "";
-    public String taggingRepos;
-    ArrayList<GithubRepo> dependencyRepos = new ArrayList<GithubRepo>();
+    GithubRepo mainRepo;
 
 
     ArrayList<VersionUpdateConfig> versionUpdateConfigs = new ArrayList<VersionUpdateConfig>();
@@ -23,6 +23,15 @@ public class ReleaseConfig {
     String releaseVersion = "";
     String nextVersion = "";
     BuildConfig buildConfig = new BuildConfig();
+
+
+    public String getConfigLocation() {
+        return configLocation;
+    }
+
+    public void setConfigLocation(String configLocation) {
+        this.configLocation = configLocation;
+    }
 
     public String getLocalDirectory() {
         return localDirectory;
@@ -57,13 +66,12 @@ public class ReleaseConfig {
         this.releaseVersion = releaseVersion;
     }
 
-
-    public ArrayList<GithubRepo> getDependencyRepos() {
-        return dependencyRepos;
+    public GithubRepo getMainRepo() {
+        return mainRepo;
     }
 
-    public void setDependencyRepos(ArrayList<GithubRepo> dependencyRepos) {
-        this.dependencyRepos = dependencyRepos;
+    public void setMainRepo(GithubRepo mainRepo) {
+        this.mainRepo = mainRepo;
     }
 
     public String getProjectType() {

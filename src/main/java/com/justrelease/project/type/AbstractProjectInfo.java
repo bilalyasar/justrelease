@@ -1,7 +1,6 @@
 package com.justrelease.project.type;
 
 import com.jcraft.jsch.Session;
-import com.justrelease.config.GithubRepo;
 import com.justrelease.config.ReleaseConfig;
 import org.apache.commons.cli.CommandLine;
 import org.eclipse.jgit.api.TransportConfigCallback;
@@ -22,29 +21,6 @@ public abstract class AbstractProjectInfo {
     ReleaseConfig releaseConfig;
 
     public CommandLine cmd;
-
-
-    public void setup() throws Exception {
-        for (GithubRepo githubRepo : releaseConfig.getDependencyRepos()) {
-            githubRepo.setRepoUrl(createGithubUrl(githubRepo.getRepoName()));
-        }
-
-        if (cmd.hasOption("localDirectory")) {
-            releaseConfig.setLocalDirectory(cmd.getOptionValue("localDirectory"));
-        }
-        System.out.println("local directory:" + releaseConfig.getLocalDirectory());
-
-        if (cmd.hasOption("c")) {
-            releaseConfig.setCurrentVersion(cmd.getOptionValue("c"));
-        }
-        // options end, now we have necessary infos
-    }
-
-    private String createGithubUrl(String repo) {
-        if (!releaseConfig.getGithubName().equals("") && !releaseConfig.getGithubPassword().equals(""))
-            return String.format("https://github.com/%s.git", repo);
-        return String.format("git@github.com:%s.git", repo);
-    }
 
     public static TransportConfigCallback getTransportConfigCallback() {
         final SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {

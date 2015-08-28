@@ -7,8 +7,6 @@ public interface ProjectInfo {
 
     String getCurrentVersion();
 
-    void setup() throws Exception;
-
     void createArtifacts();
 
 }

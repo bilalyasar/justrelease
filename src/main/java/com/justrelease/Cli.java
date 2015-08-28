@@ -18,11 +18,8 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.logging.Logger;
@@ -35,33 +32,21 @@ public class Cli {
     private Options options = new Options();
     private CommandLine cmd;
     private ProjectInfo projectInfo;
-    DefaultVersionInfo versionInfo = null;
     CredentialsProvider cp;
-    String configLocation = "";
-    String projectType = "grunt";
     ReleaseConfig releaseConfig = new ReleaseConfig();
 
     public Cli(String[] args) throws VersionParseException {
 
         this.args = args;
-        configLocation = "https://raw.githubusercontent.com/" + args[0] + "/master/justrelease.yml";
-        if (!args[1].startsWith("-")) {
-            releaseConfig.setCurrentVersion(args[1]);
-        }
-        if (args.length >= 4 && !args[2].startsWith("-")) {
-            releaseConfig.setReleaseVersion(args[2]);
-            releaseConfig.setNextVersion(args[3]);
-        }
+        releaseConfig.getMainRepo().setRepoName(args[0]);
+        releaseConfig.setConfigLocation("https://raw.githubusercontent.com/" + args[0] + "/master/justrelease.yml");
+
         options.addOption("releaseType", true, "release type (major | minor | patch");
-        options.addOption("repo", true, "repo url");
-        options.addOption("localDirectory", true, "local source repository directory");
-        options.addOption("name", true, "github username");
-        options.addOption("password", true, "github password");
-        options.addOption("c", true, "current snapshot version");
+        options.addOption("c", true, "current version of the project");
+        options.addOption("r", true, "release version of the project");
+        options.addOption("n", true, "next version of the project");
         options.addOption("h", false, "help");
         options.addOption("dryRun", false, "release without push");
-        options.addOption("type", true, "project type info");
-        options.addOption("config", true, "release config file location");
     }
 
     public void parse() throws Exception {
@@ -69,21 +54,18 @@ public class Cli {
 
         try {
             cmd = parser.parse(options, args);
-            ConfigParser configParser = new ConfigParser(configLocation);
+            ConfigParser configParser = new ConfigParser(releaseConfig.getConfigLocation());
             configParser.parse(releaseConfig);
-            if (cmd.hasOption("h")) {
-                printHelp();
-            }
-            if (cmd.hasOption("config")) {
-                configLocation = cmd.getOptionValue("config");
-            }
-            projectInfo = createProjectInfo();
-            projectInfo.setup();
-            System.out.println("Cloning Dependency Repos:");
-            cloneDependencyRepos();
+            // clone main repo
+            releaseConfig.getMainRepo().setRepoUrl(createGithubUrl(releaseConfig.getMainRepo().getRepoName()));
+            cloneMainRepo();
+            parseOptions();
+            projectInfo = createProjectInfo();  // maven or grunt project
 
             if (releaseConfig.getCurrentVersion().equals(""))
-                releaseConfig.setCurrentVersion(getCurrentVersion());
+                releaseConfig.setCurrentVersion(createProjectInfo().getCurrentVersion());
+
+
             if (cmd.hasOption("releaseType")) {
                 Version.Builder builder = new Version.Builder(releaseConfig.getCurrentVersion());
                 releaseConfig.setReleaseVersion(builder.build().getNormalVersion());
@@ -98,7 +80,7 @@ public class Cli {
 
 
             System.out.println("Find Version:");
-            findVersions();
+//            findVersions();
             System.out.println("Replace Release Version:");
             replaceReleaseVersion();
             System.out.println("Create Artifact:");
@@ -116,49 +98,58 @@ public class Cli {
         }
     }
 
-    private void cloneDependencyRepos() throws GitAPIException, IOException {
-        FileUtils.deleteDirectory(new File(releaseConfig.getLocalDirectory()));
-        if (releaseConfig.getDependencyRepos().size() == 0) return;
-        for (GithubRepo repo : releaseConfig.getDependencyRepos()) {
-            cp = new UsernamePasswordCredentialsProvider(releaseConfig.getGithubName(), releaseConfig.getGithubPassword());
-            Git.cloneRepository()
-                    .setURI(repo.getRepoUrl())
-                    .setDirectory(new File(releaseConfig.getLocalDirectory() + "/" + repo.getDirectory()))
-                    .setTransportConfigCallback(getTransportConfigCallback())
-                    .setCredentialsProvider(cp)
-                    .setBranch(repo.getBranch())
-                    .call();
+    private void parseOptions() {
+        if (cmd.hasOption("h")) {
+            printHelp();
         }
+        if (cmd.hasOption("c")) {
+            releaseConfig.setCurrentVersion(cmd.getOptionValue("c"));
+        }
+        if (cmd.hasOption("n")) {
+            releaseConfig.setNextVersion(cmd.getOptionValue("c"));
+        }
+        if (cmd.hasOption("r")) {
+            releaseConfig.setReleaseVersion(cmd.getOptionValue("c"));
+        }
+    }
+
+    private void cloneMainRepo() throws GitAPIException, IOException {
+        FileUtils.deleteDirectory(new File(releaseConfig.getLocalDirectory()));
+        cp = new UsernamePasswordCredentialsProvider(releaseConfig.getGithubName(), releaseConfig.getGithubPassword());
+        GithubRepo mainRepo = releaseConfig.getMainRepo();
+        Git.cloneRepository()
+                .setURI(mainRepo.getRepoUrl())
+                .setDirectory(new File(releaseConfig.getLocalDirectory() + "/" + mainRepo.getDirectory()))
+                .setTransportConfigCallback(getTransportConfigCallback())
+                .setCredentialsProvider(cp)
+                .setBranch(mainRepo.getBranch())
+                .call();
     }
 
     private ProjectInfo createProjectInfo() {
-        if (cmd.hasOption("type")) {
-            projectType = cmd.getOptionValue("type");
-        } else projectType = releaseConfig.getProjectType();
+        String workingDir = System.getProperty("user.dir") + "/" + releaseConfig.getLocalDirectory() + "/";
+        File file = new File(workingDir + releaseConfig.getMainRepo().getDirectory() + "/package.json");
+        if (file.exists()) return new GruntProject(cmd, releaseConfig);
+        return new MavenProject(cmd, releaseConfig);
 
-        if (projectType.equals("maven")) {
-            return new MavenProject(cmd, releaseConfig);
-        }
-        return new GruntProject(cmd, releaseConfig);
     }
 
     private void commitNextVersion() throws IOException, GitAPIException {
-        for (GithubRepo githubRepo : releaseConfig.getDependencyRepos()) {
-            if (githubRepo.getAttachmentFile() == "") continue;
-            Git git = Git.open(new File(releaseConfig.getLocalDirectory() + File.separator + githubRepo.getDirectory()));
-            git.add().addFilepattern(".").call();
-            git.commit().setCommitter("justrelease", "info@justrelease.com").setMessage(releaseConfig.getNextVersion()).call();
+        GithubRepo mainRepo = releaseConfig.getMainRepo();
+        Git git = Git.open(new File(releaseConfig.getLocalDirectory() + File.separator + mainRepo.getDirectory()));
+        git.add().addFilepattern(".").call();
+        git.commit().setCommitter("justrelease", "info@justrelease.com").setMessage(releaseConfig.getNextVersion()).call();
 
-            if (!cmd.hasOption("dryRun")) {
-                git.push().setTransportConfigCallback(getTransportConfigCallback()).setCredentialsProvider(cp).call();
-                git.push().setTransportConfigCallback(getTransportConfigCallback()).setPushTags().setCredentialsProvider(cp).call();
-            }
+        if (!cmd.hasOption("dryRun")) {
+            git.push().setTransportConfigCallback(getTransportConfigCallback()).setCredentialsProvider(cp).call();
+            git.push().setTransportConfigCallback(getTransportConfigCallback()).setPushTags().setCredentialsProvider(cp).call();
         }
     }
 
     private void replaceNextVersion() throws IOException {
+        GithubRepo mainRepo = releaseConfig.getMainRepo();
         for (VersionUpdateConfig versionUpdateConfig : releaseConfig.getVersionUpdateConfigs()) {
-            Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory() + File.separator + findRepo(versionUpdateConfig.getGithubRepo()).getDirectory()),
+            Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory() + File.separator + mainRepo.getDirectory()),
                     versionUpdateConfig.getRegex().split(","), true);
             while (it.hasNext()) {
                 File f = (File) it.next();
@@ -171,19 +162,17 @@ public class Cli {
     }
 
     private void commitAndTagVersion() throws IOException, GitAPIException {
-        for (GithubRepo githubRepo : releaseConfig.getDependencyRepos()) {
-            if (githubRepo.getAttachmentFile() == "") continue;
-            Git git = Git.open(new File(releaseConfig.getLocalDirectory() + File.separator + githubRepo.getDirectory()));
-            git.add().addFilepattern(".").call();
-            git.commit().setCommitter("justrelease", "info@justrelease.com").setMessage(releaseConfig.getReleaseVersion()).call();
-            git.tag().setName("v" + releaseConfig.getReleaseVersion()).call();
-        }
-
+        GithubRepo mainRepo = releaseConfig.getMainRepo();
+        Git git = Git.open(new File(releaseConfig.getLocalDirectory() + File.separator + mainRepo.getDirectory()));
+        git.add().addFilepattern(".").call();
+        git.commit().setCommitter("justrelease", "info@justrelease.com").setMessage(releaseConfig.getReleaseVersion()).call();
+        git.tag().setName("v" + releaseConfig.getReleaseVersion()).call();
     }
 
     private void replaceReleaseVersion() throws IOException {
+        GithubRepo mainRepo = releaseConfig.getMainRepo();
         for (VersionUpdateConfig versionUpdateConfig : releaseConfig.getVersionUpdateConfigs()) {
-            Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory() + File.separator + findRepo(versionUpdateConfig.getGithubRepo()).getDirectory()),
+            Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory() + File.separator + mainRepo.getDirectory()),
                     versionUpdateConfig.getRegex().split(","), true);
             while (it.hasNext()) {
                 File f = (File) it.next();
@@ -200,25 +189,6 @@ public class Cli {
         f.printHelp("OptionsTip", options);
     }
 
-    private void findVersions() throws VersionParseException {
-//        versionInfo = new DefaultVersionInfo(projectInfo.getCurrentVersion());
-        System.out.println("current version:" + releaseConfig.getCurrentVersion());
-//        if (releaseConfig.getReleaseVersion().equals("")) {
-//            releaseConfig.setReleaseVersion(versionInfo.getReleaseVersionString());
-//        }
-        System.out.println("releasing to the version:" + releaseConfig.getReleaseVersion());
-//        if (releaseConfig.getNextVersion().equals("")) {
-//            releaseConfig.setNextVersion(versionInfo.getNextVersion().getSnapshotVersionString());
-//        }
-        System.out.println("updating to the next version:" + releaseConfig.getNextVersion());
-    }
-
-    private GithubRepo findRepo(String repoName) {
-        for (GithubRepo repo : releaseConfig.getDependencyRepos()) {
-            if (repo.getRepoName().equals(repoName)) return repo;
-        }
-        return null;
-    }
 
     private void help() {
         // This prints out some help
@@ -228,18 +198,9 @@ public class Cli {
         System.exit(0);
     }
 
-    private String getCurrentVersion() {
-        String workingDir = System.getProperty("user.dir") + "/" + releaseConfig.getLocalDirectory() + "/";
-        JSONParser parser = new JSONParser();
-        Object obj = null;
-        try {
-            obj = parser.parse(new FileReader(workingDir + findRepo(args[0]).getDirectory() + "/package.json"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        JSONObject jsonObject = (JSONObject) obj;
-
-        String version = (String) jsonObject.get("version");
-        return version;
+    private String createGithubUrl(String repo) {
+        if (!releaseConfig.getGithubName().equals("") && !releaseConfig.getGithubPassword().equals(""))
+            return String.format("https://github.com/%s.git", repo);
+        return String.format("git@github.com:%s.git", repo);
     }
 }

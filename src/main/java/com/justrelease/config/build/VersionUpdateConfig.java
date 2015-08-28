@@ -1,13 +1,15 @@
 package com.justrelease.config.build;
 
+import com.justrelease.config.GithubRepo;
+
 /**
  * Created by bilal on 14/08/15.
  */
 public class VersionUpdateConfig {
     String regex;
-    String githubRepo;
+    GithubRepo githubRepo;
 
-    public VersionUpdateConfig(String regex, String githubRepo) {
+    public VersionUpdateConfig(String regex, GithubRepo githubRepo) {
         this.regex = regex;
         this.githubRepo = githubRepo;
     }
@@ -21,11 +23,11 @@ public class VersionUpdateConfig {
         this.regex = regex;
     }
 
-    public String getGithubRepo() {
+    public GithubRepo getGithubRepo() {
         return githubRepo;
     }
 
-    public void setGithubRepo(String githubRepo) {
+    public void setGithubRepo(GithubRepo githubRepo) {
         this.githubRepo = githubRepo;
     }
 

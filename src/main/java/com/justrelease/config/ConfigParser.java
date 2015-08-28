@@ -46,7 +46,6 @@ public class ConfigParser {
     }
 
     private void handleConfig(Map root) {
-        handleRepositories(root);
         handleBuild(root);
         handleVersionUpdate(root);
         handleTaggingRepos(root);
@@ -54,6 +53,7 @@ public class ConfigParser {
     }
 
     private void handleTaggingRepos(Map root) {
+        GithubRepo mainRepo = releaseConfig.getMainRepo();
         if (root.get("publish") == null) return;
         ArrayList<LinkedHashMap> arrayList = ((ArrayList) root.get("publish"));
         for (LinkedHashMap entry : arrayList) {
@@ -61,63 +61,30 @@ public class ConfigParser {
             ArrayList<String> commands = (ArrayList) ((LinkedHashMap) ((ArrayList) entry.get(key)).get(0)).get("github");
             for (String command : commands) {
                 if (command.startsWith("description"))
-                    findRepo(findRepoFromId(key)).setDescriptionFileName(command.split("=")[1]);
+                    mainRepo.setDescriptionFileName(command.split("=")[1]);
                 if (command.startsWith("attachment"))
-                    findRepo(findRepoFromId(key)).setAttachmentFile(command.split("=")[1]);
+                    mainRepo.setAttachmentFile(command.split("=")[1]);
             }
         }
     }
 
     private void handleVersionUpdate(Map root) {
-        String repo, regex;
+        GithubRepo mainRepo = releaseConfig.getMainRepo();
         ArrayList<String> versionUpdates = (ArrayList) root.get("version.update");
-        if (versionUpdates == null) return;
-        for (String versionUpdate : versionUpdates) {
-            repo = findRepoFromId(versionUpdate.split("=")[0]);
-            regex = versionUpdate.split("=")[1];
-            VersionUpdateConfig versionUpdateConfig = new VersionUpdateConfig(regex, repo);
+        for (String regex : versionUpdates) {
+            VersionUpdateConfig versionUpdateConfig = new VersionUpdateConfig(regex, mainRepo);
             releaseConfig.addVersionUpdateConfig(versionUpdateConfig);
         }
     }
 
 
     private void handleBuild(Map root) {
-        String repo, directory = "";
-        ArrayList<Map> artifacts = (ArrayList) root.get("create.artifacts");
-        if (artifacts == null) return;
-        for (Map<String, ArrayList<String>> artifact : artifacts) {
-            for (String command : artifact.values().iterator().next()) {
-                repo = findRepoFromId(artifact.keySet().iterator().next());
-                ExecConfig execConfig = new ExecConfig(directory, command, repo);
-                releaseConfig.addExecConfig(execConfig);
-            }
-        }
-
-    }
-
-    private GithubRepo findRepo(String repoName) {
-        for (GithubRepo repo : releaseConfig.getDependencyRepos()) {
-            if (repo.getRepoName().equals(repoName)) return repo;
-        }
-        return null;
-    }
-
-    private String findRepoFromId(String next) {
-        for (GithubRepo githubRepo : releaseConfig.getDependencyRepos()) {
-            if (githubRepo.getId().equals(next)) return githubRepo.getRepoName();
-        }
-        return null;
-    }
-
-    private void handleRepositories(Map root) {
-        for (String repo : (ArrayList<String>) root.get("repositories")) {
-            ArrayList<GithubRepo> list = releaseConfig.getDependencyRepos();
-            String dependencyRepo = repo.split("=")[1].split("#")[0];
-            GithubRepo githubRepo = new GithubRepo(dependencyRepo);
-            githubRepo.setDirectory((repo.split("=")[1].split("#")[2]));
-            githubRepo.setId(repo.split("=")[0]);
-            list.add(githubRepo);
-            releaseConfig.setDependencyRepos(list);
+        String directory = "";
+        GithubRepo mainRepo = releaseConfig.getMainRepo();
+        ArrayList<String> commands = (ArrayList) root.get("create.artifacts");
+        for (String command : commands) {
+            ExecConfig execConfig = new ExecConfig(directory, command, mainRepo);
+            releaseConfig.addExecConfig(execConfig);
         }
     }
 }
