@@ -98,9 +98,9 @@
             <version>3.7.0.201502260915-r</version>
         </dependency>
         <dependency>
-            <groupId>org.jruby</groupId>
-            <artifactId>jruby-complete</artifactId>
-            <version>1.7.6</version>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.16</version>
         </dependency>
         <dependency>
             <groupId>com.github.zafarkhaja</groupId>
