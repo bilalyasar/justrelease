@@ -16,6 +16,8 @@ public class ReleaseConfig {
     String githubPassword = "";
     GithubRepo mainRepo;
 
+    boolean dryRun;
+
 
     ArrayList<VersionUpdateConfig> versionUpdateConfigs = new ArrayList<VersionUpdateConfig>();
     String projectType = "grunt";
@@ -122,6 +124,14 @@ public class ReleaseConfig {
 
     public void addVersionUpdateConfig(VersionUpdateConfig versionUpdateConfig) {
         versionUpdateConfigs.add(versionUpdateConfig);
-
     }
+
+    public boolean isDryRun() {
+        return dryRun;
+    }
+
+    public void setDryRun(boolean dryRun) {
+        this.dryRun = dryRun;
+    }
+
 }

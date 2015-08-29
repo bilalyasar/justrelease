@@ -67,7 +67,7 @@
                             </descriptorRefs>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.justrelease.JustRelease</mainClass>
+                                    <mainClass>com.justrelease.JustReleaseCLI</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>

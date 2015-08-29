@@ -2,7 +2,6 @@ package com.justrelease.project.type;
 
 import com.jcraft.jsch.Session;
 import com.justrelease.config.ReleaseConfig;
-import org.apache.commons.cli.CommandLine;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.transport.JschConfigSessionFactory;
 import org.eclipse.jgit.transport.OpenSshConfig;
@@ -19,8 +18,6 @@ import java.io.InputStreamReader;
  */
 public abstract class AbstractProjectInfo {
     ReleaseConfig releaseConfig;
-
-    public CommandLine cmd;
 
     public static TransportConfigCallback getTransportConfigCallback() {
         final SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {

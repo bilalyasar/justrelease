@@ -1,16 +1,14 @@
 package com.justrelease.project.type;
 
 import com.justrelease.config.ReleaseConfig;
-import org.apache.commons.cli.CommandLine;
 
 /**
  * Created by bilal on 25/07/15.
  */
 public class MavenProject extends AbstractProjectInfo implements ProjectInfo {
 
-    public MavenProject(CommandLine cmd, ReleaseConfig releaseConfig) {
+    public MavenProject(ReleaseConfig releaseConfig) {
         this.releaseConfig = releaseConfig;
-        this.cmd = cmd;
     }
 
     public String getCurrentVersion() {

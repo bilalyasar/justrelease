@@ -5,7 +5,6 @@ import com.justrelease.config.GithubRepo;
 import com.justrelease.config.ReleaseConfig;
 import com.justrelease.config.build.BuildConfig;
 import com.justrelease.config.build.ExecConfig;
-import org.apache.commons.cli.CommandLine;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -13,9 +12,8 @@ import java.io.FileReader;
 
 public class GruntProject extends AbstractProjectInfo implements ProjectInfo {
 
-    public GruntProject(CommandLine cmd, ReleaseConfig releaseConfig) {
+    public GruntProject(ReleaseConfig releaseConfig) {
         this.releaseConfig = releaseConfig;
-        this.cmd = cmd;
     }
 
     public String getCurrentVersion() {
