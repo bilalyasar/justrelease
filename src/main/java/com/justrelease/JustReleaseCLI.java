@@ -3,20 +3,27 @@ package com.justrelease;
 import com.github.zafarkhaja.semver.Version;
 import com.justrelease.config.GithubRepo;
 import com.justrelease.config.ReleaseConfig;
-import com.justrelease.project.type.NPMProject;
 import com.justrelease.project.type.MavenProject;
+import com.justrelease.project.type.NPMProject;
 import com.justrelease.project.type.ProjectInfo;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.apache.commons.io.FileUtils;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.File;
+import java.io.IOException;
+
+import static com.justrelease.project.type.AbstractProjectInfo.getTransportConfigCallback;
 
 public class JustReleaseCLI {
 
     public static void main(String[] args) throws Exception {
+
         Options options = new Options();
         options.addOption("releaseType", true, "release type (major | minor | patch)");
         options.addOption("r", true, "release version of the project");
@@ -28,6 +35,7 @@ public class JustReleaseCLI {
         CommandLine cmd = parser.parse(options, args);
 
         ReleaseConfig releaseConfig = new ReleaseConfig();
+        FileUtils.deleteDirectory(new File(releaseConfig.getLocalDirectory()));
         releaseConfig.setMainRepo(new GithubRepo(args[0]));
         releaseConfig.getMainRepo().setDirectory(args[0].replace('/','_'));
         releaseConfig.setConfigLocation("https://raw.githubusercontent.com/" + args[0] + "/master/justrelease.yml");
@@ -46,6 +54,9 @@ public class JustReleaseCLI {
         if (cmd.hasOption("dryRun")) {
             releaseConfig.setDryRun(true);
         }
+
+        releaseConfig.getMainRepo().setRepoUrl(String.format("git@github.com:%s.git", args[0]));
+        cloneMainRepo(releaseConfig);
 
         ProjectInfo projectInfo = createProjectInfo(releaseConfig);  // maven or grunt project
 
@@ -82,6 +93,14 @@ public class JustReleaseCLI {
         return new MavenProject(releaseConfig);
 
     }
-
+    private static void cloneMainRepo(ReleaseConfig releaseConfig) throws GitAPIException, IOException {
+        GithubRepo mainRepo = releaseConfig.getMainRepo();
+        Git.cloneRepository()
+                .setURI(mainRepo.getRepoUrl())
+                .setDirectory(new File(releaseConfig.getLocalDirectory() + "/" + mainRepo.getDirectory()))
+                .setTransportConfigCallback(getTransportConfigCallback())
+                .setBranch(mainRepo.getBranch())
+                .call();
+    }
 
 }
