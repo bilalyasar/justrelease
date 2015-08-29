@@ -10,9 +10,9 @@ import org.json.simple.parser.JSONParser;
 
 import java.io.FileReader;
 
-public class GruntProject extends AbstractProjectInfo implements ProjectInfo {
+public class NPMProject extends AbstractProjectInfo implements ProjectInfo {
 
-    public GruntProject(ReleaseConfig releaseConfig) {
+    public NPMProject(ReleaseConfig releaseConfig) {
         this.releaseConfig = releaseConfig;
     }
 

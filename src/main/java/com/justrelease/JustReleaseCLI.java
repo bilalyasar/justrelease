@@ -3,7 +3,7 @@ package com.justrelease;
 import com.github.zafarkhaja.semver.Version;
 import com.justrelease.config.GithubRepo;
 import com.justrelease.config.ReleaseConfig;
-import com.justrelease.project.type.GruntProject;
+import com.justrelease.project.type.NPMProject;
 import com.justrelease.project.type.MavenProject;
 import com.justrelease.project.type.ProjectInfo;
 import org.apache.commons.cli.BasicParser;
@@ -77,7 +77,7 @@ public class JustReleaseCLI {
     private static ProjectInfo createProjectInfo(ReleaseConfig releaseConfig) {
         String workingDir = System.getProperty("user.dir") + "/" + releaseConfig.getLocalDirectory() + "/";
         File file = new File(workingDir + releaseConfig.getMainRepo().getDirectory() + "/package.json");
-        if (file.exists()) return new GruntProject(releaseConfig);
+        if (file.exists()) return new NPMProject(releaseConfig);
         return new MavenProject(releaseConfig);
 
     }
