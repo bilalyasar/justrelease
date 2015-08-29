@@ -11,6 +11,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -22,7 +23,7 @@ import static com.justrelease.project.type.AbstractProjectInfo.getTransportConfi
 
 public class JustReleaseCLI {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception{
 
         Options options = new Options();
         options.addOption("releaseType", true, "release type (major | minor | patch)");
@@ -32,9 +33,15 @@ public class JustReleaseCLI {
         options.addOption("dryRun", false, "release without push");
 
         CommandLineParser parser = new BasicParser();
-        CommandLine cmd = parser.parse(options, args);
+        CommandLine cmd = null;
+        try {
+            cmd = parser.parse(options, args);
+        } catch (ParseException e) {
+            printHelp(options);
+        }
 
         ReleaseConfig releaseConfig = new ReleaseConfig();
+
         FileUtils.deleteDirectory(new File(releaseConfig.getLocalDirectory()));
         releaseConfig.setMainRepo(new GithubRepo(args[0]));
         releaseConfig.getMainRepo().setDirectory(args[0].replace('/','_'));
@@ -83,7 +90,8 @@ public class JustReleaseCLI {
 
     private static void printHelp(Options options) {
         HelpFormatter f = new HelpFormatter();
-        f.printHelp("OptionsTip", options);
+        f.printHelp("justrelease <githubuser/repository>", options);
+        System.exit(0);
     }
 
     private static ProjectInfo createProjectInfo(ReleaseConfig releaseConfig) {
