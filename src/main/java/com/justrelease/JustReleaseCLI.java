@@ -29,6 +29,7 @@ public class JustReleaseCLI {
 
         ReleaseConfig releaseConfig = new ReleaseConfig();
         releaseConfig.setMainRepo(new GithubRepo(args[0]));
+        releaseConfig.getMainRepo().setDirectory(args[0].replace('/','_'));
         releaseConfig.setConfigLocation("https://raw.githubusercontent.com/" + args[0] + "/master/justrelease.yml");
 
         if (cmd.hasOption("h")) {
