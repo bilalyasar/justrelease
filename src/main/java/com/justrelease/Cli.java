@@ -35,7 +35,7 @@ public class Cli {
     CredentialsProvider cp;
     ReleaseConfig releaseConfig = new ReleaseConfig();
 
-    public Cli(String[] args) throws VersionParseException {
+    public Cli(String[] args) {
 
         this.args = args;
         releaseConfig.setMainRepo(new GithubRepo(args[0]));
