@@ -58,12 +58,17 @@ public class ConfigParser {
         ArrayList<LinkedHashMap> arrayList = ((ArrayList) root.get("publish"));
         for (LinkedHashMap entry : arrayList) {
             String key = (String) entry.keySet().iterator().next();
-            ArrayList<String> commands = (ArrayList) ((LinkedHashMap) ((ArrayList) entry.get(key)).get(0)).get("github");
-            for (String command : commands) {
-                if (command.startsWith("description"))
-                    mainRepo.setDescriptionFileName(command.split("=")[1]);
-                if (command.startsWith("attachment"))
-                    mainRepo.setAttachmentFile(command.split("=")[1]);
+            if ("npm".equals(key)) {
+                // TODO - add npm publish support
+            } else if ("github".equals(key)) {
+                ArrayList<String> commands = (ArrayList<String>)entry.get(key);
+                for (String command : commands) {
+                    if (command.startsWith("description"))
+                        mainRepo.setDescriptionFileName(command.split("=")[1]);
+                    if (command.startsWith("attachment"))
+                        mainRepo.setAttachmentFile(command.split("=")[1]);
+                }
+
             }
         }
     }
