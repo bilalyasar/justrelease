@@ -27,6 +27,7 @@ public class JustReleaseCLI {
 
 
         Options options = new Options();
+        options.addOption("snapshotVersion", true, "version number that will be updated after the release. maven spesific feature");
         options.addOption("dryRun", false, "release without push");
         options.addOption("h", false, "help");
 
@@ -56,11 +57,8 @@ public class JustReleaseCLI {
             printHelp(options);
         }
 
-        if (cmd.hasOption("n")) {
-            releaseConfig.setNextVersion(cmd.getOptionValue("n"));
-        }
-        if (cmd.hasOption("r")) {
-            releaseConfig.setReleaseVersion(cmd.getOptionValue("r"));
+        if (cmd.hasOption("snapshotVersion")) {
+            releaseConfig.setNextVersion(cmd.getOptionValue("snapshotVersion"));
         }
 
         if (cmd.hasOption("dryRun")) {
@@ -70,16 +68,26 @@ public class JustReleaseCLI {
         cloneMainRepo(releaseConfig);
 
         ProjectInfo projectInfo = createProjectInfo(releaseConfig);  // maven or grunt project
-        releaseConfig.setCurrentVersion(projectInfo.getCurrentVersion());
-            Version.Builder builder = new Version.Builder(releaseConfig.getCurrentVersion());
 
-            if (releaseType.equals("major")) {
+        releaseConfig.setCurrentVersion(projectInfo.getCurrentVersion());
+        Version.Builder builder = new Version.Builder(releaseConfig.getCurrentVersion());
+
+
+        if (releaseType.equals("major")) {
                 releaseConfig.setReleaseVersion(builder.build().incrementMajorVersion().getNormalVersion());
             } else if (releaseType.equals("minor")) {
                 releaseConfig.setReleaseVersion(builder.build().incrementMinorVersion().getNormalVersion());
             } else if (releaseType.equals("patch")) {
                 releaseConfig.setReleaseVersion(builder.build().incrementPatchVersion().getNormalVersion());
-            }
+            } else {
+               //TODO - check if format of release type match X.Y.Z
+               releaseConfig.setReleaseVersion(releaseType);
+           }
+
+        if(projectInfo instanceof MavenProject) {
+            //TODO - find snapshot version based on release type
+           // releaseConfig.setNextVersion();
+        }
 
         new JustRelease(releaseConfig,projectInfo).release();
 
@@ -88,7 +96,7 @@ public class JustReleaseCLI {
 
     private static void printHelp(Options options) {
         HelpFormatter f = new HelpFormatter();
-        f.printHelp("justrelease <username/repository> <major|minor|patch>", options);
+        f.printHelp("justrelease <username/repository> <major|minor|patch|X.Y.Z>", options);
         System.exit(0);
     }
 

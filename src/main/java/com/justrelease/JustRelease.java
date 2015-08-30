@@ -41,8 +41,11 @@ public class JustRelease {
             commitAndTagVersion();
             System.out.println("Replace Next Version:");
             replaceNextVersion();
-//            System.out.println("Commit Next Version:");
-//            commitNextVersion();
+
+        if(releaseConfig.getNextVersion() != null){
+            System.out.println("Commit Next Version:");
+            commitNextVersion();
+        }
 
 
         if (!releaseConfig.isDryRun()) {

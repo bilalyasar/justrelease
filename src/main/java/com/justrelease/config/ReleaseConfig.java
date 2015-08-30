@@ -14,9 +14,9 @@ public class ReleaseConfig {
     String localDirectory;
     String configLocation;
     String projectType = "grunt";
-    String currentVersion = "";
-    String releaseVersion = "";
-    String nextVersion = "";
+    String currentVersion;
+    String releaseVersion;
+    String nextVersion;
 
     GithubRepo mainRepo;
     boolean dryRun;
