@@ -88,7 +88,7 @@ public class JustReleaseCLI {
 
     private static void printHelp(Options options) {
         HelpFormatter f = new HelpFormatter();
-        f.printHelp("justrelease <username/repository> <major|minor|patch|version_number>", options);
+        f.printHelp("justrelease <username/repository> <major|minor|patch>", options);
         System.exit(0);
     }
 
