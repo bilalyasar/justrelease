@@ -1,6 +1,5 @@
 package com.justrelease;
 
-import com.justrelease.config.ConfigParser;
 import com.justrelease.config.ReleaseConfig;
 import com.justrelease.config.build.VersionUpdateConfig;
 import com.justrelease.project.type.ProjectInfo;
@@ -28,11 +27,6 @@ public class JustRelease {
 
     public void release() throws Exception {
 
-        ConfigParser configParser = new ConfigParser(releaseConfig.getConfigLocation());
-        configParser.parse(releaseConfig);
-        // clone main repo
-        System.out.println("Find Version:");
-//            findVersions();
         System.out.println("Replace Release Version:");
         replaceReleaseVersion();
         System.out.println("Create Artifact:");

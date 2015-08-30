@@ -1,6 +1,7 @@
 package com.justrelease;
 
 import com.github.zafarkhaja.semver.Version;
+import com.justrelease.config.ConfigParser;
 import com.justrelease.config.GithubRepo;
 import com.justrelease.config.ReleaseConfig;
 import com.justrelease.project.type.MavenProject;
@@ -13,13 +14,8 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.File;
-import java.io.IOException;
-
-import static com.justrelease.project.type.AbstractProjectInfo.getTransportConfigCallback;
 
 public class JustReleaseCLI {
 
@@ -62,7 +58,7 @@ public class JustReleaseCLI {
             releaseConfig.setDryRun(true);
         }
 
-        cloneMainRepo(releaseConfig);
+        releaseConfig.cloneMainRepo();
 
         ProjectInfo projectInfo = createProjectInfo(releaseConfig);  // maven or grunt project
 
@@ -82,13 +78,18 @@ public class JustReleaseCLI {
            }
 
         if(projectInfo instanceof MavenProject) {
-            
+
             if (cmd.hasOption("snapshotVersion")) {
                 releaseConfig.setNextVersion(cmd.getOptionValue("snapshotVersion"));
             } else {
                 //TODO - find snapshot version based on release type
                 // releaseConfig.setNextVersion();
             }
+        }
+
+        if (releaseConfig.getConfigFile() != null) {
+            ConfigParser configParser = new ConfigParser(releaseConfig.getConfigFile());
+            configParser.parse(releaseConfig);
         }
 
         new JustRelease(releaseConfig,projectInfo).release();
@@ -107,15 +108,6 @@ public class JustReleaseCLI {
         if (file.exists()) return new NPMProject(releaseConfig);
         return new MavenProject(releaseConfig);
 
-    }
-    private static void cloneMainRepo(ReleaseConfig releaseConfig) throws GitAPIException, IOException {
-        GithubRepo mainRepo = releaseConfig.getMainRepo();
-        Git.cloneRepository()
-                .setURI(mainRepo.getRepoUrl())
-                .setDirectory(new File(releaseConfig.getLocalDirectory()))
-                .setTransportConfigCallback(getTransportConfigCallback())
-                .setBranch(mainRepo.getBranch())
-                .call();
     }
 
 }

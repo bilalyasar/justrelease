@@ -4,9 +4,8 @@ import com.justrelease.config.build.ExecConfig;
 import com.justrelease.config.build.VersionUpdateConfig;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -16,36 +15,16 @@ import java.util.Map;
  */
 public class ConfigParser {
     ReleaseConfig releaseConfig;
-    String configLocation;
-    InputStream in;
+    File configFile;
+    Yaml yaml = new Yaml();
 
-    public ConfigParser(String configLocation) {
-        this.configLocation = configLocation;
-    }
-
-    void loadFromWorkingDirectory() {
-
-        try {
-            in = new URL(configLocation).openStream();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+    public ConfigParser(File configFile) {
+        this.configFile = configFile;
     }
 
     public void parse(ReleaseConfig releaseConfig) throws Exception {
         this.releaseConfig = releaseConfig;
-        loadFromWorkingDirectory();
-        if (in != null) parseAndBuildConfig();
-    }
-
-    private void parseAndBuildConfig() throws Exception {
-        Yaml yaml = new Yaml();
-        Map map = (Map) yaml.load(in);
-        handleConfig(map);
-    }
-
-    private void handleConfig(Map root) {
+        Map root = (Map) yaml.load(new FileInputStream(configFile));
         handleBuild(root);
         handleVersionUpdate(root);
         handleTaggingRepos(root);

@@ -3,16 +3,20 @@ package com.justrelease.config;
 import com.justrelease.config.build.BuildConfig;
 import com.justrelease.config.build.ExecConfig;
 import com.justrelease.config.build.VersionUpdateConfig;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+
+import static com.justrelease.project.type.AbstractProjectInfo.getTransportConfigCallback;
 
 /**
  * Created by bilal on 25/07/15.
  */
 public class ReleaseConfig {
     String localDirectory;
-    String configLocation;
     String projectType = "grunt";
     String currentVersion;
     String releaseVersion;
@@ -21,6 +25,7 @@ public class ReleaseConfig {
     String tagNameTemplate = "v${version}";
 
     GithubRepo mainRepo;
+    File configFile;
     boolean dryRun;
 
     BuildConfig buildConfig = new BuildConfig();
@@ -29,18 +34,8 @@ public class ReleaseConfig {
     public ReleaseConfig(GithubRepo githubRepo) {
         this.mainRepo = githubRepo;
         this.localDirectory = "release" + File.separator + githubRepo.getUniquePath();
-        this.configLocation = "https://raw.githubusercontent.com/" + githubRepo.getUsername()
-                + "/" + githubRepo.getRepository() + "/master/justrelease.yml";
     }
 
-
-    public String getConfigLocation() {
-        return configLocation;
-    }
-
-    public void setConfigLocation(String configLocation) {
-        this.configLocation = configLocation;
-    }
 
     public String getLocalDirectory() {
         return localDirectory;
@@ -138,5 +133,25 @@ public class ReleaseConfig {
 
     public void setTagNameTemplate(String tagNameTemplate) {
         this.tagNameTemplate = tagNameTemplate;
+    }
+
+    public File getConfigFile() {
+        return configFile;
+    }
+
+    public void cloneMainRepo() throws GitAPIException, IOException {
+        Git.cloneRepository()
+                .setURI(mainRepo.getRepoUrl())
+                .setDirectory(new File(localDirectory))
+                .setTransportConfigCallback(getTransportConfigCallback())
+                .setBranch(mainRepo.getBranch())
+                .call();
+
+        File file = new File(localDirectory + "/justrelease.yml");
+
+        if (file.exists() && !file.isDirectory()) {
+            this.configFile = file;
+        }
+
     }
 }
