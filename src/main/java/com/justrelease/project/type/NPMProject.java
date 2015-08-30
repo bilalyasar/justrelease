@@ -1,7 +1,6 @@
 package com.justrelease.project.type;
 
 
-import com.justrelease.config.GithubRepo;
 import com.justrelease.config.ReleaseConfig;
 import com.justrelease.config.build.BuildConfig;
 import com.justrelease.config.build.ExecConfig;
@@ -21,7 +20,7 @@ public class NPMProject extends AbstractProjectInfo implements ProjectInfo {
         JSONParser parser = new JSONParser();
         Object obj = null;
         try {
-            obj = parser.parse(new FileReader(workingDir + releaseConfig.getMainRepo().getDirectory() + "/package.json"));
+            obj = parser.parse(new FileReader(releaseConfig.getLocalDirectory()+ "/package.json"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -42,10 +41,8 @@ public class NPMProject extends AbstractProjectInfo implements ProjectInfo {
     }
 
     private String[] createCommand(ExecConfig execConfig) {
-        String workingDir = System.getProperty("user.dir");
-        GithubRepo repo = releaseConfig.getMainRepo();
-        System.out.println("cd " + workingDir + "/" + releaseConfig.getLocalDirectory() + "/" + repo.getDirectory() + "; " + execConfig.getCommand());
-        String[] cmd = new String[]{"/bin/sh", "-c", "cd " + workingDir + "/" + releaseConfig.getLocalDirectory() + "/" + repo.getDirectory() + "; " + execConfig.getCommand()};
+        System.out.println("cd " + releaseConfig.getLocalDirectory() + "; " + execConfig.getCommand());
+        String[] cmd = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + execConfig.getCommand()};
         System.out.println(cmd.toString());
         return cmd;
     }

@@ -4,27 +4,32 @@ import com.justrelease.config.build.BuildConfig;
 import com.justrelease.config.build.ExecConfig;
 import com.justrelease.config.build.VersionUpdateConfig;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
  * Created by bilal on 25/07/15.
  */
 public class ReleaseConfig {
-    String localDirectory = "release";
-    String configLocation = "";
-    String githubName = "";
-    String githubPassword = "";
-    GithubRepo mainRepo;
-
-    boolean dryRun;
-
-
-    ArrayList<VersionUpdateConfig> versionUpdateConfigs = new ArrayList<VersionUpdateConfig>();
+    String localDirectory;
+    String configLocation;
     String projectType = "grunt";
     String currentVersion = "";
     String releaseVersion = "";
     String nextVersion = "";
+
+    GithubRepo mainRepo;
+    boolean dryRun;
+
     BuildConfig buildConfig = new BuildConfig();
+    ArrayList<VersionUpdateConfig> versionUpdateConfigs = new ArrayList<VersionUpdateConfig>();
+
+    public ReleaseConfig(GithubRepo githubRepo) {
+        this.mainRepo = githubRepo;
+        this.localDirectory = "release" + File.separator + githubRepo.getUniquePath();
+        this.configLocation = "https://raw.githubusercontent.com/" + githubRepo.getUsername()
+                + "/" + githubRepo.getRepository() + "/master/justrelease.yml";
+    }
 
 
     public String getConfigLocation() {
@@ -42,23 +47,6 @@ public class ReleaseConfig {
     public void setLocalDirectory(String localDirectory) {
         this.localDirectory = localDirectory;
     }
-
-    public String getGithubName() {
-        return githubName;
-    }
-
-    public void setGithubName(String githubName) {
-        this.githubName = githubName;
-    }
-
-    public String getGithubPassword() {
-        return githubPassword;
-    }
-
-    public void setGithubPassword(String githubPassword) {
-        this.githubPassword = githubPassword;
-    }
-
 
     public String getReleaseVersion() {
         return releaseVersion;

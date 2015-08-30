@@ -25,12 +25,10 @@ public class JustReleaseCLI {
 
     public static void main(String[] args) throws Exception{
 
+
         Options options = new Options();
-        options.addOption("releaseType", true, "release type (major | minor | patch)");
-        options.addOption("r", true, "release version of the project");
-        options.addOption("n", true, "next version of the project");
-        options.addOption("h", false, "help");
         options.addOption("dryRun", false, "release without push");
+        options.addOption("h", false, "help");
 
         CommandLineParser parser = new BasicParser();
         CommandLine cmd = null;
@@ -40,12 +38,19 @@ public class JustReleaseCLI {
             printHelp(options);
         }
 
-        ReleaseConfig releaseConfig = new ReleaseConfig();
+        String[] tokens = args[0].split("/");
+
+        if(tokens.length != 2) {
+            printHelp(options);
+        }
+
+        String username = tokens[0];
+        String reponame = tokens[1];
+        String releaseType = args[1];
+
+        ReleaseConfig releaseConfig = new ReleaseConfig(new GithubRepo(username,reponame));
 
         FileUtils.deleteDirectory(new File(releaseConfig.getLocalDirectory()));
-        releaseConfig.setMainRepo(new GithubRepo(args[0]));
-        releaseConfig.getMainRepo().setDirectory(args[0].replace('/','_'));
-        releaseConfig.setConfigLocation("https://raw.githubusercontent.com/" + args[0] + "/master/justrelease.yml");
 
         if (cmd.hasOption("h")) {
             printHelp(options);
@@ -62,26 +67,19 @@ public class JustReleaseCLI {
             releaseConfig.setDryRun(true);
         }
 
-        releaseConfig.getMainRepo().setRepoUrl(String.format("git@github.com:%s.git", args[0]));
         cloneMainRepo(releaseConfig);
 
         ProjectInfo projectInfo = createProjectInfo(releaseConfig);  // maven or grunt project
-
-        if (releaseConfig.getCurrentVersion().equals(""))
-            releaseConfig.setCurrentVersion(projectInfo.getCurrentVersion());
-
-
-        if (cmd.hasOption("releaseType")) {
+        releaseConfig.setCurrentVersion(projectInfo.getCurrentVersion());
             Version.Builder builder = new Version.Builder(releaseConfig.getCurrentVersion());
-            releaseConfig.setReleaseVersion(builder.build().getNormalVersion());
-            if (cmd.getOptionValue("releaseType").equals("major")) {
-                releaseConfig.setNextVersion(builder.build().incrementMajorVersion().getNormalVersion());
-            } else if (cmd.getOptionValue("releaseType").equals("minor")) {
-                releaseConfig.setNextVersion(builder.build().incrementMinorVersion().getNormalVersion());
-            } else if (cmd.getOptionValue("releaseType").equals("patch")) {
-                releaseConfig.setNextVersion(builder.build().incrementPatchVersion().getNormalVersion());
+
+            if (releaseType.equals("major")) {
+                releaseConfig.setReleaseVersion(builder.build().incrementMajorVersion().getNormalVersion());
+            } else if (releaseType.equals("minor")) {
+                releaseConfig.setReleaseVersion(builder.build().incrementMinorVersion().getNormalVersion());
+            } else if (releaseType.equals("patch")) {
+                releaseConfig.setReleaseVersion(builder.build().incrementPatchVersion().getNormalVersion());
             }
-        }
 
         new JustRelease(releaseConfig,projectInfo).release();
 
@@ -90,13 +88,12 @@ public class JustReleaseCLI {
 
     private static void printHelp(Options options) {
         HelpFormatter f = new HelpFormatter();
-        f.printHelp("justrelease <githubuser/repository>", options);
+        f.printHelp("justrelease <username/repository> <major|minor|patch|version_number>", options);
         System.exit(0);
     }
 
     private static ProjectInfo createProjectInfo(ReleaseConfig releaseConfig) {
-        String workingDir = System.getProperty("user.dir") + "/" + releaseConfig.getLocalDirectory() + "/";
-        File file = new File(workingDir + releaseConfig.getMainRepo().getDirectory() + "/package.json");
+        File file = new File(releaseConfig.getLocalDirectory() + "/package.json");
         if (file.exists()) return new NPMProject(releaseConfig);
         return new MavenProject(releaseConfig);
 
@@ -105,7 +102,7 @@ public class JustReleaseCLI {
         GithubRepo mainRepo = releaseConfig.getMainRepo();
         Git.cloneRepository()
                 .setURI(mainRepo.getRepoUrl())
-                .setDirectory(new File(releaseConfig.getLocalDirectory() + "/" + mainRepo.getDirectory()))
+                .setDirectory(new File(releaseConfig.getLocalDirectory()))
                 .setTransportConfigCallback(getTransportConfigCallback())
                 .setBranch(mainRepo.getBranch())
                 .call();
