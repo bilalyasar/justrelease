@@ -59,12 +59,11 @@ public class ConfigParser {
         for (String entry : arrayList) {
             String key = entry.split("=")[0];
             String value = entry.split("=")[1];
-            value.replaceAll("\\$\\{version\\}", releaseConfig.getReleaseVersion());
             if (key.equals("commit")) {
-                releaseConfig.setCommitMessage(value);
+                releaseConfig.setCommitMessageTemplate(value);
             }
             if (key.equals("tag")) {
-                releaseConfig.setTagName(value);
+                releaseConfig.setTagNameTemplate(value);
             }
         }
     }

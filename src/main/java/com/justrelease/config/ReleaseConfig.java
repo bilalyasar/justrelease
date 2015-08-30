@@ -17,8 +17,8 @@ public class ReleaseConfig {
     String currentVersion;
     String releaseVersion;
     String nextVersion;
-    String commitMessage = "Just Release";
-    String tagName = "";
+    String commitMessageTemplate = "released ${version} with :heart: by justrelease";
+    String tagNameTemplate = "v${version}";
 
     GithubRepo mainRepo;
     boolean dryRun;
@@ -125,22 +125,18 @@ public class ReleaseConfig {
     }
 
     public String getCommitMessage() {
-        return commitMessage;
-    }
-
-    public void setCommitMessage(String commitMessage) {
-        this.commitMessage = commitMessage;
+        return commitMessageTemplate.replaceAll("\\$\\{version\\}", releaseVersion);
     }
 
     public String getTagName() {
-        if (tagName != "")
-            return tagName;
-        setTagName("v" + getReleaseVersion());
-        return "v" + getReleaseVersion();
+        return tagNameTemplate.replaceAll("\\$\\{version\\}", releaseVersion);
     }
 
-    public void setTagName(String tagName) {
-        this.tagName = tagName;
+    public void setCommitMessageTemplate(String commitMessageTemplate) {
+        this.commitMessageTemplate = commitMessageTemplate;
     }
 
+    public void setTagNameTemplate(String tagNameTemplate) {
+        this.tagNameTemplate = tagNameTemplate;
+    }
 }
