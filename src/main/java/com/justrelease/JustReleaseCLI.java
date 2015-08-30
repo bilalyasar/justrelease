@@ -57,9 +57,6 @@ public class JustReleaseCLI {
             printHelp(options);
         }
 
-        if (cmd.hasOption("snapshotVersion")) {
-            releaseConfig.setNextVersion(cmd.getOptionValue("snapshotVersion"));
-        }
 
         if (cmd.hasOption("dryRun")) {
             releaseConfig.setDryRun(true);
@@ -85,8 +82,13 @@ public class JustReleaseCLI {
            }
 
         if(projectInfo instanceof MavenProject) {
-            //TODO - find snapshot version based on release type
-           // releaseConfig.setNextVersion();
+            
+            if (cmd.hasOption("snapshotVersion")) {
+                releaseConfig.setNextVersion(cmd.getOptionValue("snapshotVersion"));
+            } else {
+                //TODO - find snapshot version based on release type
+                // releaseConfig.setNextVersion();
+            }
         }
 
         new JustRelease(releaseConfig,projectInfo).release();
