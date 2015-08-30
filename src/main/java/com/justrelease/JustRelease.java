@@ -21,26 +21,26 @@ public class JustRelease {
     ReleaseConfig releaseConfig;
 
 
-    public JustRelease(ReleaseConfig releaseConfig,ProjectInfo projectInfo) {
+    public JustRelease(ReleaseConfig releaseConfig, ProjectInfo projectInfo) {
         this.releaseConfig = releaseConfig;
         this.projectInfo = projectInfo;
     }
 
     public void release() throws Exception {
 
-             ConfigParser configParser = new ConfigParser(releaseConfig.getConfigLocation());
-            configParser.parse(releaseConfig);
-            // clone main repo
-            System.out.println("Find Version:");
+        ConfigParser configParser = new ConfigParser(releaseConfig.getConfigLocation());
+        configParser.parse(releaseConfig);
+        // clone main repo
+        System.out.println("Find Version:");
 //            findVersions();
-            System.out.println("Replace Release Version:");
-            replaceReleaseVersion();
-            System.out.println("Create Artifact:");
-            projectInfo.createArtifacts();
-            System.out.println("Commit And Tag Version:");
-            commitAndTagVersion();
-            System.out.println("Replace Next Version:");
-            replaceNextVersion();
+        System.out.println("Replace Release Version:");
+        replaceReleaseVersion();
+        System.out.println("Create Artifact:");
+        projectInfo.createArtifacts();
+        System.out.println("Commit And Tag Version:");
+        commitAndTagVersion();
+        System.out.println("Replace Next Version:");
+        replaceNextVersion();
 
         if(releaseConfig.getNextVersion() != null){
             System.out.println("Commit Next Version:");
@@ -53,6 +53,7 @@ public class JustRelease {
             git.push().setTransportConfigCallback(getTransportConfigCallback()).call();
             git.push().setTransportConfigCallback(getTransportConfigCallback()).setPushTags().call();
         }
+
 
     }
 
@@ -79,8 +80,8 @@ public class JustRelease {
     private void commitAndTagVersion() throws IOException, GitAPIException {
         Git git = Git.open(new File(releaseConfig.getLocalDirectory()));
         git.add().addFilepattern(".").call();
-        git.commit().setMessage(releaseConfig.getReleaseVersion()).call();
-        git.tag().setName("v" + releaseConfig.getReleaseVersion()).call();
+        git.commit().setMessage(releaseConfig.getCommitMessage()).call();
+        git.tag().setName(releaseConfig.getTagName()).call();
     }
 
     private void replaceReleaseVersion() throws IOException {

@@ -17,6 +17,8 @@ public class ReleaseConfig {
     String currentVersion;
     String releaseVersion;
     String nextVersion;
+    String commitMessage = "Just Release";
+    String tagName = "";
 
     GithubRepo mainRepo;
     boolean dryRun;
@@ -120,6 +122,25 @@ public class ReleaseConfig {
 
     public void setDryRun(boolean dryRun) {
         this.dryRun = dryRun;
+    }
+
+    public String getCommitMessage() {
+        return commitMessage;
+    }
+
+    public void setCommitMessage(String commitMessage) {
+        this.commitMessage = commitMessage;
+    }
+
+    public String getTagName() {
+        if (tagName != "")
+            return tagName;
+        setTagName("v" + getReleaseVersion());
+        return "v" + getReleaseVersion();
+    }
+
+    public void setTagName(String tagName) {
+        this.tagName = tagName;
     }
 
 }

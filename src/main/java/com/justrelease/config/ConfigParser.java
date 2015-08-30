@@ -49,7 +49,24 @@ public class ConfigParser {
         handleBuild(root);
         handleVersionUpdate(root);
         handleTaggingRepos(root);
+        handleScm(root);
 
+    }
+
+    private void handleScm(Map root) {
+        if (root.get("scm") == null) return;
+        ArrayList<String> arrayList = ((ArrayList) root.get("scm"));
+        for (String entry : arrayList) {
+            String key = entry.split("=")[0];
+            String value = entry.split("=")[1];
+            value.replaceAll("\\$\\{version\\}", releaseConfig.getReleaseVersion());
+            if (key.equals("commit")) {
+                releaseConfig.setCommitMessage(value);
+            }
+            if (key.equals("tag")) {
+                releaseConfig.setTagName(value);
+            }
+        }
     }
 
     private void handleTaggingRepos(Map root) {
@@ -61,7 +78,7 @@ public class ConfigParser {
             if ("npm".equals(key)) {
                 // TODO - add npm publish support
             } else if ("github".equals(key)) {
-                ArrayList<String> commands = (ArrayList<String>)entry.get(key);
+                ArrayList<String> commands = (ArrayList<String>) entry.get(key);
                 for (String command : commands) {
                     if (command.startsWith("description"))
                         mainRepo.setDescriptionFileName(command.split("=")[1]);
