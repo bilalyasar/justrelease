@@ -33,10 +33,10 @@ public class JustRelease {
         projectInfo.createArtifacts();
         System.out.println("Commit And Tag Version:");
         commitAndTagVersion();
-        System.out.println("Replace Next Version:");
-        replaceNextVersion();
 
-        if(releaseConfig.getNextVersion() != null){
+        if (releaseConfig.getNextVersion() != null) {
+            System.out.println("Replace Next Version:");
+            replaceNextVersion();
             System.out.println("Commit Next Version:");
             commitNextVersion();
         }
@@ -66,7 +66,7 @@ public class JustRelease {
                 if (f.getAbsolutePath().contains(".git")) continue;
                 if (f.isHidden() || f.isDirectory()) continue;
                 String content = FileUtils.readFileToString(f);
-                FileUtils.writeStringToFile(f, content.replaceAll(releaseConfig.getCurrentVersion(), releaseConfig.getReleaseVersion()));
+                FileUtils.writeStringToFile(f, content.replaceAll(releaseConfig.getCurrentVersion(), releaseConfig.getNextVersion()));
             }
         }
     }
