@@ -8,6 +8,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import static com.justrelease.project.type.AbstractProjectInfo.getTransportConfigCallback;
@@ -146,12 +147,21 @@ public class ReleaseConfig {
                 .setTransportConfigCallback(getTransportConfigCallback())
                 .setBranch(mainRepo.getBranch())
                 .call();
+    }
+
+    public void findConfigFile() throws URISyntaxException {
 
         File file = new File(localDirectory + "/justrelease.yml");
 
         if (file.exists() && !file.isDirectory()) {
             this.configFile = file;
         }
+        if (projectType.equals("MAVEN")) {
+            file = new File(getClass().getResource("/default-mvn.yml").toURI());
+        } else {
+            file = new File(getClass().getResource("/default-npm.yml").toURI());
+        }
 
+        this.configFile = file;
     }
 }

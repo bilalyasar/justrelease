@@ -1,0 +1,4 @@
+version.update:
+    - json,js
+create.artifacts:
+        - npm install

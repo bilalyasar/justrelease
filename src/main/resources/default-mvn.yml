@@ -1,0 +1,4 @@
+version.update:
+    - xml
+create.artifacts:
+        - mvn clean install

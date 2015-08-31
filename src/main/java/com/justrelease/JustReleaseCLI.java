@@ -19,7 +19,7 @@ import java.io.File;
 
 public class JustReleaseCLI {
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
 
 
         Options options = new Options();
@@ -37,7 +37,7 @@ public class JustReleaseCLI {
 
         String[] tokens = args[0].split("/");
 
-        if(tokens.length != 2) {
+        if (tokens.length != 2) {
             printHelp(options);
         }
 
@@ -45,7 +45,7 @@ public class JustReleaseCLI {
         String reponame = tokens[1];
         String releaseType = args[1];
 
-        ReleaseConfig releaseConfig = new ReleaseConfig(new GithubRepo(username,reponame));
+        ReleaseConfig releaseConfig = new ReleaseConfig(new GithubRepo(username, reponame));
 
         FileUtils.deleteDirectory(new File(releaseConfig.getLocalDirectory()));
 
@@ -59,25 +59,24 @@ public class JustReleaseCLI {
         }
 
         releaseConfig.cloneMainRepo();
-
         ProjectInfo projectInfo = createProjectInfo(releaseConfig);  // maven or grunt project
-
+        releaseConfig.findConfigFile();
         releaseConfig.setCurrentVersion(projectInfo.getCurrentVersion());
         Version.Builder builder = new Version.Builder(releaseConfig.getCurrentVersion());
 
 
         if (releaseType.equals("major")) {
-                releaseConfig.setReleaseVersion(builder.build().incrementMajorVersion().getNormalVersion());
-            } else if (releaseType.equals("minor")) {
-                releaseConfig.setReleaseVersion(builder.build().incrementMinorVersion().getNormalVersion());
-            } else if (releaseType.equals("patch")) {
-                releaseConfig.setReleaseVersion(builder.build().incrementPatchVersion().getNormalVersion());
-            } else {
-               //TODO - check if format of release type match X.Y.Z
-               releaseConfig.setReleaseVersion(releaseType);
-           }
+            releaseConfig.setReleaseVersion(builder.build().incrementMajorVersion().getNormalVersion());
+        } else if (releaseType.equals("minor")) {
+            releaseConfig.setReleaseVersion(builder.build().incrementMinorVersion().getNormalVersion());
+        } else if (releaseType.equals("patch")) {
+            releaseConfig.setReleaseVersion(builder.build().incrementPatchVersion().getNormalVersion());
+        } else {
+            //TODO - check if format of release type match X.Y.Z
+            releaseConfig.setReleaseVersion(releaseType);
+        }
 
-        if(projectInfo instanceof MavenProject) {
+        if (projectInfo instanceof MavenProject) {
 
             if (cmd.hasOption("snapshotVersion")) {
                 releaseConfig.setNextVersion(cmd.getOptionValue("snapshotVersion"));
@@ -92,7 +91,7 @@ public class JustReleaseCLI {
             configParser.parse(releaseConfig);
         }
 
-        new JustRelease(releaseConfig,projectInfo).release();
+        new JustRelease(releaseConfig, projectInfo).release();
 
 
     }

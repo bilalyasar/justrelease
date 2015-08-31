@@ -15,6 +15,7 @@ import java.io.FileInputStream;
 public class MavenProject extends AbstractProjectInfo implements ProjectInfo {
 
     public MavenProject(ReleaseConfig releaseConfig) {
+        releaseConfig.setProjectType("MAVEN");
         this.releaseConfig = releaseConfig;
     }
 

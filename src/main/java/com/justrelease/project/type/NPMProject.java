@@ -12,6 +12,7 @@ import java.io.FileReader;
 public class NPMProject extends AbstractProjectInfo implements ProjectInfo {
 
     public NPMProject(ReleaseConfig releaseConfig) {
+        releaseConfig.setProjectType("NPM");
         this.releaseConfig = releaseConfig;
     }
 
@@ -20,7 +21,7 @@ public class NPMProject extends AbstractProjectInfo implements ProjectInfo {
         JSONParser parser = new JSONParser();
         Object obj = null;
         try {
-            obj = parser.parse(new FileReader(releaseConfig.getLocalDirectory()+ "/package.json"));
+            obj = parser.parse(new FileReader(releaseConfig.getLocalDirectory() + "/package.json"));
         } catch (Exception e) {
             e.printStackTrace();
         }
