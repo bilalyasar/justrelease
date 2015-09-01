@@ -7,8 +7,11 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
@@ -18,6 +21,8 @@ public class JustRelease {
     private static final Logger log = Logger.getLogger(JustRelease.class.getName());
     private ProjectInfo projectInfo;
     ReleaseConfig releaseConfig;
+    String tweet = "I have just released %s version of %s";
+
 
 
     public JustRelease(ReleaseConfig releaseConfig, ProjectInfo projectInfo) {
@@ -46,6 +51,19 @@ public class JustRelease {
             Git git = Git.open(new File(releaseConfig.getLocalDirectory()));
             git.push().setTransportConfigCallback(getTransportConfigCallback()).call();
             git.push().setTransportConfigCallback(getTransportConfigCallback()).setPushTags().call();
+
+
+            if (Desktop.isDesktopSupported()) {
+                String text = String.format(tweet,releaseConfig.getReleaseVersion(),
+                        releaseConfig.getMainRepo().getRepository());
+                String encodedText = URLEncoder.encode(text,"UTF-8");
+                String via = "justrelease";
+                String encodedURL = URLEncoder.encode(releaseConfig.getMainRepo().getUrl(),"UTF-8");
+                String hashtags = "justreleased";
+                String encodedParameters = "text="+encodedText+"&"+"via="+via+"&"+"url="+encodedURL+"&"+"hashtags="+hashtags;
+                String uri ="https://twitter.com/intent/tweet?" + encodedParameters;
+                Desktop.getDesktop().browse(new URI(uri));
+            }
         }
 
 

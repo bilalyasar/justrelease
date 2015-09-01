@@ -17,7 +17,6 @@ public class NPMProject extends AbstractProjectInfo implements ProjectInfo {
     }
 
     public String getCurrentVersion() {
-        String workingDir = System.getProperty("user.dir") + "/" + releaseConfig.getLocalDirectory() + "/";
         JSONParser parser = new JSONParser();
         Object obj = null;
         try {

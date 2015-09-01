@@ -61,4 +61,8 @@ public class GithubRepo {
     public String getUniquePath() {
        return getUsername() + "_" + getRepository() + "_" + getBranch();
     }
+
+    public String getUrl() {
+        return String.format("https://github.com/%s/%s",getUsername(),getRepository());
+    }
 }
