@@ -32,8 +32,8 @@ public class ConfigParser {
         if (root.get("scm") == null) return;
         ArrayList<String> arrayList = ((ArrayList) root.get("scm"));
         for (String entry : arrayList) {
-            String key = entry.split("=")[0];
-            String value = entry.split("=")[1];
+            String key = entry.split(":")[0];
+            String value = entry.split(":")[1];
             if (key.equals("commit")) {
                 releaseConfig.setCommitMessageTemplate(value);
             }
@@ -55,9 +55,9 @@ public class ConfigParser {
                 ArrayList<String> commands = (ArrayList<String>) entry.get(key);
                 for (String command : commands) {
                     if (command.startsWith("description"))
-                        mainRepo.setDescriptionFileName(command.split("=")[1]);
+                        mainRepo.setDescriptionFileName(command.split(":")[1]);
                     if (command.startsWith("attachment"))
-                        mainRepo.setAttachmentFile(command.split("=")[1]);
+                        mainRepo.setAttachmentFile(command.split(":")[1]);
                 }
 
             }

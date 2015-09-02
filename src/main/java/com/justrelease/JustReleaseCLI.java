@@ -93,11 +93,9 @@ public class JustReleaseCLI {
             }
         }
 
-        releaseConfig.intializeConfig();
-        if (releaseConfig.isCustomConfig()) {
+            releaseConfig.intializeConfig();
             ConfigParser configParser = new ConfigParser(releaseConfig);
             configParser.parse();
-        }
 
         new JustRelease(releaseConfig, projectInfo).release();
 
