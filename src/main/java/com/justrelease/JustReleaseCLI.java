@@ -35,6 +35,10 @@ public class JustReleaseCLI {
             printHelp(options);
         }
 
+        if (args.length < 2) {
+            printHelp(options);
+        }
+
         String[] tokens = args[0].split("/");
 
         if (tokens.length != 2) {
@@ -98,6 +102,9 @@ public class JustReleaseCLI {
 
     private static void printHelp(Options options) {
         HelpFormatter f = new HelpFormatter();
+        System.out.println();
+        System.out.println("Thanks for using justrelease x.y.z!");
+        System.out.println();
         f.printHelp("justrelease <username/repository> <major|minor|patch|X.Y.Z>", options);
         System.exit(0);
     }
