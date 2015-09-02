@@ -86,8 +86,10 @@ public class JustReleaseCLI {
             if (cmd.hasOption("snapshotVersion")) {
                 releaseConfig.setNextVersion(cmd.getOptionValue("snapshotVersion"));
             } else {
-                //TODO - find snapshot version based on release type
-                // releaseConfig.setNextVersion();
+                if (((MavenProject) projectInfo).isSnapShot()) {
+                    releaseConfig.setNextVersion(releaseConfig.getReleaseVersion() + "-SNAPSHOT");
+                    releaseConfig.setReleaseVersion(builder.build().getNormalVersion());
+                }
             }
         }
 

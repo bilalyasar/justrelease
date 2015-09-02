@@ -72,7 +72,7 @@ public class JustRelease {
     private void commitNextVersion() throws IOException, GitAPIException {
         Git git = Git.open(new File(releaseConfig.getLocalDirectory()));
         git.add().addFilepattern(".").call();
-        git.commit().setMessage(releaseConfig.getReleaseVersion()).call();
+        git.commit().setMessage(releaseConfig.getNextVersion()).call();
     }
 
     private void replaceNextVersion() throws IOException {
@@ -84,7 +84,7 @@ public class JustRelease {
                 if (f.getAbsolutePath().contains(".git")) continue;
                 if (f.isHidden() || f.isDirectory()) continue;
                 String content = FileUtils.readFileToString(f);
-                FileUtils.writeStringToFile(f, content.replaceAll(releaseConfig.getCurrentVersion(), releaseConfig.getNextVersion()));
+                FileUtils.writeStringToFile(f, content.replaceAll(releaseConfig.getReleaseVersion(), releaseConfig.getNextVersion()));
             }
         }
     }

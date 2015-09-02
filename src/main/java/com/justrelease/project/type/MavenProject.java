@@ -16,6 +16,8 @@ import java.util.logging.Logger;
 public class MavenProject extends AbstractProjectInfo implements ProjectInfo {
     private final static Logger logger = Logger.getLogger(MavenProject.class.getName());
 
+    boolean isSnapShot;
+
     public MavenProject(ReleaseConfig releaseConfig) {
         releaseConfig.setProjectType("MAVEN");
         this.releaseConfig = releaseConfig;
@@ -35,6 +37,7 @@ public class MavenProject extends AbstractProjectInfo implements ProjectInfo {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if (result.getVersion().toLowerCase().contains("snapshot")) isSnapShot = true;
         releaseConfig.setCurrentVersion(result.getVersion());
         return result.getVersion();
     }
@@ -53,5 +56,13 @@ public class MavenProject extends AbstractProjectInfo implements ProjectInfo {
         String[] cmd = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + execConfig.getCommand()};
         logger.info(cmd.toString());
         return cmd;
+    }
+
+    public boolean isSnapShot() {
+        return isSnapShot;
+    }
+
+    public void setSnapShot(boolean isSnapShot) {
+        this.isSnapShot = isSnapShot;
     }
 }
