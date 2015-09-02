@@ -6,6 +6,11 @@ import com.justrelease.project.type.ProjectInfo;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.kohsuke.github.GHRelease;
+import org.kohsuke.github.GHReleaseBuilder;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GHUser;
+import org.kohsuke.github.GitHub;
 
 import java.awt.*;
 import java.io.File;
@@ -64,6 +69,22 @@ public class JustRelease {
                 String uri ="https://twitter.com/intent/tweet?" + encodedParameters;
                 Desktop.getDesktop().browse(new URI(uri));
             }
+
+
+            GitHub github = GitHub.connect();
+            GHUser user = github.getUser(releaseConfig.getMainRepo().getUsername());
+
+            GHRepository releaseRepository = user.getRepository(releaseConfig.getMainRepo().getRepository());
+            GHReleaseBuilder ghReleaseBuilder = new GHReleaseBuilder(releaseRepository,releaseConfig.getTagName());
+            ghReleaseBuilder.name(releaseConfig.getTagName());
+            //TODO - add log : git log --oneline --decorate v3.5.1..v3.5.2
+            // git.log().addRange
+            //ghReleaseBuilder.body("testbody");
+
+            GHRelease ghRelease = ghReleaseBuilder.create();
+            //TODO - add upload assets.
+            //ghRelease.uploadAsset(releaseConfig.get)
+
         }
 
 

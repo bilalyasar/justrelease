@@ -112,5 +112,10 @@
             <artifactId>maven-model</artifactId>
             <version>3.0.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.kohsuke</groupId>
+            <artifactId>github-api</artifactId>
+            <version>1.70</version>
+        </dependency>
     </dependencies>
 </project>
