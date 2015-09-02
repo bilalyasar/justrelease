@@ -16,8 +16,10 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.util.logging.Logger;
 
 public class JustReleaseCLI {
+    private final static Logger LOGGER = Logger.getLogger(JustReleaseCLI.class.getName());
 
     public static void main(String[] args) throws Exception {
 
@@ -102,9 +104,9 @@ public class JustReleaseCLI {
 
     private static void printHelp(Options options) {
         HelpFormatter f = new HelpFormatter();
-        System.out.println();
-        System.out.println("Thanks for using justrelease x.y.z!");
-        System.out.println();
+        LOGGER.info("");
+        LOGGER.info("Thanks for using justrelease x.y.z!");
+        LOGGER.info("");
         f.printHelp("justrelease <username/repository> <major|minor|patch|X.Y.Z>", options);
         System.exit(0);
     }

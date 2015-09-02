@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 import static com.justrelease.project.type.AbstractProjectInfo.getTransportConfigCallback;
 
 public class JustRelease {
-    private static final Logger log = Logger.getLogger(JustRelease.class.getName());
+    private static final Logger logger = Logger.getLogger(JustRelease.class.getName());
     private ProjectInfo projectInfo;
     ReleaseConfig releaseConfig;
     String tweet = "I have just released %s version of %s";
@@ -32,17 +32,17 @@ public class JustRelease {
 
     public void release() throws Exception {
 
-        System.out.println("Replace Release Version:");
+        logger.info("Replace Release Version:");
         replaceReleaseVersion();
-        System.out.println("Create Artifact:");
+        logger.info("Create Artifact:");
         projectInfo.createArtifacts();
-        System.out.println("Commit And Tag Version:");
+        logger.info("Commit And Tag Version:");
         commitAndTagVersion();
 
         if (releaseConfig.getNextVersion() != null) {
-            System.out.println("Replace Next Version:");
+            logger.info("Replace Next Version:");
             replaceNextVersion();
-            System.out.println("Commit Next Version:");
+            logger.info("Commit Next Version:");
             commitNextVersion();
         }
 
