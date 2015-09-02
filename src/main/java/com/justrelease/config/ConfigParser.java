@@ -4,8 +4,6 @@ import com.justrelease.config.build.ExecConfig;
 import com.justrelease.config.build.VersionUpdateConfig;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -15,16 +13,14 @@ import java.util.Map;
  */
 public class ConfigParser {
     ReleaseConfig releaseConfig;
-    File configFile;
     Yaml yaml = new Yaml();
 
-    public ConfigParser(File configFile) {
-        this.configFile = configFile;
+    public ConfigParser(ReleaseConfig releaseConfig) {
+        this.releaseConfig = releaseConfig;
     }
 
-    public void parse(ReleaseConfig releaseConfig) throws Exception {
-        this.releaseConfig = releaseConfig;
-        Map root = (Map) yaml.load(new FileInputStream(configFile));
+    public void parse() throws Exception {
+        Map root = (Map) yaml.load(releaseConfig.getConfigFileStream());
         handleBuild(root);
         handleVersionUpdate(root);
         handleTaggingRepos(root);

@@ -7,8 +7,9 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import static com.justrelease.project.type.AbstractProjectInfo.getTransportConfigCallback;
@@ -24,9 +25,10 @@ public class ReleaseConfig {
     String nextVersion;
     String commitMessageTemplate = "released ${version} with :heart: by justrelease";
     String tagNameTemplate = "v${version}";
+    boolean customConfig;
 
     GithubRepo mainRepo;
-    File configFile;
+    InputStream configFileStream;
     boolean dryRun;
 
     BuildConfig buildConfig = new BuildConfig();
@@ -42,10 +44,6 @@ public class ReleaseConfig {
         return localDirectory;
     }
 
-    public void setLocalDirectory(String localDirectory) {
-        this.localDirectory = localDirectory;
-    }
-
     public String getReleaseVersion() {
         return releaseVersion;
     }
@@ -56,10 +54,6 @@ public class ReleaseConfig {
 
     public GithubRepo getMainRepo() {
         return mainRepo;
-    }
-
-    public void setMainRepo(GithubRepo mainRepo) {
-        this.mainRepo = mainRepo;
     }
 
     public String getProjectType() {
@@ -136,10 +130,6 @@ public class ReleaseConfig {
         this.tagNameTemplate = tagNameTemplate;
     }
 
-    public File getConfigFile() {
-        return configFile;
-    }
-
     public void cloneMainRepo() throws GitAPIException, IOException {
         Git.cloneRepository()
                 .setURI(mainRepo.getRepoUrl())
@@ -147,21 +137,29 @@ public class ReleaseConfig {
                 .setTransportConfigCallback(getTransportConfigCallback())
                 .setBranch(mainRepo.getBranch())
                 .call();
+
     }
 
-    public void findConfigFile() throws URISyntaxException {
+    public void intializeConfig() throws IOException{
 
         File file = new File(localDirectory + "/justrelease.yml");
 
         if (file.exists() && !file.isDirectory()) {
-            this.configFile = file;
-        }
-        if (projectType.equals("MAVEN")) {
-            file = new File(getClass().getResource("/default-mvn.yml").toURI());
+            this.configFileStream = new FileInputStream(file);
+            customConfig = true;
+        } else if (projectType.equals("MAVEN")) {
+            this.configFileStream = ReleaseConfig.class.getResourceAsStream("/default-mvn.yml");
         } else {
-            file = new File(getClass().getResource("/default-npm.yml").toURI());
+            this.configFileStream = ReleaseConfig.class.getResourceAsStream("/default-npm.yml");
         }
 
-        this.configFile = file;
+    }
+
+    public boolean isCustomConfig() {
+        return customConfig;
+    }
+
+    public InputStream getConfigFileStream() {
+        return configFileStream;
     }
 }

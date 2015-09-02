@@ -64,7 +64,6 @@ public class JustReleaseCLI {
 
         releaseConfig.cloneMainRepo();
         ProjectInfo projectInfo = createProjectInfo(releaseConfig);  // maven or grunt project
-        releaseConfig.findConfigFile();
         releaseConfig.setCurrentVersion(projectInfo.getCurrentVersion());
         Version.Builder builder = new Version.Builder(releaseConfig.getCurrentVersion());
 
@@ -90,9 +89,10 @@ public class JustReleaseCLI {
             }
         }
 
-        if (releaseConfig.getConfigFile() != null) {
-            ConfigParser configParser = new ConfigParser(releaseConfig.getConfigFile());
-            configParser.parse(releaseConfig);
+        releaseConfig.intializeConfig();
+        if (releaseConfig.isCustomConfig()) {
+            ConfigParser configParser = new ConfigParser(releaseConfig);
+            configParser.parse();
         }
 
         new JustRelease(releaseConfig, projectInfo).release();
