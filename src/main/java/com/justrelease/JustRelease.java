@@ -77,12 +77,10 @@ public class JustRelease {
             GHRepository releaseRepository = user.getRepository(releaseConfig.getMainRepo().getRepository());
             GHReleaseBuilder ghReleaseBuilder = new GHReleaseBuilder(releaseRepository,releaseConfig.getTagName());
             ghReleaseBuilder.name(releaseConfig.getTagName());
-            //TODO - add log : git log --oneline --decorate v3.5.1..v3.5.2
             // git.log().addRange
             //ghReleaseBuilder.body("testbody");
 
             GHRelease ghRelease = ghReleaseBuilder.create();
-            //TODO - add upload assets.
             //ghRelease.uploadAsset(releaseConfig.get)
 
         }
