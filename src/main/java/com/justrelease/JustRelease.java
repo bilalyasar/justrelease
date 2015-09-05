@@ -85,11 +85,12 @@ public class JustRelease {
                             File.separator +
                             releaseConfig.getMainRepo().getDescriptionFileName())));
 
-//            ghReleaseBuilder.body()
             ghReleaseBuilder.body(out);
 
             GHRelease ghRelease = ghReleaseBuilder.create();
-            //ghRelease.uploadAsset(releaseConfig.get)
+            ghRelease.uploadAsset(new File((releaseConfig.getLocalDirectory() +
+                    File.separator +
+                    releaseConfig.getMainRepo().getAttachmentFile())), "Project Artifact");
 
         }
 
