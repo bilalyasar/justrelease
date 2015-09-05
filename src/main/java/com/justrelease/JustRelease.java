@@ -17,6 +17,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
@@ -27,7 +29,6 @@ public class JustRelease {
     private ProjectInfo projectInfo;
     ReleaseConfig releaseConfig;
     String tweet = "I have just released %s version of %s";
-
 
 
     public JustRelease(ReleaseConfig releaseConfig, ProjectInfo projectInfo) {
@@ -59,14 +60,14 @@ public class JustRelease {
 
 
             if (Desktop.isDesktopSupported() && !releaseConfig.isDryRun()) {
-                String text = String.format(tweet,releaseConfig.getReleaseVersion(),
+                String text = String.format(tweet, releaseConfig.getReleaseVersion(),
                         releaseConfig.getMainRepo().getRepository());
-                String encodedText = URLEncoder.encode(text,"UTF-8");
+                String encodedText = URLEncoder.encode(text, "UTF-8");
                 String via = "justrelease";
-                String encodedURL = URLEncoder.encode(releaseConfig.getMainRepo().getUrl(),"UTF-8");
+                String encodedURL = URLEncoder.encode(releaseConfig.getMainRepo().getUrl(), "UTF-8");
                 String hashtags = "justreleased";
-                String encodedParameters = "text="+encodedText+"&"+"via="+via+"&"+"url="+encodedURL+"&"+"hashtags="+hashtags;
-                String uri ="https://twitter.com/intent/tweet?" + encodedParameters;
+                String encodedParameters = "text=" + encodedText + "&" + "via=" + via + "&" + "url=" + encodedURL + "&" + "hashtags=" + hashtags;
+                String uri = "https://twitter.com/intent/tweet?" + encodedParameters;
                 Desktop.getDesktop().browse(new URI(uri));
             }
 
@@ -75,10 +76,17 @@ public class JustRelease {
             GHUser user = github.getUser(releaseConfig.getMainRepo().getUsername());
 
             GHRepository releaseRepository = user.getRepository(releaseConfig.getMainRepo().getRepository());
-            GHReleaseBuilder ghReleaseBuilder = new GHReleaseBuilder(releaseRepository,releaseConfig.getTagName());
+            GHReleaseBuilder ghReleaseBuilder = new GHReleaseBuilder(releaseRepository, releaseConfig.getTagName());
             ghReleaseBuilder.name(releaseConfig.getTagName());
             // git.log().addRange
-            //ghReleaseBuilder.body("testbody");
+
+            String out = String.join("\n", Files.readAllLines(Paths.get(
+                    releaseConfig.getLocalDirectory() +
+                            File.separator +
+                            releaseConfig.getMainRepo().getDescriptionFileName())));
+
+//            ghReleaseBuilder.body()
+            ghReleaseBuilder.body(out);
 
             GHRelease ghRelease = ghReleaseBuilder.create();
             //ghRelease.uploadAsset(releaseConfig.get)
