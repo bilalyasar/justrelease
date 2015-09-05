@@ -4,9 +4,9 @@
 JustRelease is a release library such that you can automate many release steps easily.
 Currently JustRelease supports following automations:
 
--Version Update
--Create Artifacts
--Publish
+- Version Update
+- Create Artifacts
+- Publish
 
 
 ##Configuration
