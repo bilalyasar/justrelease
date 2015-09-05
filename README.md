@@ -56,14 +56,14 @@ publish:
 
 ##How to Use JustRelease Library
 
-###The simple usage is:
+###Most Simple Usage:
 
 java -jar justrelease.jar username/reponame
 
 In this usage we detect your project type, update the version ( we assume it is patch release).
 
 
-###Giving release type
+###Giving Release Type
 
 java -jar justrelease.jar username/reponame (major | minor | patch )
 
