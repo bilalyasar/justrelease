@@ -58,7 +58,7 @@ public class JustRelease {
             git.push().setTransportConfigCallback(getTransportConfigCallback()).setPushTags().call();
 
 
-            if (Desktop.isDesktopSupported()) {
+            if (Desktop.isDesktopSupported() && !releaseConfig.isDryRun()) {
                 String text = String.format(tweet,releaseConfig.getReleaseVersion(),
                         releaseConfig.getMainRepo().getRepository());
                 String encodedText = URLEncoder.encode(text,"UTF-8");
