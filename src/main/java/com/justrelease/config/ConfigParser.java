@@ -55,7 +55,7 @@ public class ConfigParser {
                 ArrayList<String> commands = (ArrayList<String>) entry.get(key);
                 for (String command : commands) {
                     if (command.startsWith("description"))
-                        mainRepo.setDescriptionFileName(command.split(":")[1]);
+                        mainRepo.setDescriptionFileName(command.split(":")[1].replaceAll("\\$\\{version\\}", releaseConfig.getReleaseVersion()));
                     if (command.startsWith("attachment"))
                         mainRepo.setAttachmentFile(command.split(":")[1]);
                 }
