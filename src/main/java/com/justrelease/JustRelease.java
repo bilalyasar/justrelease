@@ -88,7 +88,12 @@ public class JustRelease {
             // git.log().addRange
 
             if (releaseConfig.getMainRepo().getDescriptionFileName() == null) {
-                String[] cmd2 = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + "git log " + latestTag + "..HEAD --oneline --pretty=format:'* %s (%h)'"};
+                String[] cmd2;
+                if (latestTag != null) {
+                    cmd2 = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + "git log " + latestTag + "..HEAD --oneline --pretty=format:'* %s (%h)'"};
+                } else {
+                    cmd2 = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + "git log --oneline --pretty=format:'* %s (%h)'"};
+                }
                 Process p2 = Runtime.getRuntime().exec(cmd2);
                 p2.waitFor();
                 String output = IOUtils.toString(p2.getInputStream());
