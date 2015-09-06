@@ -14,12 +14,15 @@ import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 
 import java.awt.*;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URLEncoder;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
@@ -92,11 +95,18 @@ public class JustRelease {
                 String errorOutput = IOUtils.toString(p2.getErrorStream());
                 ghReleaseBuilder.body(output);
             }
-            String out = String.join("\n", Files.readAllLines(Paths.get(
-                    releaseConfig.getLocalDirectory() +
-                            File.separator +
-                            releaseConfig.getMainRepo().getDescriptionFileName())));
 
+            InputStream fis = new FileInputStream(releaseConfig.getLocalDirectory() +
+                    File.separator +
+                    releaseConfig.getMainRepo().getDescriptionFileName());
+            InputStreamReader isr = new InputStreamReader(fis, Charset.forName("UTF-8"));
+            BufferedReader br = new BufferedReader(isr);
+            String line;
+            String out = "";
+            while ((line = br.readLine()) != null) {
+                out += line;
+                out += "\n";
+            }
             ghReleaseBuilder.body(out);
 
             GHRelease ghRelease = ghReleaseBuilder.create();
