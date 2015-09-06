@@ -6,7 +6,7 @@
 
     <groupId>com.justrelease</groupId>
     <artifactId>justrelease</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4-SNAPSHOT</version>
 
     <build>
         <plugins>
@@ -95,7 +95,7 @@
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
-            <version>3.7.0.201.0.360915-r</version>
+            <version>3.7.0.201.0.4-SNAPSHOT60915-r</version>
         </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
