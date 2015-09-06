@@ -94,20 +94,21 @@ public class JustRelease {
                 String output = IOUtils.toString(p2.getInputStream());
                 String errorOutput = IOUtils.toString(p2.getErrorStream());
                 ghReleaseBuilder.body(output);
-            }
+            } else {
 
-            InputStream fis = new FileInputStream(releaseConfig.getLocalDirectory() +
-                    File.separator +
-                    releaseConfig.getMainRepo().getDescriptionFileName());
-            InputStreamReader isr = new InputStreamReader(fis, Charset.forName("UTF-8"));
-            BufferedReader br = new BufferedReader(isr);
-            String line;
-            String out = "";
-            while ((line = br.readLine()) != null) {
-                out += line;
-                out += "\n";
+                InputStream fis = new FileInputStream(releaseConfig.getLocalDirectory() +
+                        File.separator +
+                        releaseConfig.getMainRepo().getDescriptionFileName());
+                InputStreamReader isr = new InputStreamReader(fis, Charset.forName("UTF-8"));
+                BufferedReader br = new BufferedReader(isr);
+                String line;
+                String out = "";
+                while ((line = br.readLine()) != null) {
+                    out += line;
+                    out += "\n";
+                }
+                ghReleaseBuilder.body(out);
             }
-            ghReleaseBuilder.body(out);
 
             GHRelease ghRelease = ghReleaseBuilder.create();
             ghRelease.uploadAsset(new File((releaseConfig.getLocalDirectory() +
