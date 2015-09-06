@@ -57,7 +57,7 @@ public class ConfigParser {
                     if (command.startsWith("description"))
                         mainRepo.setDescriptionFileName(command.split(":")[1].replaceAll("\\$\\{version\\}", releaseConfig.getReleaseVersion()));
                     if (command.startsWith("attachment"))
-                        mainRepo.setAttachmentFile(command.split(":")[1]);
+                        mainRepo.setAttachmentFile(command.split(":")[1].replaceAll("\\$\\{version\\}", releaseConfig.getReleaseVersion()));
                 }
 
             }
