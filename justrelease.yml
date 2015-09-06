@@ -1,0 +1,8 @@
+version.update:
+    - xml
+create.artifacts:
+        - mvn clean install
+publish:
+        - github:
+            - description:releasenotes.md
+            - attachment:target/justrelease-${version}-jar-with-dependencies.jar
