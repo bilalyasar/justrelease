@@ -89,7 +89,7 @@ public class JustRelease {
 
             if (releaseConfig.getMainRepo().getDescriptionFileName() == null) {
                 String[] cmd2;
-                if (latestTag != null) {
+                if (latestTag != "") {
                     cmd2 = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + "git log " + latestTag + "..HEAD --oneline --pretty=format:'* %s (%h)'"};
                 } else {
                     cmd2 = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + "git log --oneline --pretty=format:'* %s (%h)'"};
