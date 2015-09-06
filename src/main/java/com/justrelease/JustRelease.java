@@ -4,6 +4,7 @@ import com.justrelease.config.ReleaseConfig;
 import com.justrelease.config.build.VersionUpdateConfig;
 import com.justrelease.project.type.ProjectInfo;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.kohsuke.github.GHRelease;
@@ -29,6 +30,7 @@ public class JustRelease {
     private ProjectInfo projectInfo;
     ReleaseConfig releaseConfig;
     String tweet = "I have just released %s version of %s";
+    private String latestTag;
 
 
     public JustRelease(ReleaseConfig releaseConfig, ProjectInfo projectInfo) {
@@ -43,6 +45,7 @@ public class JustRelease {
         logger.info("Create Artifact:");
         projectInfo.createArtifacts();
         logger.info("Commit And Tag Version:");
+        getLatestTag();
         commitAndTagVersion();
 
         if (releaseConfig.getNextVersion() != null) {
@@ -78,8 +81,17 @@ public class JustRelease {
             GHRepository releaseRepository = user.getRepository(releaseConfig.getMainRepo().getRepository());
             GHReleaseBuilder ghReleaseBuilder = new GHReleaseBuilder(releaseRepository, releaseConfig.getTagName());
             ghReleaseBuilder.name(releaseConfig.getTagName());
+
             // git.log().addRange
 
+            if (releaseConfig.getMainRepo().getDescriptionFileName() == null) {
+                String[] cmd2 = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + "git log " + latestTag + "..HEAD --oneline --pretty=format:'* %s (%h)'"};
+                Process p2 = Runtime.getRuntime().exec(cmd2);
+                p2.waitFor();
+                String output = IOUtils.toString(p2.getInputStream());
+                String errorOutput = IOUtils.toString(p2.getErrorStream());
+                ghReleaseBuilder.body(output);
+            }
             String out = String.join("\n", Files.readAllLines(Paths.get(
                     releaseConfig.getLocalDirectory() +
                             File.separator +
@@ -138,4 +150,10 @@ public class JustRelease {
         }
     }
 
+    public void getLatestTag() throws InterruptedException, IOException {
+        String[] cmd = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + "git describe --tags --abbrev=0"};
+        Process p = Runtime.getRuntime().exec(cmd);
+        p.waitFor();
+        latestTag = IOUtils.toString(p.getInputStream()).replaceAll("(\\r|\\n|\\t)", "");
+    }
 }
