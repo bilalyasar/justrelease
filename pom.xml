@@ -70,6 +70,8 @@
                                     <mainClass>com.justrelease.JustReleaseCLI</mainClass>
                                 </manifest>
                             </archive>
+                            <finalName>justrelease-${project.version}</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>
                 </executions>

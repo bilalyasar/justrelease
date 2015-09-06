@@ -5,4 +5,4 @@ create.artifacts:
 publish:
         - github:
             - description:releasenotes.md
-            - attachment:target/justrelease-${version}-jar-with-dependencies.jar
+            - attachment:target/justrelease-${version}.jar
