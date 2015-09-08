@@ -1,12 +1,7 @@
 
 #JustRelease
 
-JustRelease is a release library such that you can automate many release steps easily.
-Currently JustRelease supports following automations:
-
-- Version Update
-- Create Artifacts
-- Publish
+JustRelease is command line tool to release software libraries hosted on github.com
 
 ##Installation & Usage
 
@@ -15,6 +10,8 @@ Currently JustRelease supports following automations:
 
 ##Requirements
 
+
+- Github Account and Github Repository
 - Java 7 or higher
 - Generate [Personal Access Token](https://github.com/settings/tokens)
 - create ~/.github file and set *login* and *oauth* parameters as below
@@ -22,6 +19,12 @@ Currently JustRelease supports following automations:
 login=github_username
 oauth=GITHUB_OAUTH_TOKEN
 ```
+## quick example
+
+- fork one of sample repositories [maven](https://github.com/justrelease/justrelease-sample-maven) or [npm](https://github.com/justrelease/justrelease-sample-npm)
+- update releasenotes.md file and commit the change.
+- run `sh justrelease.sh yourusername/reponame patch`
+- check releases page of your forked repository
 
 ##Configuration
 
