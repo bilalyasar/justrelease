@@ -8,16 +8,20 @@ Currently JustRelease supports following automations:
 - Create Artifacts
 - Publish
 
-##Setup
+##Installation & Usage
 
-Just download the latest release zip file from: https://github.com/justrelease/justrelease/releases
+- Download [latest zip file](https://github.com/justrelease/justrelease/releases)
+- unzip and run **justrelease.(sh|bat)** based on your OS
 
-Unzip the zip file to a directory. 
-There will be 2 file: **justrelease-$VERSION.jar** and a **script file**.
+##Requirements
 
-run the script file: **sh justrelease.sh \<username/repository> \<major|minor|patch>** 
-
-For detailed configuration you can continue to read ReadMe file.
+- Java 7 or higher
+- Generate [Personal Access Token](https://github.com/settings/tokens)
+- create ~/.github file and set *login* and *oauth* parameters as below
+```
+login=github_username
+oauth=GITHUB_OAUTH_TOKEN
+```
 
 ##Configuration
 
