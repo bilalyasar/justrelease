@@ -3,22 +3,35 @@
 
 JustRelease is command line tool to release software libraries hosted on github.com
 
-##Installation & Usage
-
-- Download [latest zip file](https://github.com/justrelease/justrelease/releases)
-- unzip and run **justrelease.(sh|bat)** based on your OS
-
 ##Requirements
 
 
 - Github Account and Github Repository
 - Java 7 or higher
+
+##Installation
+
+- Download and unzip [latest zip file](https://github.com/justrelease/justrelease/releases)
 - Generate [Personal Access Token](https://github.com/settings/tokens)
-- create ~/.github file and set *login* and *oauth* parameters as below
+- Create ~/.github file and set *login* and *oauth* parameters as below
 ```
 login=github_username
 oauth=GITHUB_OAUTH_TOKEN
 ```
+
+##Usage
+
+```
+$ sh justrelease.sh
+
+usage: justrelease <username/repository> <major|minor|patch|X.Y.Z>
+ -dryRun                  release without push
+ -h                       help
+ -snapshotVersion <arg>   version number that will be updated after the
+                          release. maven spesific feature
+```
+
+
 ## quick example
 
 - fork one of sample repositories [maven](https://github.com/justrelease/justrelease-sample-maven) or [npm](https://github.com/justrelease/justrelease-sample-npm)
