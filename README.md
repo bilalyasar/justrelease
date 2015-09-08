@@ -8,11 +8,34 @@ Currently JustRelease supports following automations:
 - Create Artifacts
 - Publish
 
+##Setup
+
+Just download the latest release zip file from: https://github.com/justrelease/justrelease/releases
+
+Unzip the zip file to a directory. 
+There will be 2 file: **justrelease-$VERSION.jar** and a **script file**.
+
+run the script file: **sh justrelease.sh \<username/repository> \<major|minor|patch>** 
+
+For detailed configuration you can continue to read ReadMe file.
 
 ##Configuration
 
 To configure your release steps you need to create `justrelease.yml` file in your repo.
 If you don't create a `justrelease.yml` file, default configurations will be used.
+
+This is example `justrelease.yml` file:
+
+```
+version.update:
+    - xml
+create.artifacts:
+        - mvn clean install
+publish:
+        - github:
+            - description:releasenotes.md
+            - attachment:target/justrelease-${version}.jar
+```
 
 
 ###Version Update
