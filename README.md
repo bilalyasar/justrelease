@@ -1,13 +1,14 @@
 
 #JustRelease
 
-JustRelease is command line tool to release software libraries hosted on github.com
+JustRelease is command line tool to release software libraries hosted on github.com. Justrelease requires no configuration and applies default behavior in each release operation. If you want to customize some of the features offered by justrelease, please include `justrelease.yml` file in your repository.
 
 ##Requirements
 
 
 - Github Account and Github Repository
 - Java 7 or higher
+- `justrelease.yml` for custom configuration
 
 ##Installation
 
@@ -32,14 +33,15 @@ usage: justrelease <username/repository> <major|minor|patch|X.Y.Z>
 ```
 
 
-## quick example
+## Quick Example
 
 - fork one of sample repositories [maven](https://github.com/justrelease/justrelease-sample-maven) or [npm](https://github.com/justrelease/justrelease-sample-npm)
 - update releasenotes.md file and commit the change.
 - run `sh justrelease.sh yourusername/reponame patch`
 - check releases page of your forked repository
 
-##Configuration
+
+## Advanced Configuration
 
 To configure your release steps you need to create `justrelease.yml` file in your repo.
 If you don't create a `justrelease.yml` file, default configurations will be used.
@@ -101,14 +103,14 @@ publish:
 
 ###Most Simple Usage:
 
-java -jar justrelease.jar username/reponame
+sh justrelease.sh username/reponame
 
 In this usage we detect your project type, update the version ( we assume it is patch release).
 
 
 ###Giving Release Type
 
-java -jar justrelease.jar username/reponame (major | minor | patch )
+sh justrelease.sh username/reponame (major | minor | patch )
 
 
 ###DryRun Config
@@ -116,5 +118,5 @@ java -jar justrelease.jar username/reponame (major | minor | patch )
 If you want to just observe what will happen when releasing you can use `DryRun` config.
 In this case, there will be no push or committing. You will see just logs.
 
-java -jar justrelease.jar username/reponame minor -dryRun
+sh justrelease.sh username/reponame minor -dryRun
 
