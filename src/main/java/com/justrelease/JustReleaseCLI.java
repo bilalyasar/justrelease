@@ -93,9 +93,9 @@ public class JustReleaseCLI {
             }
         }
 
-            releaseConfig.intializeConfig();
-            ConfigParser configParser = new ConfigParser(releaseConfig);
-            configParser.parse();
+        releaseConfig.intializeConfig();
+        ConfigParser configParser = new ConfigParser(releaseConfig);
+        configParser.parse();
 
         new JustRelease(releaseConfig, projectInfo).release();
 
@@ -104,9 +104,9 @@ public class JustReleaseCLI {
 
     private static void printHelp(Options options) {
         HelpFormatter f = new HelpFormatter();
-        LOGGER.info("");
-        LOGGER.info("Thanks for using justrelease x.y.z!");
-        LOGGER.info("");
+        System.out.println("");
+        System.out.println("Thanks for using justrelease x.y.z!");
+        System.out.println("");
         f.printHelp("justrelease <username/repository> <major|minor|patch|X.Y.Z>", options);
         System.exit(0);
     }

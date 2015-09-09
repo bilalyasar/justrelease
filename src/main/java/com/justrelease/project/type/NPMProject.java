@@ -8,11 +8,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.FileReader;
-import java.util.logging.Logger;
 
 public class NPMProject extends AbstractProjectInfo implements ProjectInfo {
 
-    private final static Logger logger = Logger.getLogger(NPMProject.class.getName());
 
     public NPMProject(ReleaseConfig releaseConfig) {
         releaseConfig.setProjectType("NPM");
@@ -44,9 +42,9 @@ public class NPMProject extends AbstractProjectInfo implements ProjectInfo {
     }
 
     private String[] createCommand(ExecConfig execConfig) {
-        logger.info("cd " + releaseConfig.getLocalDirectory() + "; " + execConfig.getCommand());
+        System.out.println("cd " + releaseConfig.getLocalDirectory() + "; " + execConfig.getCommand());
         String[] cmd = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + execConfig.getCommand()};
-        logger.info(cmd.toString());
+        System.out.println(cmd.toString());
         return cmd;
     }
 }

@@ -8,13 +8,11 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.logging.Logger;
 
 /**
  * Created by bilal on 25/07/15.
  */
 public class MavenProject extends AbstractProjectInfo implements ProjectInfo {
-    private final static Logger logger = Logger.getLogger(MavenProject.class.getName());
 
     boolean isSnapShot;
 
@@ -52,9 +50,9 @@ public class MavenProject extends AbstractProjectInfo implements ProjectInfo {
     }
 
     private String[] createCommand(ExecConfig execConfig) {
-        logger.info("cd " + releaseConfig.getLocalDirectory() + "; " + execConfig.getCommand());
+        System.out.println("cd " + releaseConfig.getLocalDirectory() + "; " + execConfig.getCommand());
         String[] cmd = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + execConfig.getCommand()};
-        logger.info(cmd.toString());
+        System.out.println(cmd.toString());
         return cmd;
     }
 

@@ -12,14 +12,12 @@ import org.eclipse.jgit.transport.TransportHttp;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.logging.Logger;
 
 /**
  * Created by bilal on 25/07/15.
  */
 public abstract class AbstractProjectInfo {
     ReleaseConfig releaseConfig;
-    private final static Logger logger = Logger.getLogger(AbstractProjectInfo.class.getName());
 
     public static TransportConfigCallback getTransportConfigCallback() {
         final SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
@@ -44,7 +42,7 @@ public abstract class AbstractProjectInfo {
                     new InputStreamReader(p.getInputStream()));
             String line;
             while ((line = in.readLine()) != null) {
-                logger.info(line);
+                System.out.println(line);
             }
             in.close();
         } catch (Exception e) {

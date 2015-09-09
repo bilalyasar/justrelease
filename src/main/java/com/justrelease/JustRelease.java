@@ -43,23 +43,27 @@ public class JustRelease {
 
     public void release() throws Exception {
 
-        logger.info("Replace Release Version:");
+        System.out.println("Starting to Release: " + releaseConfig.getMainRepo().getRepository());
+        System.out.println("Replace  Release Version:");
         replaceReleaseVersion();
-        logger.info("Create Artifact:");
+        System.out.println("Create Artifacts:");
         projectInfo.createArtifacts();
-        logger.info("Commit And Tag Version:");
+        System.out.println("Commit And Tag Version:");
         getLatestTag();
         commitAndTagVersion();
 
         if (releaseConfig.getNextVersion() != null) {
-            logger.info("Replace Next Version:");
+            System.out.println("Replace Next Version:");
             replaceNextVersion();
-            logger.info("Commit Next Version:");
+            System.out.println("Commit Next Version:");
             commitNextVersion();
         }
-
-
+        
+        if(releaseConfig.isDryRun()){
+            System.out.println("You enabled the dryRun config, so anything will be published or pushed.");
+        }
         if (!releaseConfig.isDryRun()) {
+            System.out.println("Pushing tags and repo");
             Git git = Git.open(new File(releaseConfig.getLocalDirectory()));
             git.push().setTransportConfigCallback(getTransportConfigCallback()).call();
             git.push().setTransportConfigCallback(getTransportConfigCallback()).setPushTags().call();
@@ -78,6 +82,7 @@ public class JustRelease {
             }
 
 
+            System.out.println("Connecting to GitHub for uploading artifacts");
             GitHub github = GitHub.connect();
             GHUser user = github.getUser(releaseConfig.getMainRepo().getUsername());
 
@@ -123,7 +128,7 @@ public class JustRelease {
 
         }
 
-
+        System.out.println("Done! Thanks for using JustRelease...");
     }
 
     private void commitNextVersion() throws IOException, GitAPIException {
@@ -155,6 +160,8 @@ public class JustRelease {
 
     private void replaceReleaseVersion() throws IOException {
         for (VersionUpdateConfig versionUpdateConfig : releaseConfig.getVersionUpdateConfigs()) {
+            System.out.println("Updating " + versionUpdateConfig.getRegex() +
+                    " extensions from " + releaseConfig.getCurrentVersion() + " to " + releaseConfig.getReleaseVersion());
             Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory()),
                     versionUpdateConfig.getRegex().split(","), true);
             while (it.hasNext()) {
