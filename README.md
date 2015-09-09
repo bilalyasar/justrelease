@@ -7,6 +7,7 @@ JustRelease is command line tool to release software libraries hosted on github.
 
 
 - Github Account and Github Repository
+- Git in your local computer
 - Java 7 or higher
 - `justrelease.yml` for custom configuration
 

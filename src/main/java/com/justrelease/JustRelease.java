@@ -44,7 +44,7 @@ public class JustRelease {
     public void release() throws Exception {
 
         System.out.println("Starting to Release: " + releaseConfig.getMainRepo().getRepository());
-        System.out.println("Replace  Release Version:");
+        System.out.println("Replace  Release Version");
         replaceReleaseVersion();
         System.out.println("Create Artifacts:");
         projectInfo.createArtifacts();
@@ -58,12 +58,13 @@ public class JustRelease {
             System.out.println("Commit Next Version:");
             commitNextVersion();
         }
-        
-        if(releaseConfig.isDryRun()){
+
+        if (releaseConfig.isDryRun()) {
             System.out.println("You enabled the dryRun config, so anything will be published or pushed.");
         }
         if (!releaseConfig.isDryRun()) {
-            System.out.println("Pushing tags and repo");
+            System.out.println("Pushing tag: " + releaseConfig.getTagName());
+            System.out.println("Pushing repo " + releaseConfig.getMainRepo().getRepository());
             Git git = Git.open(new File(releaseConfig.getLocalDirectory()));
             git.push().setTransportConfigCallback(getTransportConfigCallback()).call();
             git.push().setTransportConfigCallback(getTransportConfigCallback()).setPushTags().call();
@@ -105,7 +106,7 @@ public class JustRelease {
                 String errorOutput = IOUtils.toString(p2.getErrorStream());
                 ghReleaseBuilder.body(output);
             } else {
-
+                System.out.println("Tag Description File Name: " + releaseConfig.getMainRepo().getDescriptionFileName());
                 InputStream fis = new FileInputStream(releaseConfig.getLocalDirectory() +
                         File.separator +
                         releaseConfig.getMainRepo().getDescriptionFileName());
@@ -132,6 +133,7 @@ public class JustRelease {
     }
 
     private void commitNextVersion() throws IOException, GitAPIException {
+        System.out.println("Committing Next Version: " + releaseConfig.getNextVersion());
         Git git = Git.open(new File(releaseConfig.getLocalDirectory()));
         git.add().addFilepattern(".").call();
         git.commit().setMessage(releaseConfig.getNextVersion()).call();
@@ -139,6 +141,8 @@ public class JustRelease {
 
     private void replaceNextVersion() throws IOException {
         for (VersionUpdateConfig versionUpdateConfig : releaseConfig.getVersionUpdateConfigs()) {
+            System.out.println("Updating " + versionUpdateConfig.getRegex() +
+                    " extensions from " + releaseConfig.getCurrentVersion() + " to " + releaseConfig.getNextVersion());
             Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory()),
                     versionUpdateConfig.getRegex().split(","), true);
             while (it.hasNext()) {
@@ -152,6 +156,8 @@ public class JustRelease {
     }
 
     private void commitAndTagVersion() throws IOException, GitAPIException {
+        System.out.println("Tagging: " + releaseConfig.getTagName());
+        System.out.println("Committing with message: " + releaseConfig.getCommitMessage());
         Git git = Git.open(new File(releaseConfig.getLocalDirectory()));
         git.add().addFilepattern(".").call();
         git.commit().setMessage(releaseConfig.getCommitMessage()).call();
