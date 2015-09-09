@@ -21,15 +21,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.Iterator;
-import java.util.logging.Logger;
 
 import static com.justrelease.project.type.AbstractProjectInfo.getTransportConfigCallback;
 
 public class JustRelease {
-    private static final Logger logger = Logger.getLogger(JustRelease.class.getName());
     private ProjectInfo projectInfo;
     private ReleaseConfig releaseConfig;
     private String tweet = "I have just released %s version of %s";
@@ -65,26 +64,12 @@ public class JustRelease {
             System.out.println("You enabled the dryRun config, so anything will be published or pushed.");
             return;
         }
-        System.out.println("Pushing tag: " + releaseConfig.getTagName());
-        System.out.println("Pushing repo " + releaseConfig.getMainRepo().getRepository());
-        Git git = Git.open(new File(releaseConfig.getLocalDirectory()));
-        git.push().setTransportConfigCallback(getTransportConfigCallback()).call();
-        git.push().setTransportConfigCallback(getTransportConfigCallback()).setPushTags().call();
+        pushRepoAndTag();
+        makeAnnouncement();
+        createGithubReleasePage();
+    }
 
-
-        if (Desktop.isDesktopSupported() && !releaseConfig.isDryRun()) {
-            String text = String.format(tweet, releaseConfig.getReleaseVersion(),
-                    releaseConfig.getMainRepo().getRepository());
-            String encodedText = URLEncoder.encode(text, "UTF-8");
-            String via = "justrelease";
-            String encodedURL = URLEncoder.encode(releaseConfig.getMainRepo().getUrl(), "UTF-8");
-            String hashtags = "justreleased";
-            String encodedParameters = "text=" + encodedText + "&" + "via=" + via + "&" + "url=" + encodedURL + "&" + "hashtags=" + hashtags;
-            String uri = "https://twitter.com/intent/tweet?" + encodedParameters;
-            Desktop.getDesktop().browse(new URI(uri));
-        }
-
-
+    private void createGithubReleasePage() throws IOException, InterruptedException {
         System.out.println("Connecting to GitHub for uploading artifacts");
         GitHub github = GitHub.connect();
         GHUser user = github.getUser(releaseConfig.getMainRepo().getUsername());
@@ -93,7 +78,6 @@ public class JustRelease {
         GHReleaseBuilder ghReleaseBuilder = new GHReleaseBuilder(releaseRepository, releaseConfig.getTagName());
         ghReleaseBuilder.name(releaseConfig.getTagName());
 
-        // git.log().addRange
 
         if (releaseConfig.getMainRepo().getDescriptionFileName() == null) {
             String[] command2;
@@ -128,6 +112,29 @@ public class JustRelease {
             ghRelease.uploadAsset(new File((releaseConfig.getLocalDirectory() +
                     File.separator +
                     releaseConfig.getMainRepo().getAttachmentFile())), "Project Artifact");
+    }
+
+
+    private void makeAnnouncement() throws IOException, URISyntaxException {
+        if (Desktop.isDesktopSupported() && !releaseConfig.isDryRun()) {
+            String text = String.format(tweet, releaseConfig.getReleaseVersion(),
+                    releaseConfig.getMainRepo().getRepository());
+            String encodedText = URLEncoder.encode(text, "UTF-8");
+            String via = "justrelease";
+            String encodedURL = URLEncoder.encode(releaseConfig.getMainRepo().getUrl(), "UTF-8");
+            String hashtags = "justreleased";
+            String encodedParameters = "text=" + encodedText + "&" + "via=" + via + "&" + "url=" + encodedURL + "&" + "hashtags=" + hashtags;
+            String uri = "https://twitter.com/intent/tweet?" + encodedParameters;
+            Desktop.getDesktop().browse(new URI(uri));
+        }
+    }
+
+    private void pushRepoAndTag() throws GitAPIException, IOException {
+        System.out.println("Pushing tag: " + releaseConfig.getTagName());
+        System.out.println("Pushing repo " + releaseConfig.getMainRepo().getRepository());
+        Git git = Git.open(new File(releaseConfig.getLocalDirectory()));
+        git.push().setTransportConfigCallback(getTransportConfigCallback()).call();
+        git.push().setTransportConfigCallback(getTransportConfigCallback()).setPushTags().call();
 
     }
 
