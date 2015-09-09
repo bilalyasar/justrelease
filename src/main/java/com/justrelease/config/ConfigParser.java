@@ -12,8 +12,8 @@ import java.util.Map;
  * Created by bilal on 26/07/15.
  */
 public class ConfigParser {
-    ReleaseConfig releaseConfig;
-    Yaml yaml = new Yaml();
+    private ReleaseConfig releaseConfig;
+    private Yaml yaml = new Yaml();
 
     public ConfigParser(ReleaseConfig releaseConfig) {
         this.releaseConfig = releaseConfig;

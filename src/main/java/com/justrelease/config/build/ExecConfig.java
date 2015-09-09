@@ -6,9 +6,9 @@ import com.justrelease.config.GithubRepo;
  * Created by bilal on 14/08/15.
  */
 public class ExecConfig {
-    String command;
-    String directory;
-    GithubRepo githubRepo;
+    private String command;
+    private String directory;
+    private GithubRepo githubRepo;
 
     public ExecConfig(String directory, String command, GithubRepo githubRepo) {
         this.directory = directory;

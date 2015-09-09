@@ -16,10 +16,8 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.util.logging.Logger;
 
 public class JustReleaseCLI {
-    private final static Logger LOGGER = Logger.getLogger(JustReleaseCLI.class.getName());
 
     public static void main(String[] args) throws Exception {
 

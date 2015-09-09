@@ -14,7 +14,7 @@ import java.io.FileInputStream;
  */
 public class MavenProject extends AbstractProjectInfo implements ProjectInfo {
 
-    boolean isSnapShot;
+    private boolean isSnapShot;
 
     public MavenProject(ReleaseConfig releaseConfig) {
         releaseConfig.setProjectType("MAVEN");

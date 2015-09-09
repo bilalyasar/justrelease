@@ -4,12 +4,12 @@ package com.justrelease.config;
  * Created by bilal on 30/07/15.
  */
 public class GithubRepo {
-    String username;
-    String repository;
-    String repoUrl;
-    String branch;
-    String descriptionFileName;
-    String attachmentFile;
+    private String username;
+    private String repository;
+    private String repoUrl;
+    private String branch;
+    private String descriptionFileName;
+    private String attachmentFile;
 
     public GithubRepo(String username, String repository) {
         this(username,repository,"master");

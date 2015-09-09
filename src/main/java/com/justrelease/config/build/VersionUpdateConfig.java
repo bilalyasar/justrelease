@@ -6,8 +6,8 @@ import com.justrelease.config.GithubRepo;
  * Created by bilal on 14/08/15.
  */
 public class VersionUpdateConfig {
-    String regex;
-    GithubRepo githubRepo;
+    private String regex;
+    private GithubRepo githubRepo;
 
     public VersionUpdateConfig(String regex, GithubRepo githubRepo) {
         this.regex = regex;

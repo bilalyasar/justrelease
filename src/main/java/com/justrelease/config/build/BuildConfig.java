@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * Created by bilal on 14/08/15.
  */
 public class BuildConfig {
-    ArrayList<ExecConfig> execConfigs = new ArrayList<ExecConfig>();
+    private ArrayList<ExecConfig> execConfigs = new ArrayList<ExecConfig>();
 
     public void addExecConfig(ExecConfig execConfig) {
         execConfigs.add(execConfig);

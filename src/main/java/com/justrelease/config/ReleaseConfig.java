@@ -18,18 +18,18 @@ import static com.justrelease.project.type.AbstractProjectInfo.getTransportConfi
  * Created by bilal on 25/07/15.
  */
 public class ReleaseConfig {
-    String localDirectory;
-    String projectType = "grunt";
-    String currentVersion;
-    String releaseVersion;
-    String nextVersion;
-    String commitMessageTemplate = "released ${version} with :heart: by justrelease";
-    String tagNameTemplate = "v${version}";
-    boolean customConfig;
+    private String localDirectory;
+    private String projectType = "grunt";
+    private String currentVersion;
+    private String releaseVersion;
+    private String nextVersion;
+    private String commitMessageTemplate = "released ${version} with :heart: by justrelease";
+    private String tagNameTemplate = "v${version}";
+    private boolean customConfig;
 
-    GithubRepo mainRepo;
-    InputStream configFileStream;
-    boolean dryRun;
+    private GithubRepo mainRepo;
+    private InputStream configFileStream;
+    private boolean dryRun;
 
     BuildConfig buildConfig = new BuildConfig();
     ArrayList<VersionUpdateConfig> versionUpdateConfigs = new ArrayList<VersionUpdateConfig>();
@@ -140,7 +140,7 @@ public class ReleaseConfig {
 
     }
 
-    public void intializeConfig() throws IOException{
+    public void intializeConfig() throws IOException {
 
         File file = new File(localDirectory + "/justrelease.yml");
 
