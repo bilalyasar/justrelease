@@ -33,8 +33,8 @@ public class NPMProject extends AbstractProjectInfo implements ProjectInfo {
     }
 
     public void createArtifacts() {
+        System.out.println("Create Artifacts:");
         BuildConfig buildConfig = releaseConfig.getBuildConfig();
-
         for (ExecConfig execConfig : buildConfig.getExecConfigs()) {
             String[] command = createCommand(execConfig);
             runCommand(command);

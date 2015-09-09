@@ -44,93 +44,95 @@ public class JustRelease {
     public void release() throws Exception {
 
         System.out.println("Starting to Release: " + releaseConfig.getMainRepo().getRepository());
-        System.out.println("Replace  Release Version");
         replaceReleaseVersion();
-        System.out.println("Create Artifacts:");
         projectInfo.createArtifacts();
-        System.out.println("Commit And Tag Version:");
         getLatestTag();
         commitAndTagVersion();
-
-        if (releaseConfig.getNextVersion() != null) {
-            System.out.println("Replace Next Version:");
-            replaceNextVersion();
-            System.out.println("Commit Next Version:");
-            commitNextVersion();
-        }
-
-        if (releaseConfig.isDryRun()) {
-            System.out.println("You enabled the dryRun config, so anything will be published or pushed.");
-        } else {
-            System.out.println("Pushing tag: " + releaseConfig.getTagName());
-            System.out.println("Pushing repo " + releaseConfig.getMainRepo().getRepository());
-            Git git = Git.open(new File(releaseConfig.getLocalDirectory()));
-            git.push().setTransportConfigCallback(getTransportConfigCallback()).call();
-            git.push().setTransportConfigCallback(getTransportConfigCallback()).setPushTags().call();
-
-
-            if (Desktop.isDesktopSupported() && !releaseConfig.isDryRun()) {
-                String text = String.format(tweet, releaseConfig.getReleaseVersion(),
-                        releaseConfig.getMainRepo().getRepository());
-                String encodedText = URLEncoder.encode(text, "UTF-8");
-                String via = "justrelease";
-                String encodedURL = URLEncoder.encode(releaseConfig.getMainRepo().getUrl(), "UTF-8");
-                String hashtags = "justreleased";
-                String encodedParameters = "text=" + encodedText + "&" + "via=" + via + "&" + "url=" + encodedURL + "&" + "hashtags=" + hashtags;
-                String uri = "https://twitter.com/intent/tweet?" + encodedParameters;
-                Desktop.getDesktop().browse(new URI(uri));
-            }
-
-
-            System.out.println("Connecting to GitHub for uploading artifacts");
-            GitHub github = GitHub.connect();
-            GHUser user = github.getUser(releaseConfig.getMainRepo().getUsername());
-
-            GHRepository releaseRepository = user.getRepository(releaseConfig.getMainRepo().getRepository());
-            GHReleaseBuilder ghReleaseBuilder = new GHReleaseBuilder(releaseRepository, releaseConfig.getTagName());
-            ghReleaseBuilder.name(releaseConfig.getTagName());
-
-            // git.log().addRange
-
-            if (releaseConfig.getMainRepo().getDescriptionFileName() == null) {
-                String[] command2;
-                if (!latestTag.equals("")) {
-                    command2 = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + "git log " + latestTag + "..HEAD --oneline --pretty=format:'* %s (%h)'"};
-                } else {
-                    command2 = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + "git log --oneline --pretty=format:'* %s (%h)'"};
-                }
-                Process p2 = Runtime.getRuntime().exec(command2);
-                p2.waitFor();
-                String output = IOUtils.toString(p2.getInputStream());
-                String errorOutput = IOUtils.toString(p2.getErrorStream());
-                ghReleaseBuilder.body(output);
-            } else {
-                System.out.println("Tag Description File Name: " + releaseConfig.getMainRepo().getDescriptionFileName());
-                InputStream fis = new FileInputStream(releaseConfig.getLocalDirectory() +
-                        File.separator +
-                        releaseConfig.getMainRepo().getDescriptionFileName());
-                InputStreamReader isr = new InputStreamReader(fis, Charset.forName("UTF-8"));
-                BufferedReader br = new BufferedReader(isr);
-                String line;
-                String out = "";
-                while ((line = br.readLine()) != null) {
-                    out += line;
-                    out += "\n";
-                }
-                ghReleaseBuilder.body(out);
-            }
-
-            GHRelease ghRelease = ghReleaseBuilder.create();
-            if (releaseConfig.getMainRepo().getAttachmentFile() != null)
-                ghRelease.uploadAsset(new File((releaseConfig.getLocalDirectory() +
-                        File.separator +
-                        releaseConfig.getMainRepo().getAttachmentFile())), "Project Artifact");
-
-        }
+        checkAndCommitNextVersion();
+        publish();
         System.out.println("Done! Thanks for using JustRelease...");
     }
 
+    private void checkAndCommitNextVersion() throws IOException, GitAPIException {
+        if (releaseConfig.getNextVersion() != null) {
+            replaceNextVersion();
+            commitNextVersion();
+        }
+    }
+
+    private void publish() throws Exception {
+        if (releaseConfig.isDryRun()) {
+            System.out.println("You enabled the dryRun config, so anything will be published or pushed.");
+            return;
+        }
+        System.out.println("Pushing tag: " + releaseConfig.getTagName());
+        System.out.println("Pushing repo " + releaseConfig.getMainRepo().getRepository());
+        Git git = Git.open(new File(releaseConfig.getLocalDirectory()));
+        git.push().setTransportConfigCallback(getTransportConfigCallback()).call();
+        git.push().setTransportConfigCallback(getTransportConfigCallback()).setPushTags().call();
+
+
+        if (Desktop.isDesktopSupported() && !releaseConfig.isDryRun()) {
+            String text = String.format(tweet, releaseConfig.getReleaseVersion(),
+                    releaseConfig.getMainRepo().getRepository());
+            String encodedText = URLEncoder.encode(text, "UTF-8");
+            String via = "justrelease";
+            String encodedURL = URLEncoder.encode(releaseConfig.getMainRepo().getUrl(), "UTF-8");
+            String hashtags = "justreleased";
+            String encodedParameters = "text=" + encodedText + "&" + "via=" + via + "&" + "url=" + encodedURL + "&" + "hashtags=" + hashtags;
+            String uri = "https://twitter.com/intent/tweet?" + encodedParameters;
+            Desktop.getDesktop().browse(new URI(uri));
+        }
+
+
+        System.out.println("Connecting to GitHub for uploading artifacts");
+        GitHub github = GitHub.connect();
+        GHUser user = github.getUser(releaseConfig.getMainRepo().getUsername());
+
+        GHRepository releaseRepository = user.getRepository(releaseConfig.getMainRepo().getRepository());
+        GHReleaseBuilder ghReleaseBuilder = new GHReleaseBuilder(releaseRepository, releaseConfig.getTagName());
+        ghReleaseBuilder.name(releaseConfig.getTagName());
+
+        // git.log().addRange
+
+        if (releaseConfig.getMainRepo().getDescriptionFileName() == null) {
+            String[] command2;
+            if (!latestTag.equals("")) {
+                command2 = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + "git log " + latestTag + "..HEAD --oneline --pretty=format:'* %s (%h)'"};
+            } else {
+                command2 = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + "git log --oneline --pretty=format:'* %s (%h)'"};
+            }
+            Process p2 = Runtime.getRuntime().exec(command2);
+            p2.waitFor();
+            String output = IOUtils.toString(p2.getInputStream());
+            String errorOutput = IOUtils.toString(p2.getErrorStream());
+            ghReleaseBuilder.body(output);
+        } else {
+            System.out.println("Tag Description File Name: " + releaseConfig.getMainRepo().getDescriptionFileName());
+            InputStream fis = new FileInputStream(releaseConfig.getLocalDirectory() +
+                    File.separator +
+                    releaseConfig.getMainRepo().getDescriptionFileName());
+            InputStreamReader isr = new InputStreamReader(fis, Charset.forName("UTF-8"));
+            BufferedReader br = new BufferedReader(isr);
+            String line;
+            String out = "";
+            while ((line = br.readLine()) != null) {
+                out += line;
+                out += "\n";
+            }
+            ghReleaseBuilder.body(out);
+        }
+
+        GHRelease ghRelease = ghReleaseBuilder.create();
+        if (releaseConfig.getMainRepo().getAttachmentFile() != null)
+            ghRelease.uploadAsset(new File((releaseConfig.getLocalDirectory() +
+                    File.separator +
+                    releaseConfig.getMainRepo().getAttachmentFile())), "Project Artifact");
+
+    }
+
     private void commitNextVersion() throws IOException, GitAPIException {
+        System.out.println("Commit Next Version:");
         System.out.println("Committing Next Version: " + releaseConfig.getNextVersion());
         Git git = Git.open(new File(releaseConfig.getLocalDirectory()));
         git.add().addFilepattern(".").call();
@@ -138,6 +140,7 @@ public class JustRelease {
     }
 
     private void replaceNextVersion() throws IOException {
+        System.out.println("Replace Next Version:");
         for (VersionUpdateConfig versionUpdateConfig : releaseConfig.getVersionUpdateConfigs()) {
             System.out.println("Updating " + versionUpdateConfig.getRegex() +
                     " extensions from " + releaseConfig.getCurrentVersion() + " to " + releaseConfig.getNextVersion());
@@ -154,6 +157,7 @@ public class JustRelease {
     }
 
     private void commitAndTagVersion() throws IOException, GitAPIException {
+        System.out.println("Commit And Tag Version:");
         System.out.println("Tagging: " + releaseConfig.getTagName());
         System.out.println("Committing with message: " + releaseConfig.getCommitMessage());
         Git git = Git.open(new File(releaseConfig.getLocalDirectory()));
@@ -163,6 +167,7 @@ public class JustRelease {
     }
 
     private void replaceReleaseVersion() throws IOException {
+        System.out.println("Replace  Release Version");
         for (VersionUpdateConfig versionUpdateConfig : releaseConfig.getVersionUpdateConfigs()) {
             System.out.println("Updating " + versionUpdateConfig.getRegex() +
                     " extensions from " + releaseConfig.getCurrentVersion() + " to " + releaseConfig.getReleaseVersion());

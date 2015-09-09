@@ -41,6 +41,7 @@ public class MavenProject extends AbstractProjectInfo implements ProjectInfo {
     }
 
     public void createArtifacts() {
+        System.out.println("Create Artifacts:");
         BuildConfig buildConfig = releaseConfig.getBuildConfig();
 
         for (ExecConfig execConfig : buildConfig.getExecConfigs()) {
