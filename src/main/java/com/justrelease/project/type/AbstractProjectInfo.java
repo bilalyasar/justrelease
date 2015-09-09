@@ -17,7 +17,7 @@ import java.io.InputStreamReader;
  * Created by bilal on 25/07/15.
  */
 public abstract class AbstractProjectInfo {
-    ReleaseConfig releaseConfig;
+    protected ReleaseConfig releaseConfig;
 
     public static TransportConfigCallback getTransportConfigCallback() {
         final SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
@@ -35,9 +35,9 @@ public abstract class AbstractProjectInfo {
         };
     }
 
-    public void runCommand(String[] cmd) {
+    public void runCommand(String[] command) {
         try {
-            Process p = Runtime.getRuntime().exec(cmd);
+            Process p = Runtime.getRuntime().exec(command);
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(p.getInputStream()));
             String line;

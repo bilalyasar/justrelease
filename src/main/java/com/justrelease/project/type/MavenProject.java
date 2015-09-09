@@ -44,8 +44,8 @@ public class MavenProject extends AbstractProjectInfo implements ProjectInfo {
         BuildConfig buildConfig = releaseConfig.getBuildConfig();
 
         for (ExecConfig execConfig : buildConfig.getExecConfigs()) {
-            String[] cmd = createCommand(execConfig);
-            runCommand(cmd);
+            String[] command = createCommand(execConfig);
+            runCommand(command);
         }
     }
 

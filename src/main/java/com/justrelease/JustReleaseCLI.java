@@ -30,11 +30,12 @@ public class JustReleaseCLI {
         options.addOption("h", false, "help");
 
         CommandLineParser parser = new BasicParser();
-        CommandLine cmd = null;
+        CommandLine commandLine = null;
         try {
-            cmd = parser.parse(options, args);
+            commandLine = parser.parse(options, args);
         } catch (ParseException e) {
-            printHelp(options);
+            System.out.println("Something wrong with your arguments, You can look usage via -help option...");
+            System.exit(0);
         }
 
         if (args.length < 2) {
@@ -55,12 +56,12 @@ public class JustReleaseCLI {
 
         FileUtils.deleteDirectory(new File(releaseConfig.getLocalDirectory()));
 
-        if (cmd.hasOption("h")) {
+        if (commandLine.hasOption("h")) {
             printHelp(options);
         }
 
 
-        if (cmd.hasOption("dryRun")) {
+        if (commandLine.hasOption("dryRun")) {
             releaseConfig.setDryRun(true);
         }
 
@@ -83,8 +84,8 @@ public class JustReleaseCLI {
 
         if (projectInfo instanceof MavenProject) {
 
-            if (cmd.hasOption("snapshotVersion")) {
-                releaseConfig.setNextVersion(cmd.getOptionValue("snapshotVersion"));
+            if (commandLine.hasOption("snapshotVersion")) {
+                releaseConfig.setNextVersion(commandLine.getOptionValue("snapshotVersion"));
             } else {
                 if (((MavenProject) projectInfo).isSnapShot()) {
                     releaseConfig.setNextVersion(releaseConfig.getReleaseVersion() + "-SNAPSHOT");

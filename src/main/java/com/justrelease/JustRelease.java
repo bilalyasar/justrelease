@@ -31,8 +31,8 @@ import static com.justrelease.project.type.AbstractProjectInfo.getTransportConfi
 public class JustRelease {
     private static final Logger logger = Logger.getLogger(JustRelease.class.getName());
     private ProjectInfo projectInfo;
-    ReleaseConfig releaseConfig;
-    String tweet = "I have just released %s version of %s";
+    private ReleaseConfig releaseConfig;
+    private String tweet = "I have just released %s version of %s";
     private String latestTag;
 
 
@@ -61,8 +61,7 @@ public class JustRelease {
 
         if (releaseConfig.isDryRun()) {
             System.out.println("You enabled the dryRun config, so anything will be published or pushed.");
-        }
-        if (!releaseConfig.isDryRun()) {
+        } else {
             System.out.println("Pushing tag: " + releaseConfig.getTagName());
             System.out.println("Pushing repo " + releaseConfig.getMainRepo().getRepository());
             Git git = Git.open(new File(releaseConfig.getLocalDirectory()));
@@ -94,13 +93,13 @@ public class JustRelease {
             // git.log().addRange
 
             if (releaseConfig.getMainRepo().getDescriptionFileName() == null) {
-                String[] cmd2;
+                String[] command2;
                 if (!latestTag.equals("")) {
-                    cmd2 = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + "git log " + latestTag + "..HEAD --oneline --pretty=format:'* %s (%h)'"};
+                    command2 = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + "git log " + latestTag + "..HEAD --oneline --pretty=format:'* %s (%h)'"};
                 } else {
-                    cmd2 = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + "git log --oneline --pretty=format:'* %s (%h)'"};
+                    command2 = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + "git log --oneline --pretty=format:'* %s (%h)'"};
                 }
-                Process p2 = Runtime.getRuntime().exec(cmd2);
+                Process p2 = Runtime.getRuntime().exec(command2);
                 p2.waitFor();
                 String output = IOUtils.toString(p2.getInputStream());
                 String errorOutput = IOUtils.toString(p2.getErrorStream());
@@ -128,7 +127,6 @@ public class JustRelease {
                         releaseConfig.getMainRepo().getAttachmentFile())), "Project Artifact");
 
         }
-
         System.out.println("Done! Thanks for using JustRelease...");
     }
 
@@ -181,8 +179,8 @@ public class JustRelease {
     }
 
     public void getLatestTag() throws InterruptedException, IOException {
-        String[] cmd = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + "git describe --tags --abbrev=0"};
-        Process p = Runtime.getRuntime().exec(cmd);
+        String[] command = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + "git describe --tags --abbrev=0"};
+        Process p = Runtime.getRuntime().exec(command);
         p.waitFor();
         latestTag = IOUtils.toString(p.getInputStream()).replaceAll("(\\r|\\n|\\t)", "");
     }

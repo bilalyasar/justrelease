@@ -36,15 +36,15 @@ public class NPMProject extends AbstractProjectInfo implements ProjectInfo {
         BuildConfig buildConfig = releaseConfig.getBuildConfig();
 
         for (ExecConfig execConfig : buildConfig.getExecConfigs()) {
-            String[] cmd = createCommand(execConfig);
-            runCommand(cmd);
+            String[] command = createCommand(execConfig);
+            runCommand(command);
         }
     }
 
     private String[] createCommand(ExecConfig execConfig) {
         System.out.println("cd " + releaseConfig.getLocalDirectory() + "; " + execConfig.getCommand());
-        String[] cmd = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + execConfig.getCommand()};
-        System.out.println(cmd.toString());
-        return cmd;
+        String[] command = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + execConfig.getCommand()};
+        System.out.println(command.toString());
+        return command;
     }
 }
