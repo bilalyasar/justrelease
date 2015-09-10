@@ -42,7 +42,6 @@ public class JustRelease {
         createArtifacts();
         getLatestTag();
         commitAndTagVersion();
-
         if (releaseConfig.getNextVersion() != null) {
             replaceVersionsAndCommit(releaseConfig.getVersionUpdateConfigs(), releaseConfig.getReleaseVersion(),
                     releaseConfig.getNextVersion(), releaseConfig.getLocalDirectory());
@@ -52,12 +51,10 @@ public class JustRelease {
             GitOperations.pushRepoWithTags();
             makeAnnouncement();
             GitOperations.createGithubReleasePage(releaseConfig, latestTag);
-
+            System.out.println("Done! Thanks for using JustRelease...");
         } else {
-            System.out.println("You enabled the dryRun config, so anything will be published or pushed.");
-            return;
+            System.out.println("dryRun is enabled so nothing has been pushed to github repository.");
         }
-        System.out.println("Done! Thanks for using JustRelease...");
     }
 
     private void commitAndTagVersion() throws IOException, GitAPIException {
