@@ -48,15 +48,15 @@ public class JustRelease {
                     releaseConfig.getNextVersion(), releaseConfig.getLocalDirectory());
         }
 
-        if (releaseConfig.isDryRun()) {
+        if (!releaseConfig.isDryRun()) {
+            GitOperations.pushRepoWithTags();
+            makeAnnouncement();
+            GitOperations.createGithubReleasePage(releaseConfig, latestTag);
+
+        } else {
             System.out.println("You enabled the dryRun config, so anything will be published or pushed.");
             return;
         }
-
-        GitOperations.pushRepoWithTags();
-        makeAnnouncement();
-        GitOperations.createGithubReleasePage(releaseConfig, latestTag);
-
         System.out.println("Done! Thanks for using JustRelease...");
     }
 
