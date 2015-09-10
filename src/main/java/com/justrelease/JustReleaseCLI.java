@@ -2,9 +2,9 @@ package com.justrelease;
 
 import com.github.zafarkhaja.semver.Version;
 import com.justrelease.config.ConfigParser;
+import com.justrelease.config.ReleaseConfig;
 import com.justrelease.git.GitOperations;
 import com.justrelease.git.GithubRepo;
-import com.justrelease.config.ReleaseConfig;
 import com.justrelease.project.type.MavenProject;
 import com.justrelease.project.type.NPMProject;
 import com.justrelease.project.type.ProjectInfo;
@@ -63,8 +63,9 @@ public class JustReleaseCLI {
         if (commandLine.hasOption("dryRun")) {
             releaseConfig.setDryRun(true);
         }
-
-        GitOperations.cloneMainRepo(releaseConfig.getMainRepo(),releaseConfig.getLocalDirectory());
+        
+        GitOperations.cloneMainRepo(releaseConfig.getMainRepo(), releaseConfig.getLocalDirectory());
+        GitOperations.initialize(releaseConfig.getLocalDirectory());
         ProjectInfo projectInfo = createProjectInfo(releaseConfig);
         releaseConfig.setProjectInfo(projectInfo);
 
