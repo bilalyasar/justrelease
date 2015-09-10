@@ -3,8 +3,10 @@ package com.justrelease.config;
 import com.justrelease.config.build.BuildConfig;
 import com.justrelease.config.build.ExecConfig;
 import com.justrelease.config.build.VersionUpdateConfig;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
+import com.justrelease.git.GithubRepo;
+import com.justrelease.project.type.MavenProject;
+import com.justrelease.project.type.NPMProject;
+import com.justrelease.project.type.ProjectInfo;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,24 +14,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-import static com.justrelease.project.type.AbstractProjectInfo.getTransportConfigCallback;
 
-/**
- * Created by bilal on 25/07/15.
- */
 public class ReleaseConfig {
     private String localDirectory;
-    private String projectType = "grunt";
-    private String currentVersion;
     private String releaseVersion;
     private String nextVersion;
     private String commitMessageTemplate = "released ${version} with :heart: by justrelease";
     private String tagNameTemplate = "v${version}";
-    private boolean customConfig;
 
     private GithubRepo mainRepo;
     private InputStream configFileStream;
     private boolean dryRun;
+    private ProjectInfo projectInfo;
 
     BuildConfig buildConfig = new BuildConfig();
     ArrayList<VersionUpdateConfig> versionUpdateConfigs = new ArrayList<VersionUpdateConfig>();
@@ -56,20 +52,8 @@ public class ReleaseConfig {
         return mainRepo;
     }
 
-    public String getProjectType() {
-        return projectType;
-    }
-
-    public void setProjectType(String projectType) {
-        this.projectType = projectType;
-    }
-
     public String getCurrentVersion() {
-        return currentVersion;
-    }
-
-    public void setCurrentVersion(String currentVersion) {
-        this.currentVersion = currentVersion;
+        return projectInfo.getCurrentVersion();
     }
 
     public String getNextVersion() {
@@ -130,15 +114,6 @@ public class ReleaseConfig {
         this.tagNameTemplate = tagNameTemplate;
     }
 
-    public void cloneMainRepo() throws GitAPIException, IOException {
-        Git.cloneRepository()
-                .setURI(mainRepo.getRepoUrl())
-                .setDirectory(new File(localDirectory))
-                .setTransportConfigCallback(getTransportConfigCallback())
-                .setBranch(mainRepo.getBranch())
-                .call();
-
-    }
 
     public void intializeConfig() throws IOException {
 
@@ -146,20 +121,22 @@ public class ReleaseConfig {
 
         if (file.exists() && !file.isDirectory()) {
             this.configFileStream = new FileInputStream(file);
-            customConfig = true;
-        } else if (projectType.equals("MAVEN")) {
+        } else if (projectInfo instanceof MavenProject) {
             this.configFileStream = ReleaseConfig.class.getResourceAsStream("/default-mvn.yml");
-        } else {
+        } else if (projectInfo instanceof NPMProject) {
             this.configFileStream = ReleaseConfig.class.getResourceAsStream("/default-npm.yml");
+        } else {
+            throw new RuntimeException("We could not detect your configuration. " +
+                    "please provide justrelease.yml in your project home directory. ");
         }
 
     }
 
-    public boolean isCustomConfig() {
-        return customConfig;
-    }
-
     public InputStream getConfigFileStream() {
         return configFileStream;
+    }
+
+    public void setProjectInfo(ProjectInfo projectInfo) {
+        this.projectInfo = projectInfo;
     }
 }

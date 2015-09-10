@@ -1,6 +1,6 @@
 package com.justrelease.config.build;
 
-import com.justrelease.config.GithubRepo;
+import com.justrelease.git.GithubRepo;
 
 /**
  * Created by bilal on 14/08/15.

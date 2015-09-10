@@ -2,6 +2,7 @@ package com.justrelease.config;
 
 import com.justrelease.config.build.ExecConfig;
 import com.justrelease.config.build.VersionUpdateConfig;
+import com.justrelease.git.GithubRepo;
 import org.yaml.snakeyaml.Yaml;
 
 import java.util.ArrayList;

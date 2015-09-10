@@ -2,7 +2,8 @@ package com.justrelease;
 
 import com.github.zafarkhaja.semver.Version;
 import com.justrelease.config.ConfigParser;
-import com.justrelease.config.GithubRepo;
+import com.justrelease.git.GitOperations;
+import com.justrelease.git.GithubRepo;
 import com.justrelease.config.ReleaseConfig;
 import com.justrelease.project.type.MavenProject;
 import com.justrelease.project.type.NPMProject;
@@ -63,9 +64,10 @@ public class JustReleaseCLI {
             releaseConfig.setDryRun(true);
         }
 
-        releaseConfig.cloneMainRepo();
-        ProjectInfo projectInfo = createProjectInfo(releaseConfig);  // maven or grunt project
-        releaseConfig.setCurrentVersion(projectInfo.getCurrentVersion());
+        GitOperations.cloneMainRepo(releaseConfig.getMainRepo(),releaseConfig.getLocalDirectory());
+        ProjectInfo projectInfo = createProjectInfo(releaseConfig);
+        releaseConfig.setProjectInfo(projectInfo);
+
         Version.Builder builder = new Version.Builder(releaseConfig.getCurrentVersion());
 
 
@@ -112,8 +114,8 @@ public class JustReleaseCLI {
 
     private static ProjectInfo createProjectInfo(ReleaseConfig releaseConfig) {
         File file = new File(releaseConfig.getLocalDirectory() + "/package.json");
-        if (file.exists()) return new NPMProject(releaseConfig);
-        return new MavenProject(releaseConfig);
+        if (file.exists()) return new NPMProject(releaseConfig.getLocalDirectory());
+        return new MavenProject(releaseConfig.getLocalDirectory());
 
     }
 

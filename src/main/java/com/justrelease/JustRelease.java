@@ -1,11 +1,13 @@
 package com.justrelease;
 
 import com.justrelease.config.ReleaseConfig;
+import com.justrelease.config.build.BuildConfig;
+import com.justrelease.config.build.ExecConfig;
 import com.justrelease.config.build.VersionUpdateConfig;
+import com.justrelease.git.GitOperations;
 import com.justrelease.project.type.ProjectInfo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.kohsuke.github.GHRelease;
 import org.kohsuke.github.GHReleaseBuilder;
@@ -13,7 +15,7 @@ import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 
-import java.awt.*;
+import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,11 +27,10 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.Iterator;
+import java.util.List;
 
-import static com.justrelease.project.type.AbstractProjectInfo.getTransportConfigCallback;
 
 public class JustRelease {
-    private ProjectInfo projectInfo;
     private ReleaseConfig releaseConfig;
     private String tweet = "I have just released %s version of %s";
     private String latestTag;
@@ -37,36 +38,40 @@ public class JustRelease {
 
     public JustRelease(ReleaseConfig releaseConfig, ProjectInfo projectInfo) {
         this.releaseConfig = releaseConfig;
-        this.projectInfo = projectInfo;
     }
 
     public void release() throws Exception {
 
         System.out.println("Starting to Release: " + releaseConfig.getMainRepo().getRepository());
-        replaceReleaseVersion();
-        projectInfo.createArtifacts();
+
+        replaceVersionsAndCommit(releaseConfig.getVersionUpdateConfigs(), releaseConfig.getCurrentVersion(),
+                releaseConfig.getReleaseVersion(), releaseConfig.getLocalDirectory());
+
+        createArtifacts();
         getLatestTag();
         commitAndTagVersion();
-        checkAndCommitNextVersion();
-        publish();
-        System.out.println("Done! Thanks for using JustRelease...");
-    }
 
-    private void checkAndCommitNextVersion() throws IOException, GitAPIException {
         if (releaseConfig.getNextVersion() != null) {
-            replaceNextVersion();
-            commitNextVersion();
+            replaceVersionsAndCommit(releaseConfig.getVersionUpdateConfigs(),releaseConfig.getReleaseVersion(),
+                    releaseConfig.getNextVersion(),releaseConfig.getLocalDirectory());
         }
-    }
 
-    private void publish() throws Exception {
         if (releaseConfig.isDryRun()) {
             System.out.println("You enabled the dryRun config, so anything will be published or pushed.");
             return;
         }
-        pushRepoAndTag();
+
+        GitOperations.pushRepoWithTags();
         makeAnnouncement();
         createGithubReleasePage();
+
+        System.out.println("Done! Thanks for using JustRelease...");
+    }
+
+    private void commitAndTagVersion() throws IOException, GitAPIException {
+        System.out.println("Tagging: " + releaseConfig.getTagName());
+        System.out.println("Committing with message: " + releaseConfig.getCommitMessage());
+        GitOperations.tagAndCommit(releaseConfig.getCommitMessage(),releaseConfig.getTagName());
     }
 
     private void createGithubReleasePage() throws IOException, InterruptedException {
@@ -129,65 +134,24 @@ public class JustRelease {
         }
     }
 
-    private void pushRepoAndTag() throws GitAPIException, IOException {
-        System.out.println("Pushing tag: " + releaseConfig.getTagName());
-        System.out.println("Pushing repo " + releaseConfig.getMainRepo().getRepository());
-        Git git = Git.open(new File(releaseConfig.getLocalDirectory()));
-        git.push().setTransportConfigCallback(getTransportConfigCallback()).call();
-        git.push().setTransportConfigCallback(getTransportConfigCallback()).setPushTags().call();
 
-    }
-
-    private void commitNextVersion() throws IOException, GitAPIException {
-        System.out.println("Commit Next Version:");
-        System.out.println("Committing Next Version: " + releaseConfig.getNextVersion());
-        Git git = Git.open(new File(releaseConfig.getLocalDirectory()));
-        git.add().addFilepattern(".").call();
-        git.commit().setMessage(releaseConfig.getNextVersion()).call();
-    }
-
-    private void replaceNextVersion() throws IOException {
-        System.out.println("Replace Next Version:");
-        for (VersionUpdateConfig versionUpdateConfig : releaseConfig.getVersionUpdateConfigs()) {
+    private void replaceVersionsAndCommit(List<VersionUpdateConfig> configs,String oldVersion,String newVersion,String localDirectory) throws IOException, GitAPIException {
+        for (VersionUpdateConfig versionUpdateConfig : configs) {
             System.out.println("Updating " + versionUpdateConfig.getRegex() +
-                    " extensions from " + releaseConfig.getCurrentVersion() + " to " + releaseConfig.getNextVersion());
-            Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory()),
+                    " extensions from " + oldVersion + " to " + newVersion);
+            Iterator it = FileUtils.iterateFiles(new File(localDirectory),
                     versionUpdateConfig.getRegex().split(","), true);
             while (it.hasNext()) {
                 File f = (File) it.next();
                 if (f.getAbsolutePath().contains(".git")) continue;
                 if (f.isHidden() || f.isDirectory()) continue;
                 String content = FileUtils.readFileToString(f);
-                FileUtils.writeStringToFile(f, content.replaceAll(releaseConfig.getReleaseVersion(), releaseConfig.getNextVersion()));
+                FileUtils.writeStringToFile(f, content.replaceAll(oldVersion, newVersion));
             }
         }
-    }
 
-    private void commitAndTagVersion() throws IOException, GitAPIException {
-        System.out.println("Commit And Tag Version:");
-        System.out.println("Tagging: " + releaseConfig.getTagName());
-        System.out.println("Committing with message: " + releaseConfig.getCommitMessage());
-        Git git = Git.open(new File(releaseConfig.getLocalDirectory()));
-        git.add().addFilepattern(".").call();
-        git.commit().setMessage(releaseConfig.getCommitMessage()).call();
-        git.tag().setName(releaseConfig.getTagName()).call();
-    }
+        GitOperations.commit(newVersion);
 
-    private void replaceReleaseVersion() throws IOException {
-        System.out.println("Replace  Release Version");
-        for (VersionUpdateConfig versionUpdateConfig : releaseConfig.getVersionUpdateConfigs()) {
-            System.out.println("Updating " + versionUpdateConfig.getRegex() +
-                    " extensions from " + releaseConfig.getCurrentVersion() + " to " + releaseConfig.getReleaseVersion());
-            Iterator it = FileUtils.iterateFiles(new File(releaseConfig.getLocalDirectory()),
-                    versionUpdateConfig.getRegex().split(","), true);
-            while (it.hasNext()) {
-                File f = (File) it.next();
-                if (f.getAbsolutePath().contains(".git")) continue;
-                if (f.isHidden() || f.isDirectory()) continue;
-                String content = FileUtils.readFileToString(f);
-                FileUtils.writeStringToFile(f, content.replaceAll(releaseConfig.getCurrentVersion(), releaseConfig.getReleaseVersion()));
-            }
-        }
     }
 
     public void getLatestTag() throws InterruptedException, IOException {
@@ -196,4 +160,38 @@ public class JustRelease {
         p.waitFor();
         latestTag = IOUtils.toString(p.getInputStream()).replaceAll("(\\r|\\n|\\t)", "");
     }
+
+    private void createArtifacts() {
+        System.out.println("Create Artifacts:");
+        BuildConfig buildConfig = releaseConfig.getBuildConfig();
+        for (ExecConfig execConfig : buildConfig.getExecConfigs()) {
+            String[] command = createCommand(execConfig);
+            runCommand(command);
+        }
+    }
+
+    private void runCommand(String[] command) {
+        try {
+            Process p = Runtime.getRuntime().exec(command);
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(p.getInputStream()));
+            String line;
+            while ((line = in.readLine()) != null) {
+                System.out.println(line);
+            }
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private String[] createCommand(ExecConfig execConfig) {
+        System.out.println("cd " + releaseConfig.getLocalDirectory() + "; " + execConfig.getCommand());
+        String[] command = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + execConfig.getCommand()};
+        System.out.println(command.toString());
+        return command;
+    }
+
+
 }

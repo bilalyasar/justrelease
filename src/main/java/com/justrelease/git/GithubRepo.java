@@ -1,4 +1,4 @@
-package com.justrelease.config;
+package com.justrelease.git;
 
 /**
  * Created by bilal on 30/07/15.
@@ -24,10 +24,6 @@ public class GithubRepo {
 
     public String getRepoUrl() {
         return repoUrl;
-    }
-
-    public void setRepoUrl(String repoUrl) {
-        this.repoUrl = repoUrl;
     }
 
     public String getBranch() {
