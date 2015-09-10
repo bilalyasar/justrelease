@@ -19,9 +19,7 @@ public class MavenProject implements ProjectInfo {
         MavenXpp3Reader reader = new MavenXpp3Reader();
         Model result = null;
         try {
-            String workingDir = System.getProperty("user.dir");
-            result = reader.read(new FileInputStream(workingDir +
-                    File.separator +
+            result = reader.read(new FileInputStream(
                     localDirectory +
                     File.separator +
                     "pom.xml"));
