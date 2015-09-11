@@ -1,8 +1,5 @@
 package com.justrelease.git;
 
-/**
- * Created by bilal on 30/07/15.
- */
 public class GithubRepo {
     private String username;
     private String repository;
@@ -54,8 +51,8 @@ public class GithubRepo {
         return repository;
     }
 
-    public String getUniquePath() {
-       return getUsername() + "_" + getRepository() + "_" + getBranch();
+    public String getLocalDirectory() {
+       return "justrelease" + getUsername() + "_" + getRepository() + "_" + getBranch();
     }
 
     public String getUrl() {

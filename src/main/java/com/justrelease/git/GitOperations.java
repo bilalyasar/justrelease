@@ -2,6 +2,7 @@ package com.justrelease.git;
 
 import com.jcraft.jsch.Session;
 import com.justrelease.config.ReleaseConfig;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.TransportConfigCallback;
@@ -29,10 +30,10 @@ import java.nio.charset.Charset;
 public class GitOperations {
     private static Git git;
 
-    public static void cloneMainRepo(GithubRepo repo, String localDirectory) throws GitAPIException, IOException {
+    private static void cloneMainRepo(GithubRepo repo) throws GitAPIException, IOException {
         Git.cloneRepository()
                 .setURI(repo.getRepoUrl())
-                .setDirectory(new File(localDirectory))
+                .setDirectory(new File(repo.getLocalDirectory()))
                 .setTransportConfigCallback(getTransportConfigCallback())
                 .setBranch(repo.getBranch())
                 .call();
@@ -73,7 +74,13 @@ public class GitOperations {
         };
     }
 
-    public static void initialize(String localDirectory) throws IOException {
+    public static void initializeLocalRepository(GithubRepo mainRepo) throws IOException, GitAPIException {
+        String localDirectory = mainRepo.getLocalDirectory();
+
+        //delete and clone the source
+        FileUtils.deleteDirectory(new File(localDirectory));
+        cloneMainRepo(mainRepo);
+
         git = Git.open(new File(localDirectory));
     }
 
@@ -90,9 +97,9 @@ public class GitOperations {
         if (releaseConfig.getMainRepo().getDescriptionFileName() == null) {
             String[] command2;
             if (!latestTag.equals("")) {
-                command2 = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + "git log " + latestTag + "..HEAD --oneline --pretty=format:'* %s (%h)'"};
+                command2 = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getMainRepo().getLocalDirectory() + "; " + "git log " + latestTag + "..HEAD --oneline --pretty=format:'* %s (%h)'"};
             } else {
-                command2 = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + "git log --oneline --pretty=format:'* %s (%h)'"};
+                command2 = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getMainRepo().getLocalDirectory() + "; " + "git log --oneline --pretty=format:'* %s (%h)'"};
             }
             Process p2 = Runtime.getRuntime().exec(command2);
             p2.waitFor();
@@ -100,7 +107,7 @@ public class GitOperations {
             ghReleaseBuilder.body(output);
         } else {
             System.out.println("Tag Description File Name: " + releaseConfig.getMainRepo().getDescriptionFileName());
-            InputStream fis = new FileInputStream(releaseConfig.getLocalDirectory() +
+            InputStream fis = new FileInputStream(releaseConfig.getMainRepo().getLocalDirectory() +
                     File.separator +
                     releaseConfig.getMainRepo().getDescriptionFileName());
             InputStreamReader isr = new InputStreamReader(fis, Charset.forName("UTF-8"));
@@ -116,7 +123,7 @@ public class GitOperations {
 
         GHRelease ghRelease = ghReleaseBuilder.create();
         if (releaseConfig.getMainRepo().getAttachmentFile() != null)
-            ghRelease.uploadAsset(new File((releaseConfig.getLocalDirectory() +
+            ghRelease.uploadAsset(new File((releaseConfig.getMainRepo().getLocalDirectory() +
                     File.separator +
                     releaseConfig.getMainRepo().getAttachmentFile())), "Project Artifact");
     }

@@ -5,7 +5,6 @@ import com.justrelease.config.build.BuildConfig;
 import com.justrelease.config.build.ExecConfig;
 import com.justrelease.config.build.VersionUpdateConfig;
 import com.justrelease.git.GitOperations;
-import com.justrelease.project.type.ProjectInfo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -28,7 +27,7 @@ public class JustRelease {
     private String latestTag;
 
 
-    public JustRelease(ReleaseConfig releaseConfig, ProjectInfo projectInfo) {
+    public JustRelease(ReleaseConfig releaseConfig) {
         this.releaseConfig = releaseConfig;
     }
 
@@ -37,14 +36,14 @@ public class JustRelease {
         System.out.println("Starting to Release: " + releaseConfig.getMainRepo().getRepository());
 
         replaceVersionsAndCommit(releaseConfig.getVersionUpdateConfigs(), releaseConfig.getCurrentVersion(),
-                releaseConfig.getReleaseVersion(), releaseConfig.getLocalDirectory());
+                releaseConfig.getReleaseVersion(), releaseConfig.getMainRepo().getLocalDirectory());
 
         createArtifacts();
         getLatestTag();
         commitAndTagVersion();
         if (releaseConfig.getNextVersion() != null) {
             replaceVersionsAndCommit(releaseConfig.getVersionUpdateConfigs(), releaseConfig.getReleaseVersion(),
-                    releaseConfig.getNextVersion(), releaseConfig.getLocalDirectory());
+                    releaseConfig.getNextVersion(), releaseConfig.getMainRepo().getLocalDirectory());
         }
 
         if (!releaseConfig.isDryRun()) {
@@ -98,7 +97,7 @@ public class JustRelease {
     }
 
     public void getLatestTag() throws InterruptedException, IOException {
-        String[] command = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + "git describe --tags --abbrev=0"};
+        String[] command = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getMainRepo().getLocalDirectory() + "; " + "git describe --tags --abbrev=0"};
         Process p = Runtime.getRuntime().exec(command);
         p.waitFor();
         latestTag = IOUtils.toString(p.getInputStream()).replaceAll("(\\r|\\n|\\t)", "");
@@ -130,8 +129,8 @@ public class JustRelease {
 
 
     private String[] createCommand(ExecConfig execConfig) {
-        System.out.println("cd " + releaseConfig.getLocalDirectory() + "; " + execConfig.getCommand());
-        String[] command = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getLocalDirectory() + "; " + execConfig.getCommand()};
+        System.out.println("cd " + releaseConfig.getMainRepo().getLocalDirectory() + "; " + execConfig.getCommand());
+        String[] command = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getMainRepo().getLocalDirectory() + "; " + execConfig.getCommand()};
         System.out.println(command.toString());
         return command;
     }

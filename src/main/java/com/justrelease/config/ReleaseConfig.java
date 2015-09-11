@@ -1,5 +1,6 @@
 package com.justrelease.config;
 
+import com.github.zafarkhaja.semver.Version;
 import com.justrelease.config.build.BuildConfig;
 import com.justrelease.config.build.ExecConfig;
 import com.justrelease.config.build.VersionUpdateConfig;
@@ -10,13 +11,11 @@ import com.justrelease.project.type.ProjectInfo;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
 
 public class ReleaseConfig {
-    private String localDirectory;
     private String releaseVersion;
     private String nextVersion;
     private String commitMessageTemplate = "released ${version} with :heart: by justrelease";
@@ -25,19 +24,22 @@ public class ReleaseConfig {
     private GithubRepo mainRepo;
     private InputStream configFileStream;
     private boolean dryRun;
+    private String snapshotVersion;
+    private String releaseType;
     private ProjectInfo projectInfo;
 
     BuildConfig buildConfig = new BuildConfig();
     ArrayList<VersionUpdateConfig> versionUpdateConfigs = new ArrayList<VersionUpdateConfig>();
 
-    public ReleaseConfig(GithubRepo githubRepo) {
+
+    public ReleaseConfig(GithubRepo githubRepo, boolean dryRun, String snapshotVersion,String releaseType) throws Exception {
         this.mainRepo = githubRepo;
-        this.localDirectory = "release" + File.separator + githubRepo.getUniquePath();
-    }
-
-
-    public String getLocalDirectory() {
-        return localDirectory;
+        this.dryRun = dryRun;
+        this.snapshotVersion = snapshotVersion;
+        this.releaseType = releaseType;
+        this.projectInfo = createProjectInfo(githubRepo);
+        initializeVersions();
+        initializeConfig();
     }
 
     public String getReleaseVersion() {
@@ -115,9 +117,9 @@ public class ReleaseConfig {
     }
 
 
-    public void intializeConfig() throws IOException {
+    private void initializeConfig() throws Exception {
 
-        File file = new File(localDirectory + "/justrelease.yml");
+        File file = new File(getMainRepo().getLocalDirectory() + "/justrelease.yml");
 
         if (file.exists() && !file.isDirectory()) {
             this.configFileStream = new FileInputStream(file);
@@ -130,13 +132,47 @@ public class ReleaseConfig {
                     "please provide justrelease.yml in your project home directory. ");
         }
 
+        ConfigParser configParser = new ConfigParser(this);
+        configParser.parse();
     }
+
+    private ProjectInfo createProjectInfo(GithubRepo mainrepo) {
+        File file = new File(mainrepo.getLocalDirectory() + "/package.json");
+        if (file.exists()) return new NPMProject(mainrepo.getLocalDirectory());
+        return new MavenProject(mainrepo.getLocalDirectory());
+
+    }
+
 
     public InputStream getConfigFileStream() {
         return configFileStream;
     }
 
-    public void setProjectInfo(ProjectInfo projectInfo) {
-        this.projectInfo = projectInfo;
+    private  void initializeVersions() {
+        Version.Builder builder = new Version.Builder(getCurrentVersion());
+
+
+        if (releaseType.equals("major")) {
+            setReleaseVersion(builder.build().incrementMajorVersion().getNormalVersion());
+        } else if (releaseType.equals("minor")) {
+            setReleaseVersion(builder.build().incrementMinorVersion().getNormalVersion());
+        } else if (releaseType.equals("patch")) {
+            setReleaseVersion(builder.build().incrementPatchVersion().getNormalVersion());
+        } else {
+            //TODO - check if format of release type match X.Y.Z
+            setReleaseVersion(releaseType);
+        }
+
+        if (projectInfo instanceof MavenProject) {
+
+            if (snapshotVersion != null) {
+                setNextVersion(snapshotVersion);
+            } else {
+                if (((MavenProject) projectInfo).isSnapShot()) {
+                    setNextVersion(getReleaseVersion() + "-SNAPSHOT");
+                    setReleaseVersion(builder.build().getNormalVersion());
+                }
+            }
+        }
     }
 }
