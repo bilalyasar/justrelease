@@ -1,35 +1,22 @@
 package com.justrelease.config;
 
 import com.github.zafarkhaja.semver.Version;
-import com.justrelease.config.build.BuildConfig;
-import com.justrelease.config.build.ExecConfig;
-import com.justrelease.config.build.VersionUpdateConfig;
 import com.justrelease.git.GithubRepo;
-import com.justrelease.project.type.MavenProject;
-import com.justrelease.project.type.NPMProject;
-import com.justrelease.project.type.ProjectInfo;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
 
 
 public class ReleaseConfig {
     private String releaseVersion;
     private String nextVersion;
-    private String commitMessageTemplate = "released ${version} with :heart: by justrelease";
-    private String tagNameTemplate = "v${version}";
 
     private GithubRepo mainRepo;
-    private InputStream configFileStream;
     private boolean dryRun;
     private String snapshotVersion;
     private String releaseType;
-    private ProjectInfo projectInfo;
-
-    BuildConfig buildConfig = new BuildConfig();
-    ArrayList<VersionUpdateConfig> versionUpdateConfigs = new ArrayList<VersionUpdateConfig>();
+    private AbstractProjectConfig config;
 
 
     public ReleaseConfig(GithubRepo githubRepo, boolean dryRun, String snapshotVersion,String releaseType) throws Exception {
@@ -37,9 +24,8 @@ public class ReleaseConfig {
         this.dryRun = dryRun;
         this.snapshotVersion = snapshotVersion;
         this.releaseType = releaseType;
-        this.projectInfo = createProjectInfo(githubRepo);
+        this.config = createProjectInfo(mainRepo);
         initializeVersions();
-        initializeConfig();
     }
 
     public String getReleaseVersion() {
@@ -55,7 +41,7 @@ public class ReleaseConfig {
     }
 
     public String getCurrentVersion() {
-        return projectInfo.getCurrentVersion();
+        return config.getCurrentVersion();
     }
 
     public String getNextVersion() {
@@ -66,86 +52,53 @@ public class ReleaseConfig {
         this.nextVersion = nextVersion;
     }
 
-
-    public void addExecConfig(ExecConfig execConfig) {
-        buildConfig.addExecConfig(execConfig);
-    }
-
-    public BuildConfig getBuildConfig() {
-        return buildConfig;
-    }
-
-    public void setBuildConfig(BuildConfig buildConfig) {
-        this.buildConfig = buildConfig;
-    }
-
-
-    public ArrayList<VersionUpdateConfig> getVersionUpdateConfigs() {
-        return versionUpdateConfigs;
-    }
-
-    public void setVersionUpdateConfigs(ArrayList<VersionUpdateConfig> versionUpdateConfigs) {
-        this.versionUpdateConfigs = versionUpdateConfigs;
-    }
-
-    public void addVersionUpdateConfig(VersionUpdateConfig versionUpdateConfig) {
-        versionUpdateConfigs.add(versionUpdateConfig);
-    }
-
     public boolean isDryRun() {
         return dryRun;
     }
 
-    public void setDryRun(boolean dryRun) {
-        this.dryRun = dryRun;
+    public AbstractProjectConfig getConfig() {
+        return config;
     }
 
-    public String getCommitMessage() {
-        return commitMessageTemplate.replaceAll("\\$\\{version\\}", releaseVersion);
-    }
+    private AbstractProjectConfig createProjectInfo(GithubRepo mainrepo) throws Exception {
 
-    public String getTagName() {
-        return tagNameTemplate.replaceAll("\\$\\{version\\}", releaseVersion);
-    }
+        File justreleaseConfigFile = new File(getMainRepo().getLocalDirectory() + "/justrelease.yml");
 
-    public void setCommitMessageTemplate(String commitMessageTemplate) {
-        this.commitMessageTemplate = commitMessageTemplate;
-    }
+        InputStream projectConfigurationIS;
+        InputStream justreleaseConfigIS;
 
-    public void setTagNameTemplate(String tagNameTemplate) {
-        this.tagNameTemplate = tagNameTemplate;
-    }
+        //npm support
+        File packageJsonFile = new File(mainrepo.getLocalDirectory() + "/package.json");
 
+        if (packageJsonFile.exists() && packageJsonFile.isDirectory()) {
+            projectConfigurationIS = new FileInputStream(packageJsonFile);
 
-    private void initializeConfig() throws Exception {
-
-        File file = new File(getMainRepo().getLocalDirectory() + "/justrelease.yml");
-
-        if (file.exists() && !file.isDirectory()) {
-            this.configFileStream = new FileInputStream(file);
-        } else if (projectInfo instanceof MavenProject) {
-            this.configFileStream = ReleaseConfig.class.getResourceAsStream("/default-mvn.yml");
-        } else if (projectInfo instanceof NPMProject) {
-            this.configFileStream = ReleaseConfig.class.getResourceAsStream("/default-npm.yml");
-        } else {
-            throw new RuntimeException("We could not detect your configuration. " +
-                    "please provide justrelease.yml in your project home directory. ");
+            if (justreleaseConfigFile.exists() && !justreleaseConfigFile.isDirectory()) {
+                justreleaseConfigIS = new FileInputStream(justreleaseConfigFile);
+                return new NPMProjectConfig(projectConfigurationIS,justreleaseConfigIS,this);
+            } else {
+                justreleaseConfigIS = ReleaseConfig.class.getResourceAsStream("/default-npm.yml");
+                return new NPMProjectConfig(projectConfigurationIS,justreleaseConfigIS,this);
+            }
         }
 
-        ConfigParser configParser = new ConfigParser(this);
-        configParser.parse();
-    }
+        // maven support
+        File pomXMLFile = new File(mainrepo.getLocalDirectory() + "/pom.xml");
 
-    private ProjectInfo createProjectInfo(GithubRepo mainrepo) {
-        File file = new File(mainrepo.getLocalDirectory() + "/package.json");
-        if (file.exists()) return new NPMProject(mainrepo.getLocalDirectory());
-        return new MavenProject(mainrepo.getLocalDirectory());
+        if (pomXMLFile.exists() && pomXMLFile.isDirectory()) {
+            projectConfigurationIS = new FileInputStream(pomXMLFile);
 
-    }
+            if (justreleaseConfigFile.exists() && !justreleaseConfigFile.isDirectory()) {
+                justreleaseConfigIS = new FileInputStream(justreleaseConfigFile);
+                return new MavenProjectConfig(projectConfigurationIS,justreleaseConfigIS,this);
+            } else {
+                justreleaseConfigIS = ReleaseConfig.class.getResourceAsStream("/default-mvn.yml");
+                return new MavenProjectConfig(projectConfigurationIS,justreleaseConfigIS,this);
+            }
+        }
 
+        throw new RuntimeException("Unsupported Project Type");
 
-    public InputStream getConfigFileStream() {
-        return configFileStream;
     }
 
     private  void initializeVersions() {
@@ -163,15 +116,12 @@ public class ReleaseConfig {
             setReleaseVersion(releaseType);
         }
 
-        if (projectInfo instanceof MavenProject) {
-
+        if (config instanceof MavenProjectConfig) {
             if (snapshotVersion != null) {
                 setNextVersion(snapshotVersion);
             } else {
-                if (((MavenProject) projectInfo).isSnapShot()) {
-                    setNextVersion(getReleaseVersion() + "-SNAPSHOT");
-                    setReleaseVersion(builder.build().getNormalVersion());
-                }
+                    builder = new Version.Builder(getReleaseVersion());
+                    setNextVersion(builder.build().incrementPatchVersion().getNormalVersion() + "-SNAPSHOT");
             }
         }
     }

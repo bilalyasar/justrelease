@@ -1,28 +1,24 @@
-package com.justrelease.project.type;
+package com.justrelease.config;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.InputStream;
 
-public class MavenProject implements ProjectInfo {
+public class MavenProjectConfig extends AbstractProjectConfig {
 
     private boolean isSnapShot;
-    private String localDirectory;
 
-    public MavenProject(String localDirectory) {
-        this.localDirectory = localDirectory;
+    public MavenProjectConfig(InputStream projectConfigurationIS, InputStream justreleaseConfigIS,ReleaseConfig releaseConfig) throws Exception {
+        super(projectConfigurationIS,justreleaseConfigIS,releaseConfig);
     }
 
+    @Override
     public String getCurrentVersion() {
         MavenXpp3Reader reader = new MavenXpp3Reader();
         Model result = null;
         try {
-            result = reader.read(new FileInputStream(
-                    localDirectory +
-                    File.separator +
-                    "pom.xml"));
+            result = reader.read(projectConfigurationIS);
         } catch (Exception e) {
             e.printStackTrace();
         }

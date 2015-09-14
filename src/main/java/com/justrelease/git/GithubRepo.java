@@ -5,8 +5,6 @@ public class GithubRepo {
     private String repository;
     private String repoUrl;
     private String branch;
-    private String descriptionFileName;
-    private String attachmentFile;
 
     public GithubRepo(String username, String repository) {
         this(username,repository,"master");
@@ -25,22 +23,6 @@ public class GithubRepo {
 
     public String getBranch() {
         return branch;
-    }
-
-    public String getAttachmentFile() {
-        return attachmentFile;
-    }
-
-    public void setAttachmentFile(String attachmentFile) {
-        this.attachmentFile = attachmentFile;
-    }
-
-    public String getDescriptionFileName() {
-        return descriptionFileName;
-    }
-
-    public void setDescriptionFileName(String descriptionFileName) {
-        this.descriptionFileName = descriptionFileName;
     }
 
     public String getUsername() {

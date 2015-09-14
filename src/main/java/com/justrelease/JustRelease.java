@@ -1,9 +1,6 @@
 package com.justrelease;
 
 import com.justrelease.config.ReleaseConfig;
-import com.justrelease.config.build.BuildConfig;
-import com.justrelease.config.build.ExecConfig;
-import com.justrelease.config.build.VersionUpdateConfig;
 import com.justrelease.git.GitOperations;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -35,14 +32,14 @@ public class JustRelease {
 
         System.out.println("Starting to Release: " + releaseConfig.getMainRepo().getRepository());
 
-        replaceVersionsAndCommit(releaseConfig.getVersionUpdateConfigs(), releaseConfig.getCurrentVersion(),
+        replaceVersionsAndCommit(releaseConfig.getConfig().getVersionUpdatePatterns(), releaseConfig.getCurrentVersion(),
                 releaseConfig.getReleaseVersion(), releaseConfig.getMainRepo().getLocalDirectory());
 
         createArtifacts();
         getLatestTag();
         commitAndTagVersion();
         if (releaseConfig.getNextVersion() != null) {
-            replaceVersionsAndCommit(releaseConfig.getVersionUpdateConfigs(), releaseConfig.getReleaseVersion(),
+            replaceVersionsAndCommit(releaseConfig.getConfig().getVersionUpdatePatterns(), releaseConfig.getReleaseVersion(),
                     releaseConfig.getNextVersion(), releaseConfig.getMainRepo().getLocalDirectory());
         }
 
@@ -57,9 +54,9 @@ public class JustRelease {
     }
 
     private void commitAndTagVersion() throws IOException, GitAPIException {
-        System.out.println("Tagging: " + releaseConfig.getTagName());
-        System.out.println("Committing with message: " + releaseConfig.getCommitMessage());
-        GitOperations.tagAndCommit(releaseConfig.getCommitMessage(), releaseConfig.getTagName());
+        System.out.println("Tagging: " + releaseConfig.getConfig().getTagName());
+        System.out.println("Committing with message: " + releaseConfig.getConfig().getCommitMessage());
+        GitOperations.tagAndCommit(releaseConfig.getConfig().getCommitMessage(), releaseConfig.getConfig().getTagName());
     }
 
     private void makeAnnouncement() throws IOException, URISyntaxException {
@@ -77,12 +74,12 @@ public class JustRelease {
     }
 
 
-    private void replaceVersionsAndCommit(List<VersionUpdateConfig> configs, String oldVersion, String newVersion, String localDirectory) throws IOException, GitAPIException {
-        for (VersionUpdateConfig versionUpdateConfig : configs) {
-            System.out.println("Updating " + versionUpdateConfig.getRegex() +
+    private void replaceVersionsAndCommit(List<String> configs, String oldVersion, String newVersion, String localDirectory) throws IOException, GitAPIException {
+        for (String regex : configs) {
+            System.out.println("Updating " + regex +
                     " extensions from " + oldVersion + " to " + newVersion);
             Iterator it = FileUtils.iterateFiles(new File(localDirectory),
-                    versionUpdateConfig.getRegex().split(","), true);
+                    regex.split(","), true);
             while (it.hasNext()) {
                 File f = (File) it.next();
                 if (f.getAbsolutePath().contains(".git")) continue;
@@ -105,14 +102,12 @@ public class JustRelease {
 
     private void createArtifacts() {
         System.out.println("Create Artifacts:");
-        BuildConfig buildConfig = releaseConfig.getBuildConfig();
-        for (ExecConfig execConfig : buildConfig.getExecConfigs()) {
-            String[] command = createCommand(execConfig);
+        for (String command : releaseConfig.getConfig().getArtifactCommands()) {
             runCommand(command);
         }
     }
 
-    private void runCommand(String[] command) {
+    private void runCommand(String command) {
         try {
             Process p = Runtime.getRuntime().exec(command);
             BufferedReader in = new BufferedReader(
@@ -126,14 +121,4 @@ public class JustRelease {
             e.printStackTrace();
         }
     }
-
-
-    private String[] createCommand(ExecConfig execConfig) {
-        System.out.println("cd " + releaseConfig.getMainRepo().getLocalDirectory() + "; " + execConfig.getCommand());
-        String[] command = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getMainRepo().getLocalDirectory() + "; " + execConfig.getCommand()};
-        System.out.println(command.toString());
-        return command;
-    }
-
-
 }

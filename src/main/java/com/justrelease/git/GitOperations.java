@@ -90,11 +90,11 @@ public class GitOperations {
         GHUser user = github.getUser(releaseConfig.getMainRepo().getUsername());
 
         GHRepository releaseRepository = user.getRepository(releaseConfig.getMainRepo().getRepository());
-        GHReleaseBuilder ghReleaseBuilder = new GHReleaseBuilder(releaseRepository, releaseConfig.getTagName());
-        ghReleaseBuilder.name(releaseConfig.getTagName());
+        GHReleaseBuilder ghReleaseBuilder = new GHReleaseBuilder(releaseRepository, releaseConfig.getConfig().getTagName());
+        ghReleaseBuilder.name(releaseConfig.getConfig().getTagName());
 
 
-        if (releaseConfig.getMainRepo().getDescriptionFileName() == null) {
+        if (releaseConfig.getConfig().getDescription() == null) {
             String[] command2;
             if (!latestTag.equals("")) {
                 command2 = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getMainRepo().getLocalDirectory() + "; " + "git log " + latestTag + "..HEAD --oneline --pretty=format:'* %s (%h)'"};
@@ -106,10 +106,10 @@ public class GitOperations {
             String output = IOUtils.toString(p2.getInputStream());
             ghReleaseBuilder.body(output);
         } else {
-            System.out.println("Tag Description File Name: " + releaseConfig.getMainRepo().getDescriptionFileName());
+            System.out.println("Tag Description File Name: " + releaseConfig.getConfig().getDescription());
             InputStream fis = new FileInputStream(releaseConfig.getMainRepo().getLocalDirectory() +
                     File.separator +
-                    releaseConfig.getMainRepo().getDescriptionFileName());
+                    releaseConfig.getConfig().getDescription());
             InputStreamReader isr = new InputStreamReader(fis, Charset.forName("UTF-8"));
             BufferedReader br = new BufferedReader(isr);
             String line;
@@ -122,9 +122,9 @@ public class GitOperations {
         }
 
         GHRelease ghRelease = ghReleaseBuilder.create();
-        if (releaseConfig.getMainRepo().getAttachmentFile() != null)
+        if (releaseConfig.getConfig().getArtifactCommands() != null)
             ghRelease.uploadAsset(new File((releaseConfig.getMainRepo().getLocalDirectory() +
                     File.separator +
-                    releaseConfig.getMainRepo().getAttachmentFile())), "Project Artifact");
+                    releaseConfig.getConfig().getAttachment())), "Project Artifact");
     }
 }
