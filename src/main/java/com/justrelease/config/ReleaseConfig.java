@@ -26,6 +26,7 @@ public class ReleaseConfig {
         this.releaseType = releaseType;
         this.config = createProjectInfo(mainRepo);
         initializeVersions();
+        config.parse();
     }
 
     public String getReleaseVersion() {
@@ -70,7 +71,7 @@ public class ReleaseConfig {
         //npm support
         File packageJsonFile = new File(mainrepo.getLocalDirectory() + "/package.json");
 
-        if (packageJsonFile.exists() && packageJsonFile.isDirectory()) {
+        if (packageJsonFile.exists() && !packageJsonFile.isDirectory()) {
             projectConfigurationIS = new FileInputStream(packageJsonFile);
 
             if (justreleaseConfigFile.exists() && !justreleaseConfigFile.isDirectory()) {
@@ -85,7 +86,7 @@ public class ReleaseConfig {
         // maven support
         File pomXMLFile = new File(mainrepo.getLocalDirectory() + "/pom.xml");
 
-        if (pomXMLFile.exists() && pomXMLFile.isDirectory()) {
+        if (pomXMLFile.exists() && !pomXMLFile.isDirectory()) {
             projectConfigurationIS = new FileInputStream(pomXMLFile);
 
             if (justreleaseConfigFile.exists() && !justreleaseConfigFile.isDirectory()) {

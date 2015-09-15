@@ -95,13 +95,13 @@ public class GitOperations {
 
 
         if (releaseConfig.getConfig().getDescription() == null) {
-            String[] command2;
+            String command2;
             if (!latestTag.equals("")) {
-                command2 = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getMainRepo().getLocalDirectory() + "; " + "git log " + latestTag + "..HEAD --oneline --pretty=format:'* %s (%h)'"};
+                command2 = "git log " + latestTag + "..HEAD --oneline --pretty=format:'* %s (%h)'";
             } else {
-                command2 = new String[]{"/bin/sh", "-c", "cd " + releaseConfig.getMainRepo().getLocalDirectory() + "; " + "git log --oneline --pretty=format:'* %s (%h)'"};
+                command2 = "git log --oneline --pretty=format:'* %s (%h)'";
             }
-            Process p2 = Runtime.getRuntime().exec(command2);
+            Process p2 = Runtime.getRuntime().exec(command2, null, new File(releaseConfig.getMainRepo().getLocalDirectory()));
             p2.waitFor();
             String output = IOUtils.toString(p2.getInputStream());
             ghReleaseBuilder.body(output);

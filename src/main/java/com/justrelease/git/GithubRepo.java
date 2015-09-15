@@ -34,7 +34,7 @@ public class GithubRepo {
     }
 
     public String getLocalDirectory() {
-       return "justrelease" + getUsername() + "_" + getRepository() + "_" + getBranch();
+       return "release/" + getUsername() + "_" + getRepository() + "_" + getBranch();
     }
 
     public String getUrl() {

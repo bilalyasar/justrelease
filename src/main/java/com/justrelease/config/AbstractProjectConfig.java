@@ -28,7 +28,6 @@ public abstract class AbstractProjectConfig {
         this.projectConfigurationIS = projectConfigurationIS;
         this.justreleaseConfigIS = justreleaseConfigIS;
         this.releaseConfig = releaseConfig;
-        parse();
     }
 
     public void parse() throws Exception {
