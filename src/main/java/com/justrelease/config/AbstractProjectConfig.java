@@ -19,6 +19,7 @@ public abstract class AbstractProjectConfig {
     private String description;
     private List<String> versionUpdatePatterns;
     private List<String> artifactCommands;
+    protected String currentVersion;
 
     private ReleaseConfig releaseConfig;
 
@@ -28,6 +29,7 @@ public abstract class AbstractProjectConfig {
         this.projectConfigurationIS = projectConfigurationIS;
         this.justreleaseConfigIS = justreleaseConfigIS;
         this.releaseConfig = releaseConfig;
+        readCurrentVersion();
     }
 
     public void parse() throws Exception {
@@ -107,5 +109,9 @@ public abstract class AbstractProjectConfig {
         return artifactCommands;
     }
 
-    public abstract String getCurrentVersion();
+    public String getCurrentVersion() {
+        return currentVersion;
+    }
+
+    protected abstract void readCurrentVersion();
 }

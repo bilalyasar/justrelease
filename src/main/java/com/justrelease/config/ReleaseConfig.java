@@ -41,10 +41,6 @@ public class ReleaseConfig {
         return mainRepo;
     }
 
-    public String getCurrentVersion() {
-        return config.getCurrentVersion();
-    }
-
     public String getNextVersion() {
         return nextVersion;
     }
@@ -103,7 +99,7 @@ public class ReleaseConfig {
     }
 
     private  void initializeVersions() {
-        Version.Builder builder = new Version.Builder(getCurrentVersion());
+        Version.Builder builder = new Version.Builder(getConfig().getCurrentVersion());
 
 
         if (releaseType.equals("major")) {

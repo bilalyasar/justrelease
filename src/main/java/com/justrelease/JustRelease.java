@@ -32,7 +32,7 @@ public class JustRelease {
 
         System.out.println("Starting to Release: " + releaseConfig.getMainRepo().getRepository());
 
-        replaceVersionsAndCommit(releaseConfig.getConfig().getVersionUpdatePatterns(), releaseConfig.getCurrentVersion(),
+        replaceVersionsAndCommit(releaseConfig.getConfig().getVersionUpdatePatterns(), releaseConfig.getConfig().getCurrentVersion(),
                 releaseConfig.getReleaseVersion(), releaseConfig.getMainRepo().getLocalDirectory());
 
         createArtifacts();

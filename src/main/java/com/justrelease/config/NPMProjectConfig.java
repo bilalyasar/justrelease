@@ -9,17 +9,12 @@ import java.io.InputStreamReader;
 
 public class NPMProjectConfig extends AbstractProjectConfig {
 
-    private String currentVersion;
-
     public NPMProjectConfig(InputStream projectConfigurationIS, InputStream justreleaseConfigIS, ReleaseConfig releaseConfig) throws Exception {
         super(projectConfigurationIS, justreleaseConfigIS, releaseConfig);
     }
 
     @Override
-    public String getCurrentVersion() {
-        if (currentVersion != null) {
-            return currentVersion;
-        }
+    public void readCurrentVersion() {
         JSONParser parser = new JSONParser();
         Object obj = null;
         try {
@@ -29,9 +24,7 @@ public class NPMProjectConfig extends AbstractProjectConfig {
         }
         JSONObject jsonObject = (JSONObject) obj;
 
-        currentVersion = (String) jsonObject.get("version");
-        return currentVersion;
-
+        this.currentVersion = (String) jsonObject.get("version");
     }
 
 }

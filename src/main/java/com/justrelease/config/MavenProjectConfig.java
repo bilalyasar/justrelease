@@ -7,18 +7,12 @@ import java.io.InputStream;
 
 public class MavenProjectConfig extends AbstractProjectConfig {
 
-    private boolean isSnapShot;
-    private String currentVersion;
-
     public MavenProjectConfig(InputStream projectConfigurationIS, InputStream justreleaseConfigIS, ReleaseConfig releaseConfig) throws Exception {
         super(projectConfigurationIS, justreleaseConfigIS, releaseConfig);
     }
 
     @Override
-    public String getCurrentVersion() {
-        if (currentVersion != null) {
-            return currentVersion;
-        }
+    protected void readCurrentVersion() {
         MavenXpp3Reader reader = new MavenXpp3Reader();
         Model result = null;
         try {
@@ -26,13 +20,7 @@ public class MavenProjectConfig extends AbstractProjectConfig {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (result.getVersion().toLowerCase().contains("snapshot")) isSnapShot = true;
-        currentVersion = result.getVersion();
-        return currentVersion;
-    }
-
-    public boolean isSnapShot() {
-        return isSnapShot;
+        this.currentVersion = result.getVersion();
     }
 
 }
