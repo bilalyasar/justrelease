@@ -101,7 +101,7 @@ public class GitOperations {
             } else {
                 command2 = "git log --oneline --pretty=format:'* %s (%h)'";
             }
-            Process p2 = Runtime.getRuntime().exec(command2, null, new File(releaseConfig.getMainRepo().getLocalDirectory()));
+            Process p2 = Runtime.getRuntime().exec(command2, null, releaseConfig.getMainRepo().getFolderToExecute());
             p2.waitFor();
             String output = IOUtils.toString(p2.getInputStream());
             ghReleaseBuilder.body(output);

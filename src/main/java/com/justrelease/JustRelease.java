@@ -95,7 +95,7 @@ public class JustRelease {
 
     public void getLatestTag() throws InterruptedException, IOException {
         String command = "git describe --tags --abbrev=0";
-        Process p = Runtime.getRuntime().exec(command, null, new File(releaseConfig.getMainRepo().getLocalDirectory()));
+        Process p = Runtime.getRuntime().exec(command, null, releaseConfig.getMainRepo().getFolderToExecute());
         p.waitFor();
         latestTag = IOUtils.toString(p.getInputStream()).replaceAll("(\\r|\\n|\\t)", "");
     }
@@ -109,7 +109,7 @@ public class JustRelease {
 
     private void runCommand(String command) {
         try {
-            Process p = Runtime.getRuntime().exec(command, null, new File(releaseConfig.getMainRepo().getLocalDirectory()));
+            Process p = Runtime.getRuntime().exec(command, null, releaseConfig.getMainRepo().getFolderToExecute());
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(p.getInputStream()));
             String line;

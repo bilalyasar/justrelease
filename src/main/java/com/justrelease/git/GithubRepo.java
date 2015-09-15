@@ -1,13 +1,17 @@
 package com.justrelease.git;
 
+import java.io.File;
+
 public class GithubRepo {
     private String username;
     private String repository;
     private String repoUrl;
     private String branch;
+    private File folderToExecute;
 
     public GithubRepo(String username, String repository) {
         this(username,repository,"master");
+        this.folderToExecute = new File(getLocalDirectory());
     }
 
     public GithubRepo(String username, String repository, String branch) {
@@ -31,6 +35,10 @@ public class GithubRepo {
 
     public String getRepository() {
         return repository;
+    }
+
+    public File getFolderToExecute() {
+        return folderToExecute;
     }
 
     public String getLocalDirectory() {
