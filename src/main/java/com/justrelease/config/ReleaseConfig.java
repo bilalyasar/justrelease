@@ -118,7 +118,7 @@ public class ReleaseConfig {
                 setNextVersion(snapshotVersion);
             } else {
                     builder = new Version.Builder(getReleaseVersion());
-                    setNextVersion(builder.build().incrementPatchVersion().getNormalVersion() + "-SNAPSHOT");
+                    setNextVersion(builder.build().getNormalVersion() + "-SNAPSHOT");
             }
         }
     }
