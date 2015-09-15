@@ -29,14 +29,14 @@ public class JustReleaseTest {
 
     @Test
     public void testReleaseVersion() {
-        Version.Builder builder = new Version.Builder(releaseConfig.getCurrentVersion());
+        Version.Builder builder = new Version.Builder(releaseConfig.getConfig().getCurrentVersion());
         String releaseVersion = releaseConfig.getReleaseVersion();
         assertEquals(releaseVersion, builder.build().incrementPatchVersion().getNormalVersion());
     }
 
     @Test
     public void testNextVersion() {
-        Version.Builder builder = new Version.Builder(releaseConfig.getCurrentVersion());
+        Version.Builder builder = new Version.Builder(releaseConfig.getConfig().getCurrentVersion());
         String nextVersion = releaseConfig.getNextVersion();
         assertEquals(nextVersion, builder.build().incrementPatchVersion().getNormalVersion() + "-SNAPSHOT");
     }

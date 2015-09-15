@@ -19,7 +19,7 @@ public class ReleaseConfig {
     private AbstractProjectConfig config;
 
 
-    public ReleaseConfig(GithubRepo githubRepo, boolean dryRun, String snapshotVersion,String releaseType) throws Exception {
+    public ReleaseConfig(GithubRepo githubRepo, boolean dryRun, String snapshotVersion, String releaseType) throws Exception {
         this.mainRepo = githubRepo;
         this.dryRun = dryRun;
         this.snapshotVersion = snapshotVersion;
@@ -72,10 +72,10 @@ public class ReleaseConfig {
 
             if (justreleaseConfigFile.exists() && !justreleaseConfigFile.isDirectory()) {
                 justreleaseConfigIS = new FileInputStream(justreleaseConfigFile);
-                return new NPMProjectConfig(projectConfigurationIS,justreleaseConfigIS,this);
+                return new NPMProjectConfig(projectConfigurationIS, justreleaseConfigIS, this);
             } else {
                 justreleaseConfigIS = ReleaseConfig.class.getResourceAsStream("/default-npm.yml");
-                return new NPMProjectConfig(projectConfigurationIS,justreleaseConfigIS,this);
+                return new NPMProjectConfig(projectConfigurationIS, justreleaseConfigIS, this);
             }
         }
 
@@ -87,10 +87,10 @@ public class ReleaseConfig {
 
             if (justreleaseConfigFile.exists() && !justreleaseConfigFile.isDirectory()) {
                 justreleaseConfigIS = new FileInputStream(justreleaseConfigFile);
-                return new MavenProjectConfig(projectConfigurationIS,justreleaseConfigIS,this);
+                return new MavenProjectConfig(projectConfigurationIS, justreleaseConfigIS, this);
             } else {
                 justreleaseConfigIS = ReleaseConfig.class.getResourceAsStream("/default-mvn.yml");
-                return new MavenProjectConfig(projectConfigurationIS,justreleaseConfigIS,this);
+                return new MavenProjectConfig(projectConfigurationIS, justreleaseConfigIS, this);
             }
         }
 
@@ -98,7 +98,7 @@ public class ReleaseConfig {
 
     }
 
-    private  void initializeVersions() {
+    private void initializeVersions() {
         Version.Builder builder = new Version.Builder(getConfig().getCurrentVersion());
 
 
@@ -117,8 +117,10 @@ public class ReleaseConfig {
             if (snapshotVersion != null) {
                 setNextVersion(snapshotVersion);
             } else {
-                    builder = new Version.Builder(getReleaseVersion());
+                builder = new Version.Builder(getReleaseVersion());
+                if (releaseType.equals("patch"))
                     setNextVersion(builder.build().getNormalVersion() + "-SNAPSHOT");
+                else setNextVersion(builder.build().incrementPatchVersion().getNormalVersion() + "-SNAPSHOT");
             }
         }
     }
