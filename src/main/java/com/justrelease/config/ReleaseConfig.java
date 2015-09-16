@@ -117,10 +117,14 @@ public class ReleaseConfig {
             if (snapshotVersion != null) {
                 setNextVersion(snapshotVersion);
             } else {
-                builder = new Version.Builder(getReleaseVersion());
-                if (releaseType.equals("patch"))
-                    setNextVersion(builder.build().getNormalVersion() + "-SNAPSHOT");
-                else setNextVersion(builder.build().incrementPatchVersion().getNormalVersion() + "-SNAPSHOT");
+                if (releaseType.equals("patch")) {
+                    builder = new Version.Builder(getConfig().getCurrentVersion());
+                    setReleaseVersion(builder.build().getNormalVersion());
+                    setNextVersion(builder.build().incrementPatchVersion().getNormalVersion() + "-SNAPSHOT");
+                } else {
+                    builder = new Version.Builder(getReleaseVersion());
+                    setNextVersion(builder.build().incrementPatchVersion().getNormalVersion() + "-SNAPSHOT");
+                }
             }
         }
     }
