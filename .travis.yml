@@ -1,2 +1,6 @@
 language: java
 script: mvn clean install
+before_install:
+  - pip install codecov
+after_success:
+  - codecov
