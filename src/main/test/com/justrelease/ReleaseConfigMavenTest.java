@@ -59,4 +59,13 @@ public class ReleaseConfigMavenTest {
         assertTrue(releaseConfig.getConfig().getCommitMessage().contains(releaseConfig.getReleaseVersion()));
     }
 
+    @Test
+    public void testAttachment() {
+        assertEquals(releaseConfig.getConfig().getAttachment(), "target/hello-world-" + releaseConfig.getReleaseVersion() + ".jar");
+    }
+
+    @Test
+    public void testDescriptionFileName() {
+        assertEquals(releaseConfig.getConfig().getDescription(), "releasenotes.md");
+    }
 }
