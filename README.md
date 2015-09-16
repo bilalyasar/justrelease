@@ -13,7 +13,7 @@ JustRelease is command line tool to release software libraries hosted on github.
 - Java 7 or higher
 - `justrelease.yml` for custom configuration
 
-##Installation
+##Installation & Quick Example
 
 - Download and unzip [latest zip file](https://github.com/justrelease/justrelease/releases)
 - Generate [Personal Access Token](https://github.com/settings/tokens)
@@ -22,6 +22,10 @@ JustRelease is command line tool to release software libraries hosted on github.
 login=github_username
 oauth=GITHUB_OAUTH_TOKEN
 ```
+- fork [sample repository](https://github.com/justrelease/justrelease-sample-npm)
+- update releasenotes.md file and commit the change.
+- run `sh justrelease.sh yourusername/justrelease-sample-npm patch`
+- check releases page of your forked repository
 
 ##Usage
 
@@ -35,13 +39,6 @@ usage: justrelease <username/repository> <major|minor|patch|X.Y.Z>
                           release. maven spesific feature
 ```
 
-
-## Quick Example
-
-- fork one of sample repositories [maven](https://github.com/justrelease/justrelease-sample-maven) or [npm](https://github.com/justrelease/justrelease-sample-npm)
-- update releasenotes.md file and commit the change.
-- run `sh justrelease.sh yourusername/reponame patch`
-- check releases page of your forked repository
 
 
 ## Advanced Configuration
