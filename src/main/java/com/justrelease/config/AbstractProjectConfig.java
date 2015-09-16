@@ -13,7 +13,7 @@ public abstract class AbstractProjectConfig {
     protected InputStream projectConfigurationIS;
     protected InputStream justreleaseConfigIS;
 
-    private String commitMessageTemplate = "released ${version} with :heart: using `justrelease`";
+    private String commitMessageTemplate = "justreleased ${version} :rocket:";
     private String tagNameTemplate = "v${version}";
     private String attachment;
     private String description;
