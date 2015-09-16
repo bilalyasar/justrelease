@@ -97,9 +97,9 @@ public class GitOperations {
         if (releaseConfig.getConfig().getDescription() == null) {
             String command2;
             if (!latestTag.equals("")) {
-                command2 = "git log " + latestTag + "..HEAD --oneline --pretty=format:'* %s (%h)'";
+                command2 = "git log " + latestTag + "..HEAD --oneline";
             } else {
-                command2 = "git log --oneline --pretty=format:'* %s (%h)'";
+                command2 = "git log --oneline";
             }
             Process p2 = Runtime.getRuntime().exec(command2, null, releaseConfig.getMainRepo().getFolderToExecute());
             p2.waitFor();
@@ -122,7 +122,7 @@ public class GitOperations {
         }
 
         GHRelease ghRelease = ghReleaseBuilder.create();
-        if (releaseConfig.getConfig().getArtifactCommands() != null)
+        if (releaseConfig.getConfig().getAttachment() != null)
             ghRelease.uploadAsset(new File((releaseConfig.getMainRepo().getLocalDirectory() +
                     File.separator +
                     releaseConfig.getConfig().getAttachment())), "Project Artifact");
