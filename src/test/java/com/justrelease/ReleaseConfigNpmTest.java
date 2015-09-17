@@ -9,7 +9,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class ReleaseConfigNpmTest {
@@ -31,13 +30,13 @@ public class ReleaseConfigNpmTest {
     @Test
     public void testReleaseVersion() {
         Version.Builder builder = new Version.Builder(releaseConfig.getConfig().getCurrentVersion());
-        String releaseVersion = releaseConfig.getReleaseVersion();
+        String releaseVersion = releaseConfig.getConfig().getReleaseVersion();
         assertEquals(releaseVersion, builder.build().incrementPatchVersion().getNormalVersion());
     }
 
     @Test
     public void testNextVersion() {
-        assertNull(releaseConfig.getNextVersion());
+        assertEquals(releaseConfig.getConfig().getNextVersion(),releaseConfig.getConfig().getReleaseVersion());
     }
 
     @Test
@@ -54,7 +53,7 @@ public class ReleaseConfigNpmTest {
     //also this test checks ${version} replace functionality.
     @Test
     public void testCommitMessageIncludesVersion() {
-        assertTrue(releaseConfig.getConfig().getCommitMessage().contains(releaseConfig.getReleaseVersion()));
+        assertTrue(releaseConfig.getConfig().getCommitMessage().contains(releaseConfig.getConfig().getReleaseVersion()));
     }
 
 }

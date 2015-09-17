@@ -32,14 +32,14 @@ public class ReleaseConfigMavenTest {
     @Test
     public void testReleaseVersion() {
         Version.Builder builder = new Version.Builder(releaseConfig.getConfig().getCurrentVersion());
-        String releaseVersion = releaseConfig.getReleaseVersion();
+        String releaseVersion = releaseConfig.getConfig().getReleaseVersion();
         assertEquals(releaseVersion, builder.build().getNormalVersion());
     }
 
     @Test
     public void testNextVersion() {
-        assertNotNull(releaseConfig.getNextVersion());
-        Assert.assertTrue(releaseConfig.getNextVersion().contains("-SNAPSHOT"));
+        assertNotNull(releaseConfig.getConfig().getNextVersion());
+        Assert.assertTrue(releaseConfig.getConfig().getNextVersion().contains("-SNAPSHOT"));
     }
 
     @Test
@@ -56,12 +56,12 @@ public class ReleaseConfigMavenTest {
     //also this test checks ${version} replace functionality.
     @Test
     public void testCommitMessageIncludesVersion() {
-        assertTrue(releaseConfig.getConfig().getCommitMessage().contains(releaseConfig.getReleaseVersion()));
+        assertTrue(releaseConfig.getConfig().getCommitMessage().contains(releaseConfig.getConfig().getReleaseVersion()));
     }
 
     @Test
     public void testAttachment() {
-        assertEquals(releaseConfig.getConfig().getAttachment(), "target/hello-world-" + releaseConfig.getReleaseVersion() + ".jar");
+        assertEquals(releaseConfig.getConfig().getAttachment(), "target/hello-world-" + releaseConfig.getConfig().getReleaseVersion() + ".jar");
     }
 
     @Test
