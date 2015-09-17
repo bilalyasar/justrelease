@@ -1,6 +1,5 @@
 package com.justrelease.config;
 
-import com.github.zafarkhaja.semver.Version;
 import com.justrelease.git.GithubRepo;
 
 import java.io.File;
@@ -9,9 +8,6 @@ import java.io.InputStream;
 
 
 public class ReleaseConfig {
-    private String releaseVersion;
-    private String nextVersion;
-
     private GithubRepo mainRepo;
     private boolean dryRun;
     private String snapshotVersion;
@@ -25,28 +21,10 @@ public class ReleaseConfig {
         this.snapshotVersion = snapshotVersion;
         this.releaseType = releaseType;
         this.config = createProjectInfo(mainRepo);
-        initializeVersions();
-        config.parse();
-    }
-
-    public String getReleaseVersion() {
-        return releaseVersion;
-    }
-
-    public void setReleaseVersion(String releaseVersion) {
-        this.releaseVersion = releaseVersion;
     }
 
     public GithubRepo getMainRepo() {
         return mainRepo;
-    }
-
-    public String getNextVersion() {
-        return nextVersion;
-    }
-
-    public void setNextVersion(String nextVersion) {
-        this.nextVersion = nextVersion;
     }
 
     public boolean isDryRun() {
@@ -56,6 +34,16 @@ public class ReleaseConfig {
     public AbstractProjectConfig getConfig() {
         return config;
     }
+
+    public String getSnapshotVersion() {
+        return snapshotVersion;
+    }
+
+    public String getReleaseType() {
+        return releaseType;
+    }
+
+
 
     private AbstractProjectConfig createProjectInfo(GithubRepo mainrepo) throws Exception {
 
@@ -98,34 +86,4 @@ public class ReleaseConfig {
 
     }
 
-    private void initializeVersions() {
-        Version.Builder builder = new Version.Builder(getConfig().getCurrentVersion());
-
-
-        if (releaseType.equals("major")) {
-            setReleaseVersion(builder.build().incrementMajorVersion().getNormalVersion());
-        } else if (releaseType.equals("minor")) {
-            setReleaseVersion(builder.build().incrementMinorVersion().getNormalVersion());
-        } else if (releaseType.equals("patch")) {
-            setReleaseVersion(builder.build().incrementPatchVersion().getNormalVersion());
-        } else {
-            //TODO - check if format of release type match X.Y.Z
-            setReleaseVersion(releaseType);
-        }
-
-        if (config instanceof MavenProjectConfig) {
-            if (snapshotVersion != null) {
-                setNextVersion(snapshotVersion);
-            } else {
-                if (releaseType.equals("patch")) {
-                    builder = new Version.Builder(getConfig().getCurrentVersion());
-                    setReleaseVersion(builder.build().getNormalVersion());
-                    setNextVersion(builder.build().incrementPatchVersion().getNormalVersion() + "-SNAPSHOT");
-                } else {
-                    builder = new Version.Builder(getReleaseVersion());
-                    setNextVersion(builder.build().incrementPatchVersion().getNormalVersion() + "-SNAPSHOT");
-                }
-            }
-        }
-    }
 }

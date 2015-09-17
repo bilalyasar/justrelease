@@ -1,5 +1,6 @@
 package com.justrelease.config;
 
+import com.github.zafarkhaja.semver.Version;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.InputStream;
@@ -20,8 +21,10 @@ public abstract class AbstractProjectConfig {
     private List<String> versionUpdatePatterns;
     private List<String> artifactCommands;
     protected String currentVersion;
+    protected String releaseVersion;
+    protected String nextVersion;
 
-    private ReleaseConfig releaseConfig;
+    protected ReleaseConfig releaseConfig;
 
     private Yaml yaml = new Yaml();
 
@@ -30,6 +33,8 @@ public abstract class AbstractProjectConfig {
         this.justreleaseConfigIS = justreleaseConfigIS;
         this.releaseConfig = releaseConfig;
         readCurrentVersion();
+        initializeVersions();
+        parse();
     }
 
     public void parse() throws Exception {
@@ -67,14 +72,34 @@ public abstract class AbstractProjectConfig {
                 ArrayList<String> commands = (ArrayList<String>) entry.get(key);
                 for (String command : commands) {
                     if (command.startsWith("description"))
-                        this.description = command.split(":")[1].replaceAll("\\$\\{version\\}", releaseConfig.getReleaseVersion());
+                        this.description = command.split(":")[1].replaceAll("\\$\\{version\\}", this.releaseVersion);
                     if (command.startsWith("attachment"))
-                        this.attachment = command.split(":")[1].replaceAll("\\$\\{version\\}", releaseConfig.getReleaseVersion());
+                        this.attachment = command.split(":")[1].replaceAll("\\$\\{version\\}",this.releaseVersion);
                 }
 
             }
         }
     }
+
+    private void initializeVersions() {
+        Version.Builder builder = new Version.Builder(getCurrentVersion());
+        String releaseType = releaseConfig.getReleaseType();
+
+
+        if (releaseType.equals("major")) {
+            this.releaseVersion = builder.build().incrementMajorVersion().getNormalVersion();
+        } else if (releaseType.equals("minor")) {
+            this.releaseVersion = builder.build().incrementMinorVersion().getNormalVersion();
+        } else if (releaseType.equals("patch")) {
+            this.releaseVersion = builder.build().incrementPatchVersion().getNormalVersion();
+        } else {
+            //TODO - check if format of release type match X.Y.Z
+            this.releaseVersion = releaseType;
+        }
+
+        setNextVersion();
+    }
+
 
     private void handleVersionUpdate(Map root) {
         this.versionUpdatePatterns = (List) root.get("version.update");
@@ -86,11 +111,11 @@ public abstract class AbstractProjectConfig {
     }
 
     public String getCommitMessage() {
-        return commitMessageTemplate.replaceAll("\\$\\{version\\}", releaseConfig.getReleaseVersion());
+        return commitMessageTemplate.replaceAll("\\$\\{version\\}", this.releaseVersion);
     }
 
     public String getTagName() {
-        return tagNameTemplate.replaceAll("\\$\\{version\\}", releaseConfig.getReleaseVersion());
+        return tagNameTemplate.replaceAll("\\$\\{version\\}", this.releaseVersion);
     }
 
     public String getAttachment() {
@@ -113,5 +138,14 @@ public abstract class AbstractProjectConfig {
         return currentVersion;
     }
 
+    public String getReleaseVersion() {
+        return releaseVersion;
+    }
+
+    public String getNextVersion() {
+        return nextVersion;
+    }
+
     protected abstract void readCurrentVersion();
+    protected abstract void setNextVersion();
 }

@@ -33,14 +33,14 @@ public class JustRelease {
         System.out.println("Starting to Release: " + releaseConfig.getMainRepo().getRepository());
 
         replaceVersionsAndCommit(releaseConfig.getConfig().getVersionUpdatePatterns(), releaseConfig.getConfig().getCurrentVersion(),
-                releaseConfig.getReleaseVersion(), releaseConfig.getMainRepo().getLocalDirectory());
+                releaseConfig.getConfig().getReleaseVersion(), releaseConfig.getMainRepo().getLocalDirectory());
 
         createArtifacts();
         getLatestTag();
         commitAndTagVersion();
-        if (releaseConfig.getNextVersion() != null) {
-            replaceVersionsAndCommit(releaseConfig.getConfig().getVersionUpdatePatterns(), releaseConfig.getReleaseVersion(),
-                    releaseConfig.getNextVersion(), releaseConfig.getMainRepo().getLocalDirectory());
+        if (releaseConfig.getConfig().getNextVersion() != null) {
+            replaceVersionsAndCommit(releaseConfig.getConfig().getVersionUpdatePatterns(), releaseConfig.getConfig().getReleaseVersion(),
+                    releaseConfig.getConfig().getNextVersion(), releaseConfig.getMainRepo().getLocalDirectory());
         }
 
         if (!releaseConfig.isDryRun()) {
@@ -61,7 +61,7 @@ public class JustRelease {
 
     private void makeAnnouncement() throws IOException, URISyntaxException {
         if (Desktop.isDesktopSupported() && !releaseConfig.isDryRun()) {
-            String text = String.format(tweet, releaseConfig.getReleaseVersion(),
+            String text = String.format(tweet, releaseConfig.getConfig().getReleaseVersion(),
                     releaseConfig.getMainRepo().getRepository());
             String encodedText = URLEncoder.encode(text, "UTF-8");
             String via = "justrelease";

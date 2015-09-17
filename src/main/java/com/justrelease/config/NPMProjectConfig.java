@@ -27,4 +27,9 @@ public class NPMProjectConfig extends AbstractProjectConfig {
         this.currentVersion = (String) jsonObject.get("version");
     }
 
+    @Override
+    protected void setNextVersion() {
+        this.nextVersion = this.releaseVersion;
+    }
+
 }
