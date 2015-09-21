@@ -15,7 +15,13 @@ JustRelease is command line tool to release software libraries hosted on github.
 
 ##Installation & Quick Example
 
+##### OSX Installation
+- brew install justrelease/justrelease/justrelease
+
+##### Default Installation (Works All Operating Systems)
 - Download and unzip [latest zip file](https://github.com/justrelease/justrelease/releases)
+
+##### Configuring Credentials
 - Generate [Personal Access Token](https://github.com/settings/tokens)
 - Create ~/.github file and set *login* and *oauth* parameters as below
 ```
