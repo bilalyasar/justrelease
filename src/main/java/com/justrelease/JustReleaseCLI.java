@@ -1,5 +1,6 @@
 package com.justrelease;
 
+import com.justrelease.config.BuildInfoProvider;
 import com.justrelease.config.ReleaseConfig;
 import com.justrelease.git.GitOperations;
 import com.justrelease.git.GithubRepo;
@@ -76,14 +77,14 @@ public class JustReleaseCLI {
     }
 
     private static void printVersion() {
-        System.out.println("JustRelease 1.0.2");
+        System.out.println("JustRelease " + BuildInfoProvider.getVersion());
         System.exit(0);
     }
 
     private static void printHelp(Options options) {
         HelpFormatter f = new HelpFormatter();
         System.out.println("");
-        System.out.println("Thanks for using justrelease 1.0.2!");
+        System.out.println("Thanks for using justrelease " + BuildInfoProvider.getVersion() + "!");
         System.out.println("");
         f.printHelp("justrelease <username/repository> <major|minor|patch|X.Y.Z>", options);
         System.exit(0);

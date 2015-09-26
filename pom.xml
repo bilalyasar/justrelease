@@ -7,8 +7,19 @@
     <groupId>com.justrelease</groupId>
     <artifactId>justrelease</artifactId>
     <version>1.0.2-SNAPSHOT</version>
-
+    <properties>
+        <justrelease.version>${project.version}</justrelease.version>
+    </properties>
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
