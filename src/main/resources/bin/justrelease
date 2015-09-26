@@ -1,0 +1,9 @@
+#!/bin/sh
+if which java >/dev/null 2>&1 ; then
+BASEDIR=.
+JARFILE=$(find $BASEDIR -name justrelease-*.jar)
+echo $JARFILE
+java -jar $JARFILE $@
+else
+echo "To run justrelease, you need to install java 7 or higher version.. Thanks.."
+fi

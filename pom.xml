@@ -44,18 +44,6 @@
                 <version>2.5.4</version>
                 <executions>
                     <execution>
-                        <id>create-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>assembly.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>executable-jar</id>
                         <phase>package</phase>
                         <goals>
@@ -71,6 +59,19 @@
                                 </manifest>
                             </archive>
                             <finalName>justrelease-${project.version}</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>create-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>./assembly.xml</descriptor>
+                            </descriptors>
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>
