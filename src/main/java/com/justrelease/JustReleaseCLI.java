@@ -32,7 +32,7 @@ public class JustReleaseCLI {
             System.out.println("Something wrong with your arguments, You can look usage via -help option...");
             System.exit(0);
         }
-        if (options.hasOption("-version")) {
+        if (commandLine.hasOption("v")) {
             printVersion();
         }
         if (args.length < 2) {
