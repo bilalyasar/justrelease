@@ -9,9 +9,13 @@ import junit.framework.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
+
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ReleaseConfigMavenTest {
     static GithubRepo githubRepo;
@@ -19,7 +23,11 @@ public class ReleaseConfigMavenTest {
 
     @BeforeClass
     public static void setup() throws Exception {
-        githubRepo = new GithubRepo("justrelease", "justrelease-sample-maven");
+        githubRepo = mock(GithubRepo.class);
+        when(githubRepo.getBranch()).thenReturn("master");
+        when(githubRepo.getFolderToExecute()).thenReturn(new File("release/test"));
+        when(githubRepo.getLocalDirectory()).thenReturn("release/test");
+        when(githubRepo.getRepoUrl()).thenReturn(String.format("https://github.com/justrelease/justrelease-sample-maven"));
         GitOperations.initializeLocalRepository(githubRepo);
         releaseConfig = new ReleaseConfig(githubRepo, true, null, "patch");
     }

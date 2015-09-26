@@ -8,8 +8,12 @@ import com.justrelease.git.GithubRepo;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
+
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ReleaseConfigNpmTest {
     static GithubRepo githubRepo;
@@ -17,7 +21,11 @@ public class ReleaseConfigNpmTest {
 
     @BeforeClass
     public static void setup() throws Exception {
-        githubRepo = new GithubRepo("justrelease", "justrelease-sample-npm");
+        githubRepo = mock(GithubRepo.class);
+        when(githubRepo.getBranch()).thenReturn("master");
+        when(githubRepo.getFolderToExecute()).thenReturn(new File("release/test"));
+        when(githubRepo.getLocalDirectory()).thenReturn("release/test");
+        when(githubRepo.getRepoUrl()).thenReturn(String.format("https://github.com/justrelease/justrelease-sample-npm"));
         GitOperations.initializeLocalRepository(githubRepo);
         releaseConfig = new ReleaseConfig(githubRepo, true, null, "patch");
     }
@@ -36,7 +44,7 @@ public class ReleaseConfigNpmTest {
 
     @Test
     public void testNextVersion() {
-        assertEquals(releaseConfig.getConfig().getNextVersion(),releaseConfig.getConfig().getReleaseVersion());
+        assertEquals(releaseConfig.getConfig().getNextVersion(), releaseConfig.getConfig().getReleaseVersion());
     }
 
     @Test
