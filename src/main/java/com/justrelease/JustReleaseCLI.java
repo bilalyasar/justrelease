@@ -7,6 +7,7 @@ import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -19,6 +20,9 @@ public class JustReleaseCLI {
         options.addOption("snapshotVersion", true, "version number that will be updated after the release. maven spesific feature");
         options.addOption("dryRun", false, "release without push");
         options.addOption("h", false, "help");
+        options.addOption(OptionBuilder.withLongOpt("version")
+                .withDescription("Print the version of the application")
+                .create('v'));
 
         CommandLineParser parser = new BasicParser();
         CommandLine commandLine = null;
@@ -28,7 +32,9 @@ public class JustReleaseCLI {
             System.out.println("Something wrong with your arguments, You can look usage via -help option...");
             System.exit(0);
         }
-
+        if (options.hasOption("-version")) {
+            printVersion();
+        }
         if (args.length < 2) {
             printHelp(options);
         }
@@ -62,17 +68,22 @@ public class JustReleaseCLI {
             snapshotVersion = commandLine.getOptionValue("snapshotVersion");
         }
 
-        ReleaseConfig releaseConfig = new ReleaseConfig(githubRepo,dryRun,snapshotVersion,releaseType);
+        ReleaseConfig releaseConfig = new ReleaseConfig(githubRepo, dryRun, snapshotVersion, releaseType);
 
         new JustRelease(releaseConfig).release();
 
 
     }
 
+    private static void printVersion() {
+        System.out.println("JustRelease 1.0.2");
+        System.exit(0);
+    }
+
     private static void printHelp(Options options) {
         HelpFormatter f = new HelpFormatter();
         System.out.println("");
-        System.out.println("Thanks for using justrelease x.y.z!");
+        System.out.println("Thanks for using justrelease 1.0.2!");
         System.out.println("");
         f.printHelp("justrelease <username/repository> <major|minor|patch|X.Y.Z>", options);
         System.exit(0);
