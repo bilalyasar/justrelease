@@ -3,6 +3,7 @@
 
 [![Join the chat at https://gitter.im/justrelease/justrelease](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/justrelease/justrelease?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/justrelease/justrelease.svg?branch=master)](https://travis-ci.org/justrelease/justrelease)
 
+[![codecov.io](http://codecov.io/github/justrelease/justrelease/coverage.svg?branch=master)](http://codecov.io/github/justrelease/justrelease?branch=master)
 JustRelease is command line tool to release software libraries hosted on github.com. Justrelease requires no configuration and applies default behavior in each release operation. If you want to customize some of the features offered by justrelease, please include `justrelease.yml` file in your repository.
 
 ##Requirements
@@ -124,4 +125,3 @@ If you want to just observe what will happen when releasing you can use `DryRun`
 In this case, there will be no push or committing. You will see just logs.
 
 sh justrelease.sh username/reponame minor -dryRun
-
