@@ -4,14 +4,7 @@
 [![Join the chat at https://gitter.im/justrelease/justrelease](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/justrelease/justrelease?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/justrelease/justrelease.svg?branch=master)](https://travis-ci.org/justrelease/justrelease)
 [![codecov.io](http://codecov.io/github/justrelease/justrelease/coverage.svg?branch=master)](http://codecov.io/github/justrelease/justrelease?branch=master)
 
-JustRelease is command line tool to release software libraries hosted on github.com. Justrelease requires no configuration and applies default behavior in each release operation. If you want to customize some of the features offered by justrelease, please include `justrelease.yml` file in your repository.
-
-##Requirements
-
-
-- Github Account and Github Repository
-- Git in your local computer
-- `justrelease.yml` for custom configuration
+JustRelease is command line release tool for software libraries hosted on github.com. Justrelease requires no configuration and applies default behavior in each release operation. If you want to customize some of the features offered by justrelease, please include `justrelease.yml` file in your repository.
 
 ##Installation & Quick Example
 
@@ -21,13 +14,17 @@ JustRelease is command line tool to release software libraries hosted on github.
 ##### Default Installation (Works All Operating Systems)
 - Download and unzip [latest zip file](https://github.com/justrelease/justrelease/releases)
 
-##### Configuring Credentials
+## Configuring Credentials
+
 - Generate [Personal Access Token](https://github.com/settings/tokens)
 - Create ~/.github file and set *login* and *oauth* parameters as below
 ```
 login=github_username
 oauth=GITHUB_OAUTH_TOKEN
 ```
+
+##Quick Example
+
 - fork [sample repository](https://github.com/justrelease/justrelease-sample-npm)
 - update releasenotes.md file and commit the change.
 - run `sh justrelease.sh yourusername/justrelease-sample-npm patch`
@@ -55,7 +52,7 @@ usage: justrelease <username/repository> <major|minor|patch|X.Y.Z>
 To configure your release steps you need to create `justrelease.yml` file in your repo.
 If you don't create a `justrelease.yml` file, default configurations will be used.
 
-This is example `justrelease.yml` file:
+This is an example `justrelease.yml` file:
 
 ```
 version.update:
