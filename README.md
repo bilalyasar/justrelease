@@ -6,7 +6,7 @@
 
 JustRelease is command line release tool for software libraries hosted on github.com. Justrelease requires no configuration and applies default behavior in each release operation. If you want to customize some of the features offered by justrelease, please include `justrelease.yml` file in your repository.
 
-##Installation & Quick Example
+##Installation
 
 ##### OSX Installation
 - `brew install justrelease/justrelease/justrelease`
