@@ -36,13 +36,16 @@ oauth=GITHUB_OAUTH_TOKEN
 ##Usage
 
 ```
-$ sh justrelease.sh
+$ justrelease
+
+Thanks for using justrelease 1.0.2!
 
 usage: justrelease <username/repository> <major|minor|patch|X.Y.Z>
  -dryRun                  release without push
- -h                       help
+ -h,--help                nelp
  -snapshotVersion <arg>   version number that will be updated after the
                           release. maven spesific feature
+ -v,--version             Print the version of the application
 ```
 
 
