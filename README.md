@@ -16,7 +16,7 @@ JustRelease is command line tool to release software libraries hosted on github.
 ##Installation & Quick Example
 
 ##### OSX Installation
-- brew install justrelease/justrelease/justrelease
+- `brew install justrelease/justrelease/justrelease`
 
 ##### Default Installation (Works All Operating Systems)
 - Download and unzip [latest zip file](https://github.com/justrelease/justrelease/releases)
