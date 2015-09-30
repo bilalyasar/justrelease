@@ -27,7 +27,7 @@ oauth=GITHUB_OAUTH_TOKEN
 
 - fork [sample repository](https://github.com/justrelease/justrelease-sample-npm)
 - update releasenotes.md file and commit the change.
-- run `sh justrelease.sh yourusername/justrelease-sample-npm patch`
+- run `justrelease yourusername/justrelease-sample-npm patch`
 - check releases page of your forked repository
 
 ##Usage
