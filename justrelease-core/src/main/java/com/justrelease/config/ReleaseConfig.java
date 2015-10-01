@@ -1,5 +1,6 @@
 package com.justrelease.config;
 
+import com.justrelease.JustRelease;
 import com.justrelease.git.GithubRepo;
 
 import java.io.File;
@@ -62,7 +63,7 @@ public class ReleaseConfig {
                 justreleaseConfigIS = new FileInputStream(justreleaseConfigFile);
                 return new NPMProjectConfig(projectConfigurationIS, justreleaseConfigIS, this);
             } else {
-                justreleaseConfigIS = ReleaseConfig.class.getResourceAsStream("/default-npm.yml");
+                justreleaseConfigIS = JustRelease.class.getClassLoader().getResourceAsStream("/default-npm.yml");
                 return new NPMProjectConfig(projectConfigurationIS, justreleaseConfigIS, this);
             }
         }
@@ -77,7 +78,7 @@ public class ReleaseConfig {
                 justreleaseConfigIS = new FileInputStream(justreleaseConfigFile);
                 return new MavenProjectConfig(projectConfigurationIS, justreleaseConfigIS, this);
             } else {
-                justreleaseConfigIS = ReleaseConfig.class.getResourceAsStream("/default-mvn.yml");
+                justreleaseConfigIS = JustRelease.class.getClassLoader().getResourceAsStream("/default-mvn.yml");
                 return new MavenProjectConfig(projectConfigurationIS, justreleaseConfigIS, this);
             }
         }
