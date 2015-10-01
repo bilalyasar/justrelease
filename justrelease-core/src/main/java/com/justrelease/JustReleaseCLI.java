@@ -21,7 +21,7 @@ public class JustReleaseCLI {
         options.addOption("snapshotVersion", true, "version number that will be updated after the release. maven spesific feature");
         options.addOption("dryRun", false, "release without push");
         options.addOption(OptionBuilder.withLongOpt("help")
-                .withDescription("nelp")
+                .withDescription("help")
                 .create('h'));
         options.addOption(OptionBuilder.withLongOpt("version")
                 .withDescription("Print the version of the application")

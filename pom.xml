@@ -6,14 +6,19 @@
 
     <groupId>com.justrelease</groupId>
     <artifactId>justrelease</artifactId>
+    <packaging>pom</packaging>
     <version>1.0.3-SNAPSHOT</version>
+    <modules>
+        <module>justrelease-core</module>
+        <module>justrelease-maven-plugin</module>
+    </modules>
     <properties>
         <justrelease.version>${project.version}</justrelease.version>
     </properties>
     <build>
         <resources>
             <resource>
-                <directory>src/main/resources</directory>
+                <directory>justrelease-core/src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
                     <include>**</include>
@@ -81,7 +86,7 @@
                         </goals>
                         <configuration>
                             <descriptors>
-                                <descriptor>./assembly.xml</descriptor>
+                                <descriptor>justrelease-core/assembly.xml</descriptor>
                             </descriptors>
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
@@ -91,7 +96,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.5.201.0.3-SNAPSHOT41946</version>
+                <version>0.7.4.201502262128</version>
                 <executions>
                     <execution>
                         <goals>
@@ -128,7 +133,7 @@
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
-            <version>3.7.0.201.0.3-SNAPSHOT60915-r</version>
+            <version>3.7.0.201502260915-r</version>
         </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
