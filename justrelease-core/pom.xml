@@ -21,17 +21,17 @@
                 </includes>
             </resource>
         </resources>
-        <plugins>
-            <plugin>
-                <groupId>com.justrelease</groupId>
-                <artifactId>justrelease-maven-plugin</artifactId>
-                <version>1.0.3-SNAPSHOT</version>
-                <executions>
-                    <execution>
-                        <goals><goal>justrelease</goal></goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
+        <!--<plugins>-->
+            <!--<plugin>-->
+                <!--<groupId>com.justrelease</groupId>-->
+                <!--<artifactId>justrelease-maven-plugin</artifactId>-->
+                <!--<version>1.0.3-SNAPSHOT</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<goals><goal>justrelease</goal></goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
+        <!--</plugins>-->
     </build>
 </project>
