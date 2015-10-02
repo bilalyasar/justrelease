@@ -26,11 +26,9 @@
                 <!--<groupId>com.justrelease</groupId>-->
                 <!--<artifactId>justrelease-maven-plugin</artifactId>-->
                 <!--<version>1.0.3-SNAPSHOT</version>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<goals><goal>justrelease</goal></goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
+                <!--<configuration>-->
+                    <!--<github>justrelease/justrelease</github>-->
+                <!--</configuration>-->
             <!--</plugin>-->
         <!--</plugins>-->
     </build>

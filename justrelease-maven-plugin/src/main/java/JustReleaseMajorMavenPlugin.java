@@ -6,19 +6,26 @@ import org.apache.maven.plugin.MojoFailureException;
 /**
  * This goal will say a message.
  *
- * @goal justrelease
+ * @goal major
  */
-public class JustReleaseMavenPlugin extends AbstractMojo {
+public class JustReleaseMajorMavenPlugin extends AbstractMojo {
 
     /**
-     * @parameter expression="${params}"
+     * @parameter expression="${github}"
      */
-    private String url;
+    private String github;
+
+    /**
+     * @parameter expression="${dryRun}"
+     */
+    private String dryRun;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        System.out.println("hello world");
         try {
-            new JustReleaseCLI().main(url.split(" "));
+            if (dryRun.equals("true")) dryRun = "-dryRun";
+            else dryRun = "";
+            new JustReleaseCLI().main(new String[]{github, "major", dryRun});
         } catch (Exception e) {
             e.printStackTrace();
         }
