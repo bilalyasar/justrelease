@@ -11,5 +11,15 @@
 
     <artifactId>justrelease-core</artifactId>
 
-
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
 </project>

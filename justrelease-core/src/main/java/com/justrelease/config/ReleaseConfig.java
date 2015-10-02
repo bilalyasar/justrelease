@@ -63,7 +63,7 @@ public class ReleaseConfig {
                 justreleaseConfigIS = new FileInputStream(justreleaseConfigFile);
                 return new NPMProjectConfig(projectConfigurationIS, justreleaseConfigIS, this);
             } else {
-                justreleaseConfigIS = JustRelease.class.getClassLoader().getResourceAsStream("/default-npm.yml");
+                justreleaseConfigIS = JustRelease.class.getResourceAsStream("../../default-npm.yml");
                 return new NPMProjectConfig(projectConfigurationIS, justreleaseConfigIS, this);
             }
         }
@@ -78,7 +78,7 @@ public class ReleaseConfig {
                 justreleaseConfigIS = new FileInputStream(justreleaseConfigFile);
                 return new MavenProjectConfig(projectConfigurationIS, justreleaseConfigIS, this);
             } else {
-                justreleaseConfigIS = JustRelease.class.getClassLoader().getResourceAsStream("/default-mvn.yml");
+                justreleaseConfigIS = JustRelease.class.getClassLoader().getResourceAsStream("../../default-mvn.yml");
                 return new MavenProjectConfig(projectConfigurationIS, justreleaseConfigIS, this);
             }
         }
