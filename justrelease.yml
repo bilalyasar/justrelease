@@ -2,7 +2,7 @@ version.update:
     - xml
 create.artifacts:
         - mvn clean install
-        - github_changelog_generator
+        - github_changelog_generator  --since-tag v1.1.3
 publish:
         - github:
             - description:CHANGELOG.md
