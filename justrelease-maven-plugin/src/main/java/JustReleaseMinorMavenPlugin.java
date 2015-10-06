@@ -23,6 +23,7 @@ public class JustReleaseMinorMavenPlugin extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
+            if (dryRun == null) dryRun = "";
             if (dryRun.equals("true")) dryRun = "-dryRun";
             else dryRun = "";
             new JustReleaseCLI().main(new String[]{github, "minor", dryRun});
