@@ -30,6 +30,35 @@ JustRelease is command line release tool for software libraries hosted on github
 ##### Default Installation (Works All Operating Systems)
 - Download and unzip [latest zip file](https://github.com/justrelease/justrelease/releases)
 
+## JustRelease Maven Plugin
+
+Add your pom.xml following plugin repository.
+```
+        <pluginRepository>
+            <id>repo</id>
+            <url>https://github.com/justrelease/maven-repository/raw/master</url>
+        </pluginRepository>
+```
+Define JustRelease Plugin as follows:
+
+```
+    <plugin>
+                <groupId>com.justrelease</groupId>
+                <artifactId>justrelease-maven-plugin</artifactId>
+                <version>1.1.3</version>
+                <configuration>
+                    <github>username/reponame</github>
+                </configuration>
+            </plugin>
+```
+
+Run plugin with this command:
+
+`mvn justrelease:goal`
+goal = patch | minor | major
+
+If you want to enable `dryRun` you need to pass `-DdryRun=true` argument.
+
 ## Configuring Credentials
 
 - Generate [Personal Access Token](https://github.com/settings/tokens)
