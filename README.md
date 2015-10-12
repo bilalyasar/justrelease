@@ -42,7 +42,7 @@ Add your pom.xml following plugin repository.
 Define JustRelease Plugin as follows:
 
 ```
-    <plugin>
+            <plugin>
                 <groupId>com.justrelease</groupId>
                 <artifactId>justrelease-maven-plugin</artifactId>
                 <version>1.1.3</version>
@@ -55,6 +55,7 @@ Define JustRelease Plugin as follows:
 Run plugin with this command:
 
 `mvn justrelease:goal`
+
 goal = patch | minor | major
 
 If you want to enable `dryRun` you need to pass `-DdryRun=true` argument.
