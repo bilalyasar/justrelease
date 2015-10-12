@@ -7,6 +7,7 @@ public class GithubRepo {
     private String repository;
     private String repoUrl;
     private String branch;
+    private String latestTag;
     private File folderToExecute;
 
     public GithubRepo(String username, String repository) {
@@ -48,4 +49,14 @@ public class GithubRepo {
     public String getUrl() {
         return String.format("https://github.com/%s/%s",getUsername(),getRepository());
     }
+
+    public String getLatestTag() {
+        return latestTag;
+    }
+
+    public void setLatestTag(String latestTag) {
+        this.latestTag = latestTag;
+    }
+
+
 }

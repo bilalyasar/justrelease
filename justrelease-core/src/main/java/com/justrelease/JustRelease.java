@@ -31,12 +31,13 @@ public class JustRelease {
     public void release() throws Exception {
 
         System.out.println("Starting to Release: " + releaseConfig.getMainRepo().getRepository());
+        latestTag = getLatestTag();
+        releaseConfig.getMainRepo().setLatestTag(latestTag);
 
         replaceVersionsAndCommit(releaseConfig.getConfig().getVersionUpdatePatterns(), releaseConfig.getConfig().getCurrentVersion(),
                 releaseConfig.getConfig().getReleaseVersion(), releaseConfig.getMainRepo().getLocalDirectory());
 
         createArtifacts();
-        getLatestTag();
         commitAndTagVersion();
         if (releaseConfig.getConfig().getNextVersion() != null) {
             replaceVersionsAndCommit(releaseConfig.getConfig().getVersionUpdatePatterns(), releaseConfig.getConfig().getReleaseVersion(),
@@ -93,16 +94,17 @@ public class JustRelease {
 
     }
 
-    public void getLatestTag() throws InterruptedException, IOException {
+    public String getLatestTag() throws InterruptedException, IOException {
         String command = "git describe --tags --abbrev=0";
         Process p = Runtime.getRuntime().exec(command, null, releaseConfig.getMainRepo().getFolderToExecute());
         p.waitFor();
-        latestTag = IOUtils.toString(p.getInputStream()).replaceAll("(\\r|\\n|\\t)", "");
+        return IOUtils.toString(p.getInputStream()).replaceAll("(\\r|\\n|\\t)", "");
     }
 
     private void createArtifacts() {
         System.out.println("Create Artifacts:");
         for (String command : releaseConfig.getConfig().getArtifactCommands()) {
+            command.replaceAll("\\$\\{latest.tag\\}", latestTag);
             runCommand(command);
         }
     }
