@@ -5,7 +5,7 @@
 [![codecov.io](http://codecov.io/github/justrelease/justrelease/coverage.svg?branch=master)](http://codecov.io/github/justrelease/justrelease?branch=master)
 
 - [Installation](#installation)
-  - [OSX Installation](#OSX Installation)
+  - [OSX Installation](#osx-installation)
 
 JustRelease is command line release tool for software libraries hosted on github.com. Justrelease requires no configuration and applies default behavior in each release operation. If you want to customize some of the features offered by justrelease, please include `justrelease.yml` file in your repository.
 
