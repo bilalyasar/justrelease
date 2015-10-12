@@ -7,14 +7,18 @@
 - [Installation](#installation)
   - [OSX Installation](#osx-installation)
   - [Default Installation](#default-installation-works-all-operating-systems)
+- [JustRelease Maven Plugin](#justrelease-maven-plugin) :new:
 - [Configuring Credentials](#configuring-credentials) 
 - [Quick Example](#quick-example)
 - [Usage](#usage)
 - [Advanced Configuration](#advanced-configuration)
-- [Version Update](#version-update)
-- [Create Artifacts](#create-artifacts)
-- [Publish](#publish)
-
+  - [Version Update](#version-update)
+  - [Create Artifacts](#create-artifacts)
+  - [Publish](#publish)
+- [How to Use JustRelease Library](#how-to-use-justrelease-library)
+  - [Most Simple Usage](#most-simple-usage)
+  - [Giving Release Type](#giving-release-type)
+  - [DryRun Config](#dryrun-config)
 
 JustRelease is command line release tool for software libraries hosted on github.com. Justrelease requires no configuration and applies default behavior in each release operation. If you want to customize some of the features offered by justrelease, please include `justrelease.yml` file in your repository.
 
