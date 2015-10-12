@@ -6,6 +6,15 @@
 
 - [Installation](#installation)
   - [OSX Installation](#osx-installation)
+  - [Default Installation](#default-installation-works-all-operating-systems)
+- [Configuring Credentials](#configuring-credentials) 
+- [Quick Example](#quick-example)
+- [Usage](#usage)
+- [Advanced Configuration](#advanced-configuration)
+- [Version Update](#version-update)
+- [Create Artifacts](#create-artifacts)
+- [Publish](#publish)
+
 
 JustRelease is command line release tool for software libraries hosted on github.com. Justrelease requires no configuration and applies default behavior in each release operation. If you want to customize some of the features offered by justrelease, please include `justrelease.yml` file in your repository.
 
