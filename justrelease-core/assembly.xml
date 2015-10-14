@@ -1,6 +1,6 @@
-<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.4-SNAPSHOT" 
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.4" 
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.4-SNAPSHOT http://maven.apache.org/xsd/assembly-1.1.4-SNAPSHOT.xsd">
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.4 http://maven.apache.org/xsd/assembly-1.1.4.xsd">
   <!-- TODO: a jarjar format would be better -->
   <id>last-step</id>
     <formats>
