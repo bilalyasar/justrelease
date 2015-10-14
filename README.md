@@ -16,10 +16,12 @@
   - [Create Artifacts](#create-artifacts)
   - [Publish](#publish)
   - [Project Variables](#project-variables)
+  - [Release Notes Generator](#release-notes-generator)
 - [How to Use JustRelease Library](#how-to-use-justrelease-library)
   - [Most Simple Usage](#most-simple-usage)
   - [Giving Release Type](#giving-release-type)
   - [DryRun Config](#dryrun-config)
+
 
 JustRelease is command line release tool for software libraries hosted on github.com. Justrelease requires no configuration and applies default behavior in each release operation. If you want to customize some of the features offered by justrelease, please include `justrelease.yml` file in your repository.
 
@@ -161,6 +163,32 @@ So, JustRelease automatically change those variables with corresponding values.
 This is an example:
 
 ` - attachment:target/justrelease-${version}.zip`
+
+###Release Notes Generator
+
+JustRelease can update your Github Release Page according to your change log file..
+You can specify change log file as:
+```
+publish:
+        - github:
+            - description=releasenotes.md
+```
+If you don't specify this file, JustRelease automatically collects all commit messages from the latest tag and generates change log file.
+
+Also you can use third party tools for generating change log file.
+See this example:
+```
+create.artifacts:
+        - github_changelog_generator  --since-tag v1.1.3
+publish:
+        - github:
+            - description:CHANGELOG.md
+```
+We are creating `CHANGELOG.md` file at `create.artifacts` step then use that file in `github` step.
+
+Note: Github Changelog Generator is a good open source project you can find here: 
+
+https://github.com/skywinder/github-changelog-generator
 
 ##How to Use JustRelease Library
 
