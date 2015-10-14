@@ -104,7 +104,7 @@ public class JustRelease {
     private void createArtifacts() {
         System.out.println("Create Artifacts:");
         for (String command : releaseConfig.getConfig().getArtifactCommands()) {
-            command.replaceAll("\\$\\{latest\\.tag\\}", latestTag);
+            command = command.replaceAll("\\$\\{latest\\.tag\\}", latestTag);
             runCommand(command);
         }
     }
