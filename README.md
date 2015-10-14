@@ -15,6 +15,7 @@
   - [Version Update](#version-update)
   - [Create Artifacts](#create-artifacts)
   - [Publish](#publish)
+  - [Project Variables](#project-variables)
 - [How to Use JustRelease Library](#how-to-use-justrelease-library)
   - [Most Simple Usage](#most-simple-usage)
   - [Giving Release Type](#giving-release-type)
@@ -150,6 +151,16 @@ publish:
             - description=releasenotes.md
             - attachment=lib/index.js
 ```
+
+###Project Variables
+
+In the commands, you can use some variables. They are `${latest.tag}` and `${version}`
+
+So, JustRelease automatically change those variables with corresponding values.
+
+This is an example:
+
+` - attachment:target/justrelease-${version}.zip`
 
 ##How to Use JustRelease Library
 
