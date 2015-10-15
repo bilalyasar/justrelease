@@ -4,13 +4,21 @@
 [![Join the chat at https://gitter.im/justrelease/justrelease](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/justrelease/justrelease?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/justrelease/justrelease.svg?branch=master)](https://travis-ci.org/justrelease/justrelease)
 [![codecov.io](http://codecov.io/github/justrelease/justrelease/coverage.svg?branch=master)](http://codecov.io/github/justrelease/justrelease?branch=master)
 
-- [Installation](#installation)
-  - [OSX Installation](#osx-installation)
-  - [Default Installation](#default-installation-works-all-operating-systems)
-- [JustRelease Maven Plugin](#justrelease-maven-plugin) :new:
+JustRelease is a set of release tools for software libraries hosted on github.com. Using JustRelease, you can get rid of release scripts and automate release processes. [All Release Steps](#justrelease-release-steps) will be executed with one simple action.
+
+Justrelease requires no configuration and applies default behavior in each release step. If you want to customize some of the features offered by justrelease, please include `justrelease.yml` file in your repository.
+
 - [Configuring Credentials](#configuring-credentials) 
-- [Quick Example](#quick-example)
-- [Usage](#usage)
+- [JustRelease CLI](#justrelease-cli)
+  - [Installation](#homebrew)
+    - [OS X-Homebrew](#homebrew)
+    - [All Operating Systems](#all-operating-systems)
+  - [Quick Example](#quick-example)
+  - [Usage](#usage)
+- [JustRelease Maven Plugin](#justrelease-maven-plugin) :new:
+  - [Plugin Configuration](#plugin-configuration)
+  - [Usage](#usage)
+  - [Options](#options)
 - [Advanced Configuration](#advanced-configuration)
   - [Version Update](#version-update)
   - [Create Artifacts](#create-artifacts)
@@ -23,17 +31,51 @@
   - [DryRun Config](#dryrun-config)
 
 
-JustRelease is command line release tool for software libraries hosted on github.com. Justrelease requires no configuration and applies default behavior in each release operation. If you want to customize some of the features offered by justrelease, please include `justrelease.yml` file in your repository.
+## Configuring Credentials
 
-##Installation
+- Generate [Personal Access Token](https://github.com/settings/tokens)
+- Create ~/.github file and set *login* and *oauth* parameters as below
+```
+login=github_username
+oauth=GITHUB_OAUTH_TOKEN
+```
 
-##### OSX Installation
+##JustRelease CLI
+
+#### Installation
+
+##### Homebrew
 - `brew install justrelease/justrelease/justrelease`
 
-##### Default Installation (Works All Operating Systems)
+##### All Operating Systems
 - Download and unzip [latest zip file](https://github.com/justrelease/justrelease/releases)
 
+####Quick Example
+
+- fork [sample repository](https://github.com/justrelease/justrelease-sample-npm)
+- update releasenotes.md file and commit the change.
+- run `justrelease yourusername/justrelease-sample-npm patch`
+- check releases page of your forked repository
+
+####Usage
+
+```
+$ justrelease
+
+Thanks for using justrelease 1.0.2!
+
+usage: justrelease <username/repository> <major|minor|patch|X.Y.Z>
+ -dryRun                  release without push
+ -h,--help                nelp
+ -snapshotVersion <arg>   version number that will be updated after the
+                          release. maven spesific feature
+ -v,--version             Print the version of the application
+```
+
+
 ## JustRelease Maven Plugin
+
+### Plugin Configuration
 
 Add your pom.xml following plugin repository.
 ```
@@ -54,52 +96,31 @@ Define JustRelease Plugin as follows:
                 </configuration>
             </plugin>
 ```
+### Usage
 
-Run plugin with this command:
+Based on release type, you can use following maven goals to perform release operation
 
-`mvn justrelease:goal`
+- mvn justrelease:patch
+- mvn justrelease:minor
+- mvn justrelease:major
 
-goal = patch | minor | major
+### Options
 
 If you want to enable `dryRun` you need to pass `-DdryRun=true` argument.
 
-## Configuring Credentials
+## JustRelease Release Steps
 
-- Generate [Personal Access Token](https://github.com/settings/tokens)
-- Create ~/.github file and set *login* and *oauth* parameters as below
-```
-login=github_username
-oauth=GITHUB_OAUTH_TOKEN
-```
+Those are steps executed during each release:
 
-##Quick Example
-
-- fork [sample repository](https://github.com/justrelease/justrelease-sample-npm)
-- update releasenotes.md file and commit the change.
-- run `justrelease yourusername/justrelease-sample-npm patch`
-- check releases page of your forked repository
-
-##Usage
-
-```
-$ justrelease
-
-Thanks for using justrelease 1.0.2!
-
-usage: justrelease <username/repository> <major|minor|patch|X.Y.Z>
- -dryRun                  release without push
- -h,--help                nelp
- -snapshotVersion <arg>   version number that will be updated after the
-                          release. maven spesific feature
- -v,--version             Print the version of the application
-```
+- Updating release versions
+- creating artifacts such as software library,bundled distributions(zip,tar.gz),creating documentation,generating release notes
+- publishing artifacts like creating Github Release page,uploading artifacts to some servers
+- finalizing release by committing and pushing changes
 
 
+## justrelease.yml Configuration
 
-## Advanced Configuration
-
-To configure your release steps you need to create `justrelease.yml` file in your repo.
-If you don't create a `justrelease.yml` file, default configurations will be used.
+The first step to use justrelease as your release tool is to create `justrelease.yml` file in your github repository. That is optional and if you don't configure `justrelease.yml` in your repository, [default configurations](#default-justrelease-configurations) will be used based on your build system.
 
 This is an example `justrelease.yml` file:
 
@@ -114,8 +135,7 @@ publish:
             - attachment:target/justrelease-${version}.jar
 ```
 
-
-###Version Update
+###version.update configuration
 
 You need to give file extensions as a config. If you don't provide this step, we automatically detect your project type
 and use default configurations. Currently we are supporting maven and npm type projects.
@@ -127,7 +147,7 @@ version.update:
     - json,js
 ```
 
-###Create Artifacts
+###create.artifacts configuration
 
 In this step, you need to provide commands that create artifacts in your project. If you don't provide this configuration,
 we will use default config according to your project. ( i.e.: For maven `mvn clean install` )
@@ -140,7 +160,7 @@ create.artifacts:
         - npm test
 ```
 
-###Publish
+###publish configuration
 
 In this step you need to provide publish configuration. Currently we are supporting `github` publish.
 
@@ -190,23 +210,17 @@ Note: Github Changelog Generator is a good open source project you can find here
 
 https://github.com/skywinder/github-changelog-generator
 
-##How to Use JustRelease Library
+##Default JustRelease Configurations
 
-###Most Simple Usage:
+JustRelease is compatible with all github projects if only `justrelease.yml` is provided in the root directory. Otherwise, following build tools are supported with default configurations.
 
-sh justrelease.sh username/reponame
-
-In this usage we detect your project type, update the version ( we assume it is patch release).
-
-
-###Giving Release Type
-
-sh justrelease.sh username/reponame (major | minor | patch )
+  - [maven](https://github.com/justrelease/justrelease/blob/master/justrelease-core/src/main/resources/default-mvn.yml)
+  - [npm](https://github.com/justrelease/justrelease/blob/master/justrelease-core/src/main/resources/default-npm.yml)
 
 
-###DryRun Config
 
-If you want to just observe what will happen when releasing you can use `DryRun` config.
-In this case, there will be no push or committing. You will see just logs.
 
-sh justrelease.sh username/reponame minor -dryRun
+
+
+
+
