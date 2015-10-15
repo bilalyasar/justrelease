@@ -25,11 +25,7 @@ Justrelease requires no configuration and applies default behavior in each relea
   - [Publish](#publish)
   - [Project Variables](#project-variables)
   - [Release Notes Generator](#release-notes-generator)
-- [How to Use JustRelease Library](#how-to-use-justrelease-library)
-  - [Most Simple Usage](#most-simple-usage)
-  - [Giving Release Type](#giving-release-type)
-  - [DryRun Config](#dryrun-config)
-
+- [Developers](#developers)
 
 ## Configuring Credentials
 
@@ -216,6 +212,12 @@ JustRelease is compatible with all github projects if only `justrelease.yml` is 
 
   - [maven](https://github.com/justrelease/justrelease/blob/master/justrelease-core/src/main/resources/default-mvn.yml)
   - [npm](https://github.com/justrelease/justrelease/blob/master/justrelease-core/src/main/resources/default-npm.yml)
+  
+##Developers
+
+- [Bilal Yasar](https://twitter.com/bilalyasar_)
+- [Mesut Celik](https://twitter.com/mesutcelik)
+
 
 
 
