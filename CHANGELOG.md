@@ -2,10 +2,11 @@
 
 ## [Unreleased](https://github.com/justrelease/justrelease/tree/HEAD)
 
-[Full Changelog](https://github.com/justrelease/justrelease/compare/v1.1.3...HEAD)
+[Full Changelog](https://github.com/justrelease/justrelease/compare/v1.1.4...HEAD)
 
 **Closed issues:**
 
+- Code quality improvement tips [\#3](https://github.com/justrelease/justrelease/issues/3)
 - convert logging messages to system.out [\#1](https://github.com/justrelease/justrelease/issues/1)
 
 **Merged pull requests:**
