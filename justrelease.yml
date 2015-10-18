@@ -6,4 +6,4 @@ create.artifacts:
 publish:
         - github:
             - description:CHANGELOG.md
-            - attachment:target/justrelease-${version}.zip
+            - attachment:justrelease-core/target/justrelease-core-${version}.zip
