@@ -2,7 +2,7 @@
 
 ## [Unreleased](https://github.com/justrelease/justrelease/tree/HEAD)
 
-[Full Changelog](https://github.com/justrelease/justrelease/compare/v1.1.5...HEAD)
+[Full Changelog](https://github.com/justrelease/justrelease/compare/v1.1.6...HEAD)
 
 **Closed issues:**
 
