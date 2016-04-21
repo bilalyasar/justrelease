@@ -12,6 +12,8 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import static com.justrelease.config.ConfigHelper.checkReleaseType;
+
 public class JustReleaseCLI {
 
     public static void main(String[] args) throws Exception {
@@ -55,7 +57,7 @@ public class JustReleaseCLI {
         String username = tokens[0];
         String reponame = tokens[1];
         String releaseType = args[1];
-
+        checkReleaseType(releaseType, options);
         GithubRepo githubRepo = new GithubRepo(username, reponame);
         GitOperations.initializeLocalRepository(githubRepo);
 
@@ -83,7 +85,7 @@ public class JustReleaseCLI {
         System.exit(0);
     }
 
-    private static void printHelp(Options options) {
+    public static void printHelp(Options options) {
         HelpFormatter f = new HelpFormatter();
         System.out.println("");
         System.out.println("Thanks for using justrelease " + BuildInfoProvider.getVersion() + "!");

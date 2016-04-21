@@ -74,7 +74,7 @@ public class JustRelease {
             Desktop.getDesktop().browse(new URI(uri));
         }
     }
-    
+
     private void replaceVersionsAndCommit(List<String> configs, String oldVersion, String newVersion, String localDirectory) throws IOException, GitAPIException {
         for (String regex : configs) {
             System.out.println("Updating " + regex +

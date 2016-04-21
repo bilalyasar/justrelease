@@ -28,7 +28,7 @@ public abstract class AbstractProjectConfig {
 
     private Yaml yaml = new Yaml();
 
-    public AbstractProjectConfig(InputStream projectConfigurationIS, InputStream justreleaseConfigIS,ReleaseConfig releaseConfig) throws Exception {
+    public AbstractProjectConfig(InputStream projectConfigurationIS, InputStream justreleaseConfigIS, ReleaseConfig releaseConfig) throws Exception {
         this.projectConfigurationIS = projectConfigurationIS;
         this.justreleaseConfigIS = justreleaseConfigIS;
         this.releaseConfig = releaseConfig;
@@ -74,7 +74,7 @@ public abstract class AbstractProjectConfig {
                     if (command.startsWith("description"))
                         this.description = command.split(":")[1].replaceAll("\\$\\{version\\}", this.releaseVersion);
                     if (command.startsWith("attachment"))
-                        this.attachment = command.split(":")[1].replaceAll("\\$\\{version\\}",this.releaseVersion);
+                        this.attachment = command.split(":")[1].replaceAll("\\$\\{version\\}", this.releaseVersion);
                 }
 
             }
@@ -93,7 +93,6 @@ public abstract class AbstractProjectConfig {
         } else if (releaseType.equals("patch")) {
             this.releaseVersion = builder.build().incrementPatchVersion().getNormalVersion();
         } else {
-            //TODO - check if format of release type match X.Y.Z
             this.releaseVersion = releaseType;
         }
 
@@ -147,5 +146,6 @@ public abstract class AbstractProjectConfig {
     }
 
     protected abstract void readCurrentVersion();
+
     protected abstract void setNextVersion();
 }
