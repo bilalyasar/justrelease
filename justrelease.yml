@@ -1,5 +1,5 @@
 version.update:
-    - xml
+    - "*.xml"
 create.artifacts:
         - mvn clean install
         - github_changelog_generator  --since-tag ${latest.tag}
