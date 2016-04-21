@@ -9,13 +9,14 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
-import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 
 public class JustRelease {
@@ -74,15 +75,26 @@ public class JustRelease {
         }
     }
 
+    public static File[] listFilesMatching(File root, String regex) {
+        if (!root.isDirectory()) {
+            throw new IllegalArgumentException(root + " is no directory.");
+        }
+        final Pattern p = Pattern.compile(regex); // careful: could also throw an exception!
+        return root.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                return p.matcher(file.getName()).matches();
+            }
+        });
+    }
 
     private void replaceVersionsAndCommit(List<String> configs, String oldVersion, String newVersion, String localDirectory) throws IOException, GitAPIException {
         for (String regex : configs) {
             System.out.println("Updating " + regex +
                     " extensions from " + oldVersion + " to " + newVersion);
-            Iterator it = FileUtils.iterateFiles(new File(localDirectory),
-                    regex.split(","), true);
-            while (it.hasNext()) {
-                File f = (File) it.next();
+            File[] files = listFilesMatching(new File(localDirectory),
+                    regex);
+            for (File f : files) {
                 if (f.getAbsolutePath().contains(".git")) continue;
                 if (f.isHidden() || f.isDirectory()) continue;
                 String content = FileUtils.readFileToString(f);
