@@ -4,19 +4,19 @@ import com.justrelease.config.ReleaseConfig;
 import com.justrelease.git.GitOperations;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Pattern;
 
 
 public class JustRelease {
@@ -74,27 +74,16 @@ public class JustRelease {
             Desktop.getDesktop().browse(new URI(uri));
         }
     }
-
-    public static File[] listFilesMatching(File root, String regex) {
-        if (!root.isDirectory()) {
-            throw new IllegalArgumentException(root + " is no directory.");
-        }
-        final Pattern p = Pattern.compile(regex); // careful: could also throw an exception!
-        return root.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return p.matcher(file.getName()).matches();
-            }
-        });
-    }
-
+    
     private void replaceVersionsAndCommit(List<String> configs, String oldVersion, String newVersion, String localDirectory) throws IOException, GitAPIException {
         for (String regex : configs) {
             System.out.println("Updating " + regex +
                     " extensions from " + oldVersion + " to " + newVersion);
-            File[] files = listFilesMatching(new File(localDirectory),
-                    regex);
-            for (File f : files) {
+            Iterator iterator = FileUtils.iterateFiles(new File(localDirectory),
+                    new WildcardFileFilter(regex),
+                    new WildcardFileFilter("*"));
+            while (iterator.hasNext()) {
+                File f = (File) iterator.next();
                 if (f.getAbsolutePath().contains(".git")) continue;
                 if (f.isHidden() || f.isDirectory()) continue;
                 String content = FileUtils.readFileToString(f);
